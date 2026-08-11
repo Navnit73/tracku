@@ -6,11 +6,35 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
-import { Settings as SettingsIcon, Globe, User, LogOut, ShieldCheck } from "lucide-react";
+import { deleteUserAccountAndData } from "@/app/actions/user";
+import { showToast, confirmDialog } from "@/lib/toast";
+import { Settings as SettingsIcon, Globe, User, LogOut, ShieldCheck, Trash2, AlertTriangle } from "lucide-react";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
   const [currency, setCurrency] = useState("USD");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    const confirmed = await confirmDialog({
+      title: "PERMANENTLY DELETE ACCOUNT & ALL DATA?",
+      text: "This action CANNOT be undone. All your personal records, income, expenses, investments, and custom categories will be permanently purged from the database.",
+      confirmText: "Yes, Delete Everything",
+    });
+
+    if (confirmed) {
+      setIsDeleting(true);
+      const res = await deleteUserAccountAndData();
+      setIsDeleting(false);
+
+      if (res.success) {
+        showToast.success("Account & Data Purged", res.message || "Your account has been deleted.");
+        signOut({ callbackUrl: "/auth/signin" });
+      } else {
+        showToast.error("Deletion Failed", res.error);
+      }
+    }
+  };
 
   return (
     <AppShell title="Settings & Preferences">
@@ -109,6 +133,34 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="text-xs text-[#615d59] dark:text-[#9b9b9b] leading-relaxed">
             Your transactions and custom categories are associated directly with your Google user ID in MongoDB Atlas. No other user can read or modify your financial data.
+          </CardContent>
+        </Card>
+
+        {/* Danger Zone: Account & Data Erasure */}
+        <Card className="p-4 sm:p-6 border-[#e11d48]/40 dark:border-[#e11d48]/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-[#e11d48]">
+              <AlertTriangle className="w-4 h-4 text-[#e11d48]" />
+              Danger Zone: Account & Data Erasure (GDPR)
+            </CardTitle>
+            <CardDescription>
+              Permanently delete your profile, transactions, and categories from MongoDB
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="text-xs text-[#615d59] dark:text-[#9b9b9b] max-w-xl">
+              Purges all personal records, income/expense ledgers, investment portfolio data, and custom category structures. This action is immediate and permanent.
+            </div>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={handleDeleteAccount}
+              isLoading={isDeleting}
+              leftIcon={<Trash2 className="w-4 h-4" />}
+              className="w-full sm:w-auto shrink-0"
+            >
+              Delete Account & All Data
+            </Button>
           </CardContent>
         </Card>
       </div>

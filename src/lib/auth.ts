@@ -32,7 +32,7 @@ export const authOptions: NextAuthOptions = {
           token.sub = dbUser._id.toString();
           token.currency = dbUser.currency || "USD";
         } catch (err) {
-          console.error("Error linking Google user to MongoDB:", err);
+          console.error("[REDACTED Auth Error]", err instanceof Error ? err.message : "Authentication processing error");
         }
       }
       return token;
@@ -48,7 +48,7 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET || "default_secret_finance_track_key",
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/auth/signin",
     error: "/auth/signin",

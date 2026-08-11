@@ -109,7 +109,7 @@ export async function getTransactions(filters: TransactionFilterInput) {
       },
     };
   } catch (error: any) {
-    console.error("getTransactions error:", error);
+    console.error("[REDACTED Transactions Error]", error instanceof Error ? error.message : "Failed to fetch transactions");
     return {
       success: false,
       error: error.message || "Failed to fetch transactions",
@@ -149,7 +149,7 @@ export async function createTransaction(input: TransactionInput) {
       },
     };
   } catch (error: any) {
-    console.error("createTransaction error:", error);
+    console.error("[REDACTED Transactions Error]", error instanceof Error ? error.message : "Failed to create transaction");
     return { success: false, error: error.message || "Failed to create transaction" };
   }
 }
@@ -417,7 +417,7 @@ export async function seedSampleTransactions() {
 
     return { success: true, count: docs.length };
   } catch (error: any) {
-    console.error("seedSampleTransactions error:", error);
+    console.error("[REDACTED Transactions Error]", error instanceof Error ? error.message : "Failed to seed transactions");
     return { success: false, error: error.message };
   }
 }

@@ -32,7 +32,7 @@ export async function getCategories(typeFilter?: string) {
       })),
     };
   } catch (error: any) {
-    console.error("getCategories error:", error);
+    console.error("[REDACTED Categories Error]", error instanceof Error ? error.message : "Failed to fetch categories");
     return { success: false, error: error.message || "Failed to fetch categories" };
   }
 }
@@ -70,7 +70,7 @@ export async function createCategory(input: CategoryInput) {
       },
     };
   } catch (error: any) {
-    console.error("createCategory error:", error);
+    console.error("[REDACTED Categories Error]", error instanceof Error ? error.message : "Failed to create category");
     return { success: false, error: error.message || "Failed to create category" };
   }
 }

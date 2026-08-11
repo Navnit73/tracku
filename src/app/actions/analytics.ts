@@ -192,10 +192,10 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
       recentTransactions,
     };
   } catch (error: any) {
-    console.error("getDashboardAnalytics error:", error);
+    console.error("[REDACTED Analytics Error]", error instanceof Error ? error.message : "Failed to calculate analytics");
     return {
       success: false,
-      error: error.message || "Failed to calculate analytics",
+      error: error?.message || "Failed to calculate analytics",
     };
   }
 }

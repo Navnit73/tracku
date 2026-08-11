@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 export async function middleware(req: NextRequest) {
   const token = await getToken({
     req,
-    secret: process.env.NEXTAUTH_SECRET || "default_secret_finance_track_key",
+    secret: process.env.NEXTAUTH_SECRET,
   });
   const { pathname } = req.nextUrl;
 

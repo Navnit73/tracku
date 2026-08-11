@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/finance_tracker";
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
   throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
@@ -32,7 +32,7 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
       bufferCommands: false,
     };
 
-    cached!.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
+    cached!.promise = mongoose.connect(MONGODB_URI!, opts).then((mongooseInstance) => {
       return mongooseInstance;
     });
   }
