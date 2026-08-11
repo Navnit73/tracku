@@ -6,23 +6,6 @@ import { requireAuthUser } from "@/lib/auth";
 import { categorySchema, CategoryInput } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 
-const DEFAULT_CATEGORIES = [
-  { name: "Salary", type: "Income", icon: "Banknote", color: "#10b981" },
-  { name: "Freelance", type: "Income", icon: "Laptop", color: "#06b6d4" },
-  { name: "Food & Dining", type: "Expense", icon: "Utensils", color: "#f59e0b" },
-  { name: "Shopping", type: "Expense", icon: "ShoppingBag", color: "#ec4899" },
-  { name: "Transport", type: "Expense", icon: "Car", color: "#3b82f6" },
-  { name: "Rent & Housing", type: "Expense", icon: "Home", color: "#8b5cf6" },
-  { name: "Bills & Utilities", type: "Expense", icon: "Zap", color: "#ef4444" },
-  { name: "Entertainment", type: "Expense", icon: "Film", color: "#6366f1" },
-  { name: "Stocks & Equities", type: "Investment", icon: "TrendingUp", color: "#10b981" },
-  { name: "Mutual Funds", type: "Investment", icon: "PieChart", color: "#8b5cf6" },
-  { name: "Gold & Precious Metals", type: "Investment", icon: "Coins", color: "#eab308" },
-  { name: "Crypto", type: "Investment", icon: "Bitcoin", color: "#f97316" },
-  { name: "Fixed Deposit (FD)", type: "Investment", icon: "ShieldCheck", color: "#14b8a6" },
-  { name: "Other", type: "Expense", icon: "Tag", color: "#64748b" },
-];
-
 export async function getCategories(typeFilter?: string) {
   try {
     const user = await requireAuthUser();
@@ -150,5 +133,22 @@ export async function deleteCategory(id: string) {
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to delete category" };
+  }
+}
+
+export async function clearAllCategories() {
+  try {
+    const user = await requireAuthUser();
+    await connectToDatabase();
+
+    await Category.deleteMany({ userId: user.id });
+
+    revalidatePath("/categories");
+    revalidatePath("/transactions");
+    revalidatePath("/");
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to clear categories" };
   }
 }

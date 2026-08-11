@@ -2,16 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { CategoryModal } from "@/components/categories/CategoryModal";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { getCategories, deleteCategory } from "@/app/actions/categories";
+import { getCategories, deleteCategory, clearAllCategories } from "@/app/actions/categories";
 import { showToast, confirmDialog } from "@/lib/toast";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
-import { Tag, Plus, Edit2, Trash2, Layers } from "lucide-react";
+import { Tag, Plus, Edit2, Trash2, Trash } from "lucide-react";
 
 export default function CategoriesPage() {
   const [activeType, setActiveType] = useState<string>("All");
@@ -59,6 +59,24 @@ export default function CategoriesPage() {
     }
   };
 
+  const handleClearAll = async () => {
+    const confirmed = await confirmDialog({
+      title: "Delete ALL Categories?",
+      text: "This will remove all existing categories from your database so you can add your custom categories from scratch.",
+      confirmText: "Delete All Categories",
+    });
+
+    if (confirmed) {
+      const res = await clearAllCategories();
+      if (res.success) {
+        showToast.success("Categories Cleared", "All existing categories removed.");
+        fetchCategoryData();
+      } else {
+        showToast.error("Clear Failed", res.error);
+      }
+    }
+  };
+
   return (
     <AppShell title="Custom Categories">
       <div className="flex flex-col gap-6">
@@ -66,23 +84,35 @@ export default function CategoriesPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#ffffff] dark:bg-[#202020] p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
           <div>
             <h2 className="text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
-              Custom Classification Engine
+              Custom Categories
             </h2>
             <p className="text-xs text-[#615d59] dark:text-[#9b9b9b] mt-0.5">
-              Organize transactions into personalized categories with custom color tokens
+              Create your own custom categories for Expense, Income & Investment transactions
             </p>
           </div>
 
-          <Button
-            size="sm"
-            onClick={() => {
-              setSelectedCategory(null);
-              setIsModalOpen(true);
-            }}
-            leftIcon={<Plus className="w-4 h-4" />}
-          >
-            Create Category
-          </Button>
+          <div className="flex items-center gap-2">
+            {categories.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleClearAll}
+                leftIcon={<Trash className="w-4 h-4 text-[#e11d48]" />}
+              >
+                Clear All
+              </Button>
+            )}
+            <Button
+              size="sm"
+              onClick={() => {
+                setSelectedCategory(null);
+                setIsModalOpen(true);
+              }}
+              leftIcon={<Plus className="w-4 h-4" />}
+            >
+              Create Category
+            </Button>
+          </div>
         </div>
 
         {/* Category Type Filter Bar */}
@@ -162,9 +192,9 @@ export default function CategoriesPage() {
           </div>
         ) : (
           <EmptyState
-            title="No Categories Found"
-            description="Create custom categories to organize your financial transactions."
-            actionLabel="Add Category"
+            title="No Categories Yet"
+            description="You have no categories created. Click 'Create Category' to add your custom categories."
+            actionLabel="Create Category"
             onAction={() => {
               setSelectedCategory(null);
               setIsModalOpen(true);
