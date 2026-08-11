@@ -5,14 +5,17 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { Navbar } from "./Navbar";
+import { BottomNav } from "./BottomNav";
 import { Loader2, Wallet } from "lucide-react";
 
 export function AppShell({
   children,
   title,
+  onOpenNewTransaction,
 }: {
   children: ReactNode;
   title?: string;
+  onOpenNewTransaction?: () => void;
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -43,17 +46,23 @@ export function AppShell({
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f5f4] dark:bg-[#191919] text-[#171717] dark:text-[#f7f7f7] flex">
+    <div className="min-h-screen bg-[#f6f5f4] dark:bg-[#191919] text-[#171717] dark:text-[#f7f7f7] flex relative">
       {/* Sidebar */}
       <Sidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
       {/* Main Content Workspace */}
       <div className="flex-1 flex flex-col lg:pl-64 min-w-0">
         <Navbar onOpenMobileMenu={() => setMobileOpen(true)} title={title} />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-3.5 sm:p-6 lg:p-8 pb-24 lg:pb-8 max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <BottomNav
+        onOpenSidebar={() => setMobileOpen(true)}
+        onOpenNewTransaction={onOpenNewTransaction}
+      />
     </div>
   );
 }

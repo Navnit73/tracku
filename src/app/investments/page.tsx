@@ -51,12 +51,15 @@ export default function InvestmentsPage() {
   }, [fetchData]);
 
   return (
-    <AppShell title="Investments Portfolio">
-      <div className="flex flex-col gap-6">
+    <AppShell
+      title="Investments Portfolio"
+      onOpenNewTransaction={() => setIsModalOpen(true)}
+    >
+      <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#ffffff] dark:bg-[#202020] p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-[#ffffff] dark:bg-[#202020] p-3.5 sm:p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
           <div>
-            <h2 className="text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
               Asset Allocation & Wealth Accumulation
             </h2>
             <p className="text-xs text-[#615d59] dark:text-[#9b9b9b] mt-0.5">
@@ -64,7 +67,7 @@ export default function InvestmentsPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <DatePicker
               selectedPreset={datePreset}
               startDate={customStart}
@@ -79,6 +82,7 @@ export default function InvestmentsPage() {
               size="sm"
               onClick={() => setIsModalOpen(true)}
               leftIcon={<Plus className="w-4 h-4" />}
+              className="w-full sm:w-auto"
             >
               Add Investment
             </Button>
@@ -87,15 +91,15 @@ export default function InvestmentsPage() {
 
         {/* Portfolio Summary Cards */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card variant="hero">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <Card variant="hero" className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-purple-200">
                   Total Portfolio Invested
@@ -104,7 +108,7 @@ export default function InvestmentsPage() {
                   <LineChart className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold tracking-tight">
+              <div className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                 {formatCurrency(analytics?.totalInvested || 0)}
               </div>
               <div className="mt-2 text-xs text-purple-200 border-t border-white/10 pt-2 flex justify-between">
@@ -113,58 +117,58 @@ export default function InvestmentsPage() {
               </div>
             </Card>
 
-            <Card>
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Largest Allocation
                 </span>
-                <div className="p-2 rounded-lg bg-[#f5f3ff] text-[#7c3aed]">
+                <div className="p-2 rounded-lg bg-[#f5f3ff] dark:bg-[#2e1a47] text-[#7c3aed]">
                   <Coins className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-[#7c3aed]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#7c3aed]">
                 {formatCurrency(analytics?.largestInvestment || 0)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59] truncate">
+              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b] truncate">
                 Asset: <strong>{analytics?.largestInvestmentItem || "N/A"}</strong>
               </div>
             </Card>
 
-            <Card>
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Average Allocation
                 </span>
                 <Badge variant="investment" size="sm">
                   DCA Avg
                 </Badge>
               </div>
-              <div className="text-2xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
                 {formatCurrency(analytics?.averageInvestment || 0)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59]">Per deposit metric</div>
+              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b]">Per deposit metric</div>
             </Card>
 
-            <Card>
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Asset Types
                 </span>
-                <div className="p-2 rounded-lg bg-[#ecfdf5] text-[#059669]">
+                <div className="p-2 rounded-lg bg-[#ecfdf5] dark:bg-[#133e2b] text-[#059669]">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
                 {analytics?.investmentByCategory?.length || 0}
               </div>
-              <div className="mt-2 text-xs text-[#615d59]">Active asset classes</div>
+              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b]">Active asset classes</div>
             </Card>
           </div>
         )}
 
         {/* Investment Growth Chart & Category Allocation */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          <Card className="lg:col-span-2 p-4 sm:p-5">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div>
                 <CardTitle>Cumulative Portfolio Growth</CardTitle>
@@ -179,7 +183,7 @@ export default function InvestmentsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="p-4 sm:p-5">
             <CardHeader>
               <CardTitle>Asset Allocation</CardTitle>
               <CardDescription>Portfolio split by investment type</CardDescription>
@@ -195,7 +199,7 @@ export default function InvestmentsPage() {
         </div>
 
         {/* Asset Items Breakdown List */}
-        <Card>
+        <Card className="p-4 sm:p-5">
           <CardHeader>
             <CardTitle>Individual Asset Holdings</CardTitle>
             <CardDescription>Investments grouped by asset ticker/name</CardDescription>
@@ -212,7 +216,7 @@ export default function InvestmentsPage() {
                       <div className="text-sm font-bold text-[#171717] dark:text-[#f7f7f7]">
                         {item.item}
                       </div>
-                      <div className="text-xs text-[#615d59]">Asset Holding</div>
+                      <div className="text-xs text-[#615d59] dark:text-[#9b9b9b]">Asset Holding</div>
                     </div>
                     <div className="text-right font-extrabold text-sm text-[#7c3aed]">
                       {formatCurrency(item.amount)}

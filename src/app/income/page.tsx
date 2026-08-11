@@ -40,12 +40,15 @@ export default function IncomePage() {
   }, [fetchData]);
 
   return (
-    <AppShell title="Income Analytics">
-      <div className="flex flex-col gap-6">
+    <AppShell
+      title="Income Analytics"
+      onOpenNewTransaction={() => setIsModalOpen(true)}
+    >
+      <div className="flex flex-col gap-4 sm:gap-6">
         {/* Control Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#ffffff] dark:bg-[#202020] p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-[#ffffff] dark:bg-[#202020] p-3.5 sm:p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
           <div>
-            <h2 className="text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
               Income Streams & Earnings
             </h2>
             <p className="text-xs text-[#615d59] dark:text-[#9b9b9b] mt-0.5">
@@ -53,7 +56,7 @@ export default function IncomePage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <DatePicker
               selectedPreset={datePreset}
               startDate={customStart}
@@ -68,6 +71,7 @@ export default function IncomePage() {
               size="sm"
               onClick={() => setIsModalOpen(true)}
               leftIcon={<Plus className="w-4 h-4" />}
+              className="w-full sm:w-auto"
             >
               Add Income
             </Button>
@@ -76,83 +80,83 @@ export default function IncomePage() {
 
         {/* Metrics Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Total Inflow
                 </span>
-                <div className="p-2 rounded-lg bg-[#ecfdf5] text-[#059669]">
+                <div className="p-2 rounded-lg bg-[#ecfdf5] dark:bg-[#133e2b] text-[#059669]">
                   <TrendingUp className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-[#059669]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#059669]">
                 {formatCurrency(analytics?.totalIncome || 0)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59]">
+              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b]">
                 {analytics?.transactionCount || 0} Income deposits logged
               </div>
             </Card>
 
-            <Card>
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Top Income Source
                 </span>
-                <div className="p-2 rounded-lg bg-[#f0f9ff] text-[#0075de]">
+                <div className="p-2 rounded-lg bg-[#f0f9ff] dark:bg-[#0c2a3a] text-[#0075de]">
                   <Banknote className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
                 {formatCurrency(analytics?.highestIncome || 0)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59] truncate">
+              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b] truncate">
                 Source: <strong>{analytics?.highestIncomeSource || "N/A"}</strong>
               </div>
             </Card>
 
-            <Card>
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Average Deposit
                 </span>
                 <Badge variant="income" size="sm">
                   Average
                 </Badge>
               </div>
-              <div className="text-2xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
                 {formatCurrency(analytics?.averageIncome || 0)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59]">Per deposit metric</div>
+              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b]">Per deposit metric</div>
             </Card>
 
-            <Card>
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Income Streams
                 </span>
-                <div className="p-2 rounded-lg bg-[#f5f3ff] text-[#7c3aed]">
+                <div className="p-2 rounded-lg bg-[#f5f3ff] dark:bg-[#2e1a47] text-[#7c3aed]">
                   <ArrowUpRight className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
                 {analytics?.incomeByItem?.length || 0}
               </div>
-              <div className="mt-2 text-xs text-[#615d59]">Unique income sources</div>
+              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b]">Unique income sources</div>
             </Card>
           </div>
         )}
 
         {/* Charts & Breakdown */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <Card className="p-4 sm:p-5">
             <CardHeader>
               <CardTitle>Income Distribution by Category</CardTitle>
               <CardDescription>Earnings split by category type</CardDescription>
@@ -166,7 +170,7 @@ export default function IncomePage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="p-4 sm:p-5">
             <CardHeader>
               <CardTitle>Top Income Sources</CardTitle>
               <CardDescription>Individual clients and salary payments</CardDescription>
@@ -178,8 +182,8 @@ export default function IncomePage() {
                     key={idx}
                     className="flex items-center justify-between p-3 rounded-xl bg-[#f6f5f4] dark:bg-[#191919] border border-[#e6e6e6] dark:border-[#2f2f2f]"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-[#ecfdf5] text-[#059669]">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                      <div className="p-2 rounded-lg bg-[#ecfdf5] dark:bg-[#133e2b] text-[#059669]">
                         <Banknote className="w-4 h-4" />
                       </div>
                       <div className="font-bold text-sm text-[#171717] dark:text-[#f7f7f7]">

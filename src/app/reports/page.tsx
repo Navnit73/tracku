@@ -60,11 +60,11 @@ export default function ReportsPage() {
 
   return (
     <AppShell title="Financial Reports">
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#ffffff] dark:bg-[#202020] p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-[#ffffff] dark:bg-[#202020] p-3.5 sm:p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
           <div>
-            <h2 className="text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight flex items-center gap-2">
               <FileSpreadsheet className="w-5 h-5 text-[#0075de]" />
               Executive Financial Statement
             </h2>
@@ -89,6 +89,7 @@ export default function ReportsPage() {
               size="sm"
               onClick={handlePrint}
               leftIcon={<Printer className="w-4 h-4" />}
+              className="flex-1 sm:flex-none"
             >
               Print Report
             </Button>
@@ -96,6 +97,7 @@ export default function ReportsPage() {
               size="sm"
               onClick={() => handleExportCSV("All")}
               leftIcon={<Download className="w-4 h-4" />}
+              className="flex-1 sm:flex-none"
             >
               Export Report CSV
             </Button>
@@ -103,13 +105,13 @@ export default function ReportsPage() {
         </div>
 
         {/* Report Overview Card */}
-        <Card className="p-6">
-          <div className="border-b border-[#e6e6e6] dark:border-[#2f2f2f] pb-4 mb-6 flex justify-between items-start">
+        <Card className="p-4 sm:p-6">
+          <div className="border-b border-[#e6e6e6] dark:border-[#2f2f2f] pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start gap-2">
             <div>
               <div className="text-xs uppercase font-bold text-[#0075de] tracking-wider">
                 Personal Finance Audit Summary
               </div>
-              <h1 className="text-2xl font-black text-[#171717] dark:text-[#f7f7f7] mt-1">
+              <h1 className="text-xl sm:text-2xl font-black text-[#171717] dark:text-[#f7f7f7] mt-1">
                 Cash Flow & Wealth Report
               </h1>
             </div>
@@ -118,31 +120,31 @@ export default function ReportsPage() {
             </Badge>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="p-4 rounded-xl bg-[#f6f5f4] dark:bg-[#191919] border border-[#e6e6e6] dark:border-[#2f2f2f]">
-              <div className="text-xs font-semibold text-[#615d59]">Total Cash Inflow</div>
-              <div className="text-xl font-extrabold text-[#059669] mt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+            <div className="p-3.5 sm:p-4 rounded-xl bg-[#f6f5f4] dark:bg-[#191919] border border-[#e6e6e6] dark:border-[#2f2f2f]">
+              <div className="text-xs font-semibold text-[#615d59] dark:text-[#9b9b9b]">Total Cash Inflow</div>
+              <div className="text-lg sm:text-xl font-extrabold text-[#059669] mt-1">
                 {formatCurrency(analytics?.summary?.totalIncome || 0)}
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#f6f5f4] dark:bg-[#191919] border border-[#e6e6e6] dark:border-[#2f2f2f]">
-              <div className="text-xs font-semibold text-[#615d59]">Total Cash Outflow</div>
-              <div className="text-xl font-extrabold text-[#e11d48] mt-1">
+            <div className="p-3.5 sm:p-4 rounded-xl bg-[#f6f5f4] dark:bg-[#191919] border border-[#e6e6e6] dark:border-[#2f2f2f]">
+              <div className="text-xs font-semibold text-[#615d59] dark:text-[#9b9b9b]">Total Cash Outflow</div>
+              <div className="text-lg sm:text-xl font-extrabold text-[#e11d48] mt-1">
                 {formatCurrency(analytics?.summary?.totalExpenses || 0)}
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#f6f5f4] dark:bg-[#191919] border border-[#e6e6e6] dark:border-[#2f2f2f]">
-              <div className="text-xs font-semibold text-[#615d59]">Total Wealth Invested</div>
-              <div className="text-xl font-extrabold text-[#7c3aed] mt-1">
+            <div className="p-3.5 sm:p-4 rounded-xl bg-[#f6f5f4] dark:bg-[#191919] border border-[#e6e6e6] dark:border-[#2f2f2f]">
+              <div className="text-xs font-semibold text-[#615d59] dark:text-[#9b9b9b]">Total Wealth Invested</div>
+              <div className="text-lg sm:text-xl font-extrabold text-[#7c3aed] mt-1">
                 {formatCurrency(analytics?.summary?.totalInvestments || 0)}
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#213183] text-white">
+            <div className="p-3.5 sm:p-4 rounded-xl bg-[#213183] text-white">
               <div className="text-xs font-semibold text-blue-200">Net Surplus / Balance</div>
-              <div className="text-xl font-extrabold mt-1">
+              <div className="text-lg sm:text-xl font-extrabold mt-1">
                 {formatCurrency(analytics?.summary?.balance || 0)}
               </div>
             </div>

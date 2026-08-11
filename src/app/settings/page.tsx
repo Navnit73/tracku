@@ -14,9 +14,9 @@ export default function SettingsPage() {
 
   return (
     <AppShell title="Settings & Preferences">
-      <div className="flex flex-col gap-6 max-w-4xl">
-        <div className="bg-[#ffffff] dark:bg-[#202020] p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
-          <h2 className="text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight flex items-center gap-2">
+      <div className="flex flex-col gap-4 sm:gap-6 max-w-4xl">
+        <div className="bg-[#ffffff] dark:bg-[#202020] p-3.5 sm:p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
+          <h2 className="text-lg sm:text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight flex items-center gap-2">
             <SettingsIcon className="w-5 h-5 text-[#0075de]" />
             Application Settings
           </h2>
@@ -26,7 +26,7 @@ export default function SettingsPage() {
         </div>
 
         {/* User Account Profile */}
-        <Card>
+        <Card className="p-4 sm:p-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="w-4 h-4 text-[#0075de]" />
@@ -35,25 +35,25 @@ export default function SettingsPage() {
             <CardDescription>Authenticated user session details</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-xl bg-[#f6f5f4] dark:bg-[#191919] border border-[#e6e6e6] dark:border-[#2f2f2f]">
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl bg-[#f6f5f4] dark:bg-[#191919] border border-[#e6e6e6] dark:border-[#2f2f2f]">
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                 {session?.user?.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={session.user.image}
                     alt={session.user.name || "Google User"}
-                    className="w-12 h-12 rounded-full border border-[#0075de]"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[#0075de] shrink-0"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-[#0075de] text-white flex items-center justify-center font-bold text-lg">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0075de] text-white flex items-center justify-center font-bold text-base sm:text-lg shrink-0">
                     {session?.user?.name?.[0] || "U"}
                   </div>
                 )}
-                <div>
-                  <div className="text-base font-bold text-[#171717] dark:text-[#f7f7f7]">
+                <div className="min-w-0">
+                  <div className="text-sm sm:text-base font-bold text-[#171717] dark:text-[#f7f7f7] truncate">
                     {session?.user?.name || "Google Authenticated User"}
                   </div>
-                  <div className="text-xs text-[#615d59] dark:text-[#9b9b9b]">
+                  <div className="text-xs text-[#615d59] dark:text-[#9b9b9b] truncate">
                     {session?.user?.email || "No email associated"}
                   </div>
                 </div>
@@ -64,6 +64,7 @@ export default function SettingsPage() {
                 size="sm"
                 onClick={() => signOut()}
                 leftIcon={<LogOut className="w-4 h-4" />}
+                className="w-full sm:w-auto"
               >
                 Sign Out
               </Button>
@@ -72,7 +73,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Currency & Locale Preferences */}
-        <Card>
+        <Card className="p-4 sm:p-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="w-4 h-4 text-[#059669]" />
@@ -98,7 +99,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Data Security Note */}
-        <Card>
+        <Card className="p-4 sm:p-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-[#059669]" />

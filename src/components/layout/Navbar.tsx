@@ -49,15 +49,16 @@ export function Navbar({
   };
 
   return (
-    <header className="h-16 sticky top-0 z-30 bg-[#ffffff]/80 dark:bg-[#202020]/80 backdrop-blur-md border-b border-[#e6e6e6] dark:border-[#2f2f2f] px-4 sm:px-6 flex items-center justify-between">
-      <div className="flex items-center gap-3">
+    <header className="h-14 sm:h-16 sticky top-0 z-30 bg-[#ffffff]/85 dark:bg-[#202020]/85 backdrop-blur-md border-b border-[#e6e6e6] dark:border-[#2f2f2f] px-3.5 sm:px-6 flex items-center justify-between transition-colors">
+      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
         <button
           onClick={onOpenMobileMenu}
-          className="p-2 rounded-lg text-[#615d59] dark:text-[#9b9b9b] hover:bg-[#f6f5f4] dark:hover:bg-[#2e2e2e] lg:hidden"
+          className="p-1.5 sm:p-2 rounded-xl text-[#615d59] dark:text-[#9b9b9b] hover:bg-[#f6f5f4] dark:hover:bg-[#2e2e2e] active:scale-95 transition-transform lg:hidden cursor-pointer"
+          aria-label="Open Navigation Menu"
         >
           <Menu className="w-5 h-5" />
         </button>
-        <h1 className="text-lg font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
+        <h1 className="text-base sm:text-lg font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight truncate">
           {title}
         </h1>
       </div>

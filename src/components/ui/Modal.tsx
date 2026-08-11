@@ -49,26 +49,29 @@ export function Modal({
   };
 
   const content = (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
         onClick={onClose}
       />
 
       {/* Modal Dialog Surface */}
       <div
         className={cn(
-          "relative w-full rounded-2xl bg-[#ffffff] dark:bg-[#202020] border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-2xl transition-all animate-in zoom-in-95 duration-200 z-10 flex flex-col max-h-[90vh]",
+          "relative w-full rounded-t-3xl sm:rounded-2xl bg-[#ffffff] dark:bg-[#202020] border-t sm:border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-2xl transition-all animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 z-10 flex flex-col max-h-[85vh] sm:max-h-[90vh]",
           maxWidths[maxWidth]
         )}
       >
+        {/* Mobile Pull Indicator */}
+        <div className="w-12 h-1 bg-[#e6e6e6] dark:bg-[#3a3a3a] rounded-full mx-auto my-2.5 sm:hidden" />
+
         {/* Header */}
         {(title || description) && (
-          <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-[#e6e6e6] dark:border-[#2f2f2f]">
+          <div className="flex items-start justify-between px-5 sm:px-6 pt-2 sm:pt-6 pb-3 sm:pb-4 border-b border-[#e6e6e6] dark:border-[#2f2f2f]">
             <div>
               {title && (
-                <h2 className="text-lg font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
+                <h2 className="text-base sm:text-lg font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
                   {title}
                 </h2>
               )}
@@ -80,7 +83,7 @@ export function Modal({
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-[#615d59] hover:bg-[#f6f5f4] dark:hover:bg-[#2e2e2e] transition-colors"
+              className="p-1.5 rounded-full sm:rounded-lg text-[#615d59] dark:text-[#9b9b9b] hover:bg-[#f6f5f4] dark:hover:bg-[#2e2e2e] transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -88,11 +91,11 @@ export function Modal({
         )}
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto flex-1">{children}</div>
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1">{children}</div>
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#f6f5f4]/50 dark:bg-[#191919]/50 rounded-b-2xl">
+          <div className="flex items-center justify-end gap-2.5 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#f6f5f4]/60 dark:bg-[#191919]/60 rounded-b-none sm:rounded-b-2xl">
             {footer}
           </div>
         )}

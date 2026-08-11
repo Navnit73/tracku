@@ -78,12 +78,18 @@ export default function CategoriesPage() {
   };
 
   return (
-    <AppShell title="Custom Categories">
-      <div className="flex flex-col gap-6">
+    <AppShell
+      title="Custom Categories"
+      onOpenNewTransaction={() => {
+        setSelectedCategory(null);
+        setIsModalOpen(true);
+      }}
+    >
+      <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#ffffff] dark:bg-[#202020] p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-[#ffffff] dark:bg-[#202020] p-3.5 sm:p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
           <div>
-            <h2 className="text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
               Custom Categories
             </h2>
             <p className="text-xs text-[#615d59] dark:text-[#9b9b9b] mt-0.5">
@@ -91,13 +97,14 @@ export default function CategoriesPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {categories.length > 0 && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleClearAll}
                 leftIcon={<Trash className="w-4 h-4 text-[#e11d48]" />}
+                className="flex-1 sm:flex-none"
               >
                 Clear All
               </Button>
@@ -109,6 +116,7 @@ export default function CategoriesPage() {
                 setIsModalOpen(true);
               }}
               leftIcon={<Plus className="w-4 h-4" />}
+              className="flex-1 sm:flex-none"
             >
               Create Category
             </Button>
@@ -116,12 +124,12 @@ export default function CategoriesPage() {
         </div>
 
         {/* Category Type Filter Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           {["All", "Expense", "Income", "Investment"].map((type) => (
             <button
               key={type}
               onClick={() => setActiveType(type)}
-              className={`px-4 py-2 text-xs font-bold rounded-xl transition-all select-none cursor-pointer border ${
+              className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all select-none cursor-pointer border whitespace-nowrap active:scale-95 ${
                 activeType === type
                   ? "bg-[#0075de] text-white border-[#0075de] shadow-xs"
                   : "bg-[#ffffff] dark:bg-[#202020] text-[#615d59] dark:text-[#9b9b9b] border-[#e6e6e6] dark:border-[#2f2f2f] hover:text-[#171717] dark:hover:text-[#f7f7f7]"
@@ -136,7 +144,7 @@ export default function CategoriesPage() {
         {loading ? (
           <TableSkeleton rows={4} />
         ) : categories.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {categories.map((cat) => (
               <Card
                 key={cat._id}

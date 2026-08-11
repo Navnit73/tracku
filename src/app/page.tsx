@@ -80,16 +80,16 @@ export default function DashboardPage() {
   };
 
   return (
-    <AppShell title="Dashboard">
-      <div className="flex flex-col gap-6">
+    <AppShell title="Dashboard" onOpenNewTransaction={() => setIsModalOpen(true)}>
+      <div className="flex flex-col gap-4 sm:gap-6">
         {/* Top Control Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#ffffff] dark:bg-[#202020] p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-[#ffffff] dark:bg-[#202020] p-3.5 sm:p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
           <div>
-            <h2 className="text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
               Financial Summary
             </h2>
             <p className="text-xs text-[#615d59] dark:text-[#9b9b9b] mt-0.5">
-              Live metrics computed for horizon: <strong className="text-[#0075de]">{datePreset}</strong>
+              Metrics horizon: <strong className="text-[#0075de]">{datePreset}</strong>
             </p>
           </div>
 
@@ -105,6 +105,7 @@ export default function DashboardPage() {
               size="sm"
               onClick={() => setIsModalOpen(true)}
               leftIcon={<Plus className="w-4 h-4" />}
+              className="w-full sm:w-auto"
             >
               New Transaction
             </Button>
@@ -113,16 +114,16 @@ export default function DashboardPage() {
 
         {/* Summary Metric Cards */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Total Balance */}
-            <Card variant="hero" className="relative overflow-hidden">
+            <Card variant="hero" className="relative overflow-hidden p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-blue-100 uppercase tracking-wider">
                   Total Net Balance
@@ -141,7 +142,7 @@ export default function DashboardPage() {
             </Card>
 
             {/* Savings */}
-            <Card>
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Net Savings
@@ -162,7 +163,7 @@ export default function DashboardPage() {
             </Card>
 
             {/* Total Income & Expenses */}
-            <Card>
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Income & Expenses
@@ -174,13 +175,13 @@ export default function DashboardPage() {
               <div className="flex items-baseline justify-between gap-1">
                 <div>
                   <div className="text-xs text-[#615d59] dark:text-[#9b9b9b]">Income</div>
-                  <div className="text-lg font-bold text-[#059669]">
+                  <div className="text-base sm:text-lg font-bold text-[#059669]">
                     {formatCurrency(analytics?.summary?.totalIncome || 0)}
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="text-xs text-[#615d59] dark:text-[#9b9b9b]">Expenses</div>
-                  <div className="text-lg font-bold text-[#e11d48]">
+                  <div className="text-base sm:text-lg font-bold text-[#e11d48]">
                     {formatCurrency(analytics?.summary?.totalExpenses || 0)}
                   </div>
                 </div>
@@ -194,7 +195,7 @@ export default function DashboardPage() {
             </Card>
 
             {/* Investments */}
-            <Card>
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Total Investments
@@ -217,9 +218,9 @@ export default function DashboardPage() {
         )}
 
         {/* Charts Grid Row 1 */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Income vs Expenses Trend Chart */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 p-4 sm:p-5">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div>
                 <CardTitle>Income vs Expenses Trend</CardTitle>
@@ -241,7 +242,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* Category Spending Breakdown */}
-          <Card>
+          <Card className="p-4 sm:p-5">
             <CardHeader className="pb-2">
               <CardTitle>Category Spending</CardTitle>
               <CardDescription>Expense allocation by category</CardDescription>
@@ -257,9 +258,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Charts Grid Row 2 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Investment Portfolio Growth */}
-          <Card>
+          <Card className="p-4 sm:p-5">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div>
                 <CardTitle>Investment Growth</CardTitle>
@@ -279,7 +280,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* Top Spending Items */}
-          <Card>
+          <Card className="p-4 sm:p-5">
             <CardHeader className="pb-2">
               <CardTitle>Top Spending Items</CardTitle>
               <CardDescription>Highest expenditure line items</CardDescription>
@@ -295,11 +296,11 @@ export default function DashboardPage() {
         </div>
 
         {/* Bottom Section: Frequently Spent & Recent Transactions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Frequently Spent Items */}
-          <Card className="lg:col-span-1">
+          <Card className="lg:col-span-1 p-4 sm:p-5">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <Sparkles className="w-4 h-4 text-[#0075de]" />
                 Frequently Spent Items
               </CardTitle>
@@ -335,7 +336,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* Recent Transactions Ledger Feed */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 p-4 sm:p-5">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Recent Transactions</CardTitle>
@@ -354,9 +355,9 @@ export default function DashboardPage() {
                 <div className="divide-y divide-[#e6e6e6] dark:divide-[#2f2f2f]">
                   {analytics.recentTransactions.map((t: any) => (
                     <div key={t._id} className="py-3 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <div
-                          className={`p-2 rounded-xl text-white ${
+                          className={`p-2 rounded-xl text-white shrink-0 ${
                             t.type === "Income"
                               ? "bg-[#059669]"
                               : t.type === "Expense"
@@ -370,17 +371,17 @@ export default function DashboardPage() {
                             <ArrowDownRight className="w-4 h-4" />
                           )}
                         </div>
-                        <div>
-                          <div className="text-sm font-bold text-[#171717] dark:text-[#f7f7f7]">
+                        <div className="min-w-0">
+                          <div className="text-sm font-bold text-[#171717] dark:text-[#f7f7f7] truncate">
                             {t.item}
                           </div>
-                          <div className="text-xs text-[#615d59] dark:text-[#9b9b9b]">
-                            {t.categoryName} • {formatDate(t.date)} • {t.paymentMethod}
+                          <div className="text-xs text-[#615d59] dark:text-[#9b9b9b] truncate">
+                            {t.categoryName} • {formatDate(t.date)}
                           </div>
                         </div>
                       </div>
                       <div
-                        className={`text-sm font-bold ${
+                        className={`text-sm font-bold shrink-0 ${
                           t.type === "Income"
                             ? "text-[#059669]"
                             : t.type === "Expense"

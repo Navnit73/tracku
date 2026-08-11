@@ -53,12 +53,15 @@ export default function ExpensesPage() {
   }, [fetchData]);
 
   return (
-    <AppShell title="Expenses Analytics">
-      <div className="flex flex-col gap-6">
+    <AppShell
+      title="Expenses Analytics"
+      onOpenNewTransaction={() => setIsModalOpen(true)}
+    >
+      <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Control */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#ffffff] dark:bg-[#202020] p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-[#ffffff] dark:bg-[#202020] p-3.5 sm:p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
           <div>
-            <h2 className="text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
               Expense Tracker & Analysis
             </h2>
             <p className="text-xs text-[#615d59] dark:text-[#9b9b9b] mt-0.5">
@@ -66,7 +69,7 @@ export default function ExpensesPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <DatePicker
               selectedPreset={datePreset}
               startDate={customStart}
@@ -82,6 +85,7 @@ export default function ExpensesPage() {
               variant="danger"
               onClick={() => setIsModalOpen(true)}
               leftIcon={<Plus className="w-4 h-4" />}
+              className="w-full sm:w-auto"
             >
               Add Expense
             </Button>
@@ -90,83 +94,83 @@ export default function ExpensesPage() {
 
         {/* Metrics Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Total Expenses
                 </span>
-                <div className="p-2 rounded-lg bg-[#fff1f2] text-[#e11d48]">
+                <div className="p-2 rounded-lg bg-[#fff1f2] dark:bg-[#3b1c24] text-[#e11d48]">
                   <TrendingDown className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-[#e11d48]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#e11d48]">
                 {formatCurrency(analytics?.totalExpense || 0)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59]">
+              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b]">
                 {analytics?.transactionCount || 0} Total Transactions
               </div>
             </Card>
 
-            <Card>
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59]">
-                  Highest Single Expense
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
+                  Highest Expense
                 </span>
-                <div className="p-2 rounded-lg bg-[#fff7ed] text-[#ea580c]">
+                <div className="p-2 rounded-lg bg-[#fff7ed] dark:bg-[#3a2012] text-[#ea580c]">
                   <ShoppingBag className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
                 {formatCurrency(analytics?.highestExpense || 0)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59] truncate">
+              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b] truncate">
                 Item: <strong>{analytics?.highestExpenseItem || "N/A"}</strong>
               </div>
             </Card>
 
-            <Card>
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Average Expense
                 </span>
-                <div className="p-2 rounded-lg bg-[#f0f9ff] text-[#0075de]">
+                <div className="p-2 rounded-lg bg-[#f0f9ff] dark:bg-[#0c2a3a] text-[#0075de]">
                   <CreditCard className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
                 {formatCurrency(analytics?.averageExpense || 0)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59]">Per transaction spend</div>
+              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b]">Per transaction spend</div>
             </Card>
 
-            <Card>
+            <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
                   Transaction Volume
                 </span>
                 <Badge variant="expense" size="sm">
                   Expenses
                 </Badge>
               </div>
-              <div className="text-2xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
                 {analytics?.transactionCount || 0}
               </div>
-              <div className="mt-2 text-xs text-[#615d59]">Expense records logged</div>
+              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b]">Expense records logged</div>
             </Card>
           </div>
         )}
 
         {/* Charts & Frequent Items */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <Card className="p-4 sm:p-5">
             <CardHeader>
               <CardTitle>Spending by Category</CardTitle>
               <CardDescription>Visual breakdown of expense categories</CardDescription>
@@ -180,9 +184,9 @@ export default function ExpensesPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="p-4 sm:p-5">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <Sparkles className="w-4 h-4 text-[#e11d48]" />
                 Frequently Purchased Items
               </CardTitle>
@@ -199,7 +203,7 @@ export default function ExpensesPage() {
                       <div className="text-sm font-bold text-[#171717] dark:text-[#f7f7f7]">
                         {item.item}
                       </div>
-                      <div className="text-xs text-[#615d59]">
+                      <div className="text-xs text-[#615d59] dark:text-[#9b9b9b]">
                         {item.count} purchases • Avg {formatCurrency(item.averageAmount)}
                       </div>
                     </div>

@@ -16,7 +16,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { getTransactions, deleteTransaction } from "@/app/actions/transactions";
 import { getCategories } from "@/app/actions/categories";
 import { downloadTransactionsCSV } from "@/lib/csvExport";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import { showToast, confirmDialog } from "@/lib/toast";
 import {
   Search,
@@ -148,13 +148,21 @@ export default function TransactionsPage() {
     }
   };
 
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
   return (
-    <AppShell title="Transactions Ledger">
-      <div className="flex flex-col gap-6">
+    <AppShell
+      title="Transactions Ledger"
+      onOpenNewTransaction={() => {
+        setSelectedTransaction(null);
+        setIsModalOpen(true);
+      }}
+    >
+      <div className="flex flex-col gap-4 sm:gap-6">
         {/* Action & Filter Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-[#ffffff] dark:bg-[#202020] p-4 sm:p-5 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-[#ffffff] dark:bg-[#202020] p-4 sm:p-5 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
           <div>
-            <h2 className="text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
               Transaction Records
             </h2>
             <p className="text-xs text-[#615d59] dark:text-[#9b9b9b] mt-0.5">
@@ -168,6 +176,7 @@ export default function TransactionsPage() {
               size="sm"
               onClick={handleExportCSV}
               leftIcon={<Download className="w-4 h-4" />}
+              className="flex-1 sm:flex-none"
             >
               Export CSV
             </Button>
@@ -178,6 +187,7 @@ export default function TransactionsPage() {
                 setIsModalOpen(true);
               }}
               leftIcon={<Plus className="w-4 h-4" />}
+              className="flex-1 sm:flex-none"
             >
               Add Transaction
             </Button>
@@ -185,10 +195,36 @@ export default function TransactionsPage() {
         </div>
 
         {/* Filters Bar */}
-        <Card className="p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            {/* Search Input */}
-            <div className="lg:col-span-2">
+        <Card className="p-3.5 sm:p-4">
+          <div className="flex items-center justify-between gap-2 sm:hidden mb-2.5">
+            <Input
+              placeholder="Search item, notes..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              leftIcon={<Search className="w-4 h-4" />}
+              className="flex-1"
+            />
+            <Button
+              variant={showMobileFilters ? "primary" : "secondary"}
+              size="sm"
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              leftIcon={<Filter className="w-4 h-4" />}
+            >
+              Filters
+            </Button>
+          </div>
+
+          <div
+            className={cn(
+              "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3",
+              !showMobileFilters && "hidden sm:grid"
+            )}
+          >
+            {/* Search Input (Desktop view / Mobile drawer) */}
+            <div className="hidden sm:block lg:col-span-2">
               <Input
                 placeholder="Search item, notes, tags..."
                 value={search}
@@ -245,7 +281,12 @@ export default function TransactionsPage() {
           </div>
 
           {/* Amount range collapse */}
-          <div className="mt-3 pt-3 border-t border-[#e6e6e6] dark:border-[#2f2f2f] flex items-center gap-3 text-xs text-[#615d59]">
+          <div
+            className={cn(
+              "mt-3 pt-3 border-t border-[#e6e6e6] dark:border-[#2f2f2f] flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-[#615d59]",
+              !showMobileFilters && "hidden sm:flex"
+            )}
+          >
             <span className="font-semibold flex items-center gap-1">
               <Filter className="w-3.5 h-3.5" /> Amount Range:
             </span>
@@ -254,7 +295,7 @@ export default function TransactionsPage() {
               placeholder="Min $"
               value={minAmount}
               onChange={(e) => setMinAmount(e.target.value)}
-              className="w-24 px-2 py-1 text-xs rounded border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#ffffff] dark:bg-[#191919]"
+              className="w-20 sm:w-24 px-2 py-1 text-xs rounded border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#ffffff] dark:bg-[#191919]"
             />
             <span>to</span>
             <input
@@ -262,7 +303,7 @@ export default function TransactionsPage() {
               placeholder="Max $"
               value={maxAmount}
               onChange={(e) => setMaxAmount(e.target.value)}
-              className="w-24 px-2 py-1 text-xs rounded border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#ffffff] dark:bg-[#191919]"
+              className="w-20 sm:w-24 px-2 py-1 text-xs rounded border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#ffffff] dark:bg-[#191919]"
             />
             {(search || type !== "All" || categoryId !== "All" || minAmount || maxAmount) && (
               <Button
@@ -276,7 +317,7 @@ export default function TransactionsPage() {
                   setMaxAmount("");
                   setDateRange("All Time");
                 }}
-                className="text-xs py-0.5 px-2"
+                className="text-xs py-0.5 px-2 ml-auto"
               >
                 Reset Filters
               </Button>
