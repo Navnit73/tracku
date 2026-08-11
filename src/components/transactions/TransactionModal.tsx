@@ -125,6 +125,12 @@ export function TransactionModal({
       return;
     }
 
+    if (!categoryId) {
+      setErrors({ categoryId: "Please select a category" });
+      setIsLoading(false);
+      return;
+    }
+
     const selectedCat = categories.find((c) => c._id === categoryId);
     const categoryName = selectedCat ? selectedCat.name : "Uncategorized";
 
@@ -235,16 +241,14 @@ export function TransactionModal({
             label="Category *"
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
+            error={errors.categoryId}
           >
-            {matchingCategories.length === 0 ? (
-              <option value="">No categories for {type}</option>
-            ) : (
-              matchingCategories.map((cat) => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.name}
-                </option>
-              ))
-            )}
+            <option value="">-- Select Category --</option>
+            {matchingCategories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name} ({cat.type})
+              </option>
+            ))}
           </Select>
 
           <Input

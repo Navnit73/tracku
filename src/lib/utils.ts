@@ -38,9 +38,10 @@ export function getDateRangeBounds(dateRange: string, customStart?: string, cust
     case "This Week": {
       const dayOfWeek = now.getDay();
       const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Monday start
-      const monday = new Date(now.setDate(diff));
+      const monday = new Date(now);
+      monday.setDate(diff);
       startDate = startOfDay(monday);
-      endDate = endOfDay(new Date());
+      endDate = endOfDay(now);
       break;
     }
 

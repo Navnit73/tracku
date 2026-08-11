@@ -28,13 +28,16 @@ export function IncomeExpenseChart({ data }: { data: IncomeExpenseData[] }) {
     );
   }
 
-  const formattedData = data.map((d) => ({
-    ...d,
-    displayDate: new Date(d.date).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    }),
-  }));
+  const formattedData = data.map((d) => {
+    const dateObj = d.date.includes("T") ? new Date(d.date) : new Date(d.date + "T12:00:00");
+    return {
+      ...d,
+      displayDate: dateObj.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
+    };
+  });
 
   return (
     <div className="w-full h-72">

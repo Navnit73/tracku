@@ -33,17 +33,7 @@ export async function getCategories(typeFilter?: string) {
       query.type = typeFilter;
     }
 
-    let categories = await Category.find(query).sort({ name: 1 }).lean();
-
-    // Auto-seed default categories if user has zero categories created
-    if (categories.length === 0 && (!typeFilter || typeFilter === "All")) {
-      const docsToInsert = DEFAULT_CATEGORIES.map((cat) => ({
-        ...cat,
-        userId: user.id,
-      }));
-      const seeded = await Category.insertMany(docsToInsert);
-      categories = seeded.map((doc) => doc.toObject());
-    }
+    const categories = await Category.find(query).sort({ name: 1 }).lean();
 
     return {
       success: true,
@@ -119,8 +109,16 @@ export async function updateCategory(id: string, input: CategoryInput) {
       return { success: false, error: "Category not found or unauthorized." };
     }
 
+    // Sync updated category name across user's existing transactions
+    const { Transaction } = await import("@/models/Transaction");
+    await Transaction.updateMany(
+      { userId: user.id, categoryId: id },
+      { $set: { categoryName: validated.name } }
+    );
+
     revalidatePath("/categories");
     revalidatePath("/transactions");
+    revalidatePath("/");
 
     return { success: true };
   } catch (error: any) {
@@ -138,8 +136,16 @@ export async function deleteCategory(id: string) {
       return { success: false, error: "Category not found or unauthorized." };
     }
 
+    // Update transactions associated with this category
+    const { Transaction } = await import("@/models/Transaction");
+    await Transaction.updateMany(
+      { userId: user.id, categoryId: id },
+      { $set: { categoryName: "Uncategorized" } }
+    );
+
     revalidatePath("/categories");
     revalidatePath("/transactions");
+    revalidatePath("/");
 
     return { success: true };
   } catch (error: any) {

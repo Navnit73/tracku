@@ -102,17 +102,6 @@ export default function DashboardPage() {
             />
 
             <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleSeedDemoData}
-              isLoading={seeding}
-              leftIcon={<Database className="w-3.5 h-3.5 text-[#7c3aed]" />}
-              title="Populate test transactions if empty"
-            >
-              Seed Sample Data
-            </Button>
-
-            <Button
               size="sm"
               onClick={() => setIsModalOpen(true)}
               leftIcon={<Plus className="w-4 h-4" />}

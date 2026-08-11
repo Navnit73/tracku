@@ -88,9 +88,10 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
         dailyTrendMap[dateKey].investment += amt;
 
         cumulativeInvestment += amt;
+        const prevAmount = investmentGrowthMap[dateKey]?.amount || 0;
         investmentGrowthMap[dateKey] = {
           date: dateKey,
-          amount: amt,
+          amount: prevAmount + amt,
           cumulative: cumulativeInvestment,
         };
       }

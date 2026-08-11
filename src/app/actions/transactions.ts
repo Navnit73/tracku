@@ -66,8 +66,8 @@ export async function getTransactions(filters: TransactionFilterInput) {
     // Amount range filtering
     if (minAmount !== undefined || maxAmount !== undefined) {
       query.amount = {};
-      if (minAmount !== undefined && minAmount > 0) query.amount.$gte = minAmount;
-      if (maxAmount !== undefined && maxAmount > 0) query.amount.$lte = maxAmount;
+      if (minAmount !== undefined && !isNaN(minAmount)) query.amount.$gte = minAmount;
+      if (maxAmount !== undefined && !isNaN(maxAmount)) query.amount.$lte = maxAmount;
     }
 
     const sortOption: any = {};
@@ -126,10 +126,12 @@ export async function createTransaction(input: TransactionInput) {
 
     await connectToDatabase();
 
+    const txDate = validated.date.includes("T") ? new Date(validated.date) : new Date(validated.date + "T12:00:00");
+
     const transaction = await Transaction.create({
       ...validated,
       userId: user.id,
-      date: new Date(validated.date),
+      date: txDate,
     });
 
     revalidatePath("/transactions");
@@ -159,12 +161,14 @@ export async function updateTransaction(id: string, input: TransactionInput) {
 
     await connectToDatabase();
 
+    const txDate = validated.date.includes("T") ? new Date(validated.date) : new Date(validated.date + "T12:00:00");
+
     const transaction = await Transaction.findOneAndUpdate(
       { _id: id, userId: user.id },
       {
         $set: {
           ...validated,
-          date: new Date(validated.date),
+          date: txDate,
         },
       },
       { new: true }

@@ -1,68 +1,27 @@
 import { NextAuthOptions, getServerSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
 import { connectToDatabase } from "@/lib/db";
 import { User } from "@/models/User";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "demo-google-id",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "demo-google-secret",
-    }),
-    CredentialsProvider({
-      id: "credentials",
-      name: "Demo Account",
-      credentials: {
-        email: { label: "Email", type: "email", placeholder: "demo@finances.app" },
-        name: { label: "Name", type: "text", placeholder: "Demo User" },
-      },
-      async authorize(credentials) {
-        const email = credentials?.email || "demo@finances.app";
-        const name = credentials?.name || "Demo User";
-
-        try {
-          await connectToDatabase();
-          let user = await User.findOne({ email });
-
-          if (!user) {
-            user = await User.create({
-              name,
-              email,
-              image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
-              currency: "USD",
-            });
-          }
-
-          return {
-            id: user._id.toString(),
-            name: user.name,
-            email: user.email,
-            image: user.image,
-            currency: user.currency,
-          };
-        } catch (error) {
-          console.error("Auth error:", error);
-          // Fallback user object if DB is not reachable immediately
-          return {
-            id: "demo-user-id-12345",
-            name,
-            email,
-            image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
-            currency: "USD",
-          };
-        }
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      httpOptions: {
+        timeout: 10000, // Increase HTTP timeout to 10s for slow network calls
       },
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
-      if (account?.provider === "google" && user.email) {
+    async jwt({ token, user, account }) {
+      // Triggered on initial sign-in when account is present
+      if (account && user?.email) {
         try {
           await connectToDatabase();
-          const existingUser = await User.findOne({ email: user.email });
-          if (!existingUser) {
-            await User.create({
+          let dbUser = await User.findOne({ email: user.email });
+          if (!dbUser) {
+            dbUser = await User.create({
               name: user.name || "Google User",
               email: user.email,
               image: user.image || undefined,
@@ -70,31 +29,29 @@ export const authOptions: NextAuthOptions = {
               currency: "USD",
             });
           }
+          token.sub = dbUser._id.toString();
+          token.currency = dbUser.currency || "USD";
         } catch (err) {
-          console.error("Error saving Google user:", err);
+          console.error("Error linking Google user to MongoDB:", err);
         }
       }
-      return true;
+      return token;
     },
     async session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub;
+        session.user.currency = (token.currency as string) || "USD";
       }
       return session;
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.sub = user.id;
-      }
-      return token;
     },
   },
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET || "default_secret_key_finance_tracker_2026",
+  secret: process.env.NEXTAUTH_SECRET || "default_secret_finance_track_key",
   pages: {
     signIn: "/auth/signin",
+    error: "/auth/signin",
   },
 };
 
@@ -105,12 +62,7 @@ export async function getAuthSession() {
 export async function requireAuthUser() {
   const session = await getAuthSession();
   if (!session || !session.user || !session.user.id) {
-    // If running locally without auth session, fallback to default demo user for frictionless dev
-    return {
-      id: "demo-user-id-12345",
-      name: "Demo User",
-      email: "demo@finances.app",
-    };
+    throw new Error("Unauthorized: Please sign in with Google to access your account.");
   }
   return session.user;
 }

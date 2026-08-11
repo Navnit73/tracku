@@ -10,6 +10,7 @@ import { TableSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getCategories, deleteCategory } from "@/app/actions/categories";
 import { showToast, confirmDialog } from "@/lib/toast";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { Tag, Plus, Edit2, Trash2, Layers } from "lucide-react";
 
 export default function CategoriesPage() {
@@ -116,7 +117,7 @@ export default function CategoriesPage() {
                     className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-xs"
                     style={{ backgroundColor: cat.color || "#0075de" }}
                   >
-                    <Tag className="w-5 h-5" />
+                    <CategoryIcon iconName={cat.icon} className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="font-bold text-sm text-[#171717] dark:text-[#f7f7f7]">

@@ -23,7 +23,6 @@ export const showToast = {
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true,
-      background: "var(--surface-bg, #ffffff)",
       iconColor: "#059669",
     });
   },
