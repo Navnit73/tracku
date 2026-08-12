@@ -1,15 +1,45 @@
 "use server";
 
+import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/db";
-import { Category, CategoryType } from "@/models/Category";
+import { Category } from "@/models/Category";
 import { requireAuthUser } from "@/lib/auth";
 import { categorySchema, CategoryInput } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
+
+const DEFAULT_CATEGORIES = [
+  { name: "Salary", type: "Income", icon: "Banknote", color: "#059669" },
+  { name: "Freelance", type: "Income", icon: "Briefcase", color: "#0075de" },
+  { name: "Investments Return", type: "Income", icon: "TrendingUp", color: "#7c3aed" },
+  { name: "Rent & Housing", type: "Expense", icon: "Home", color: "#e11d48" },
+  { name: "Food & Dining", type: "Expense", icon: "Utensils", color: "#ea580c" },
+  { name: "Transport", type: "Expense", icon: "Car", color: "#d97706" },
+  { name: "Bills & Utilities", type: "Expense", icon: "Zap", color: "#0284c7" },
+  { name: "Entertainment", type: "Expense", icon: "Film", color: "#ec4899" },
+  { name: "Shopping", type: "Expense", icon: "ShoppingBag", color: "#8b5cf6" },
+  { name: "Stocks & Equities", type: "Investment", icon: "LineChart", color: "#7c3aed" },
+  { name: "Mutual Funds", type: "Investment", icon: "PieChart", color: "#2563eb" },
+  { name: "Crypto", type: "Investment", icon: "Bitcoin", color: "#f59e0b" },
+  { name: "Gold & Precious Metals", type: "Investment", icon: "Coins", color: "#d97706" },
+];
+
+export async function ensureDefaultCategories(userId: string) {
+  const count = await Category.countDocuments({ userId });
+  if (count === 0) {
+    const docs = DEFAULT_CATEGORIES.map((c) => ({
+      ...c,
+      userId,
+    }));
+    await Category.insertMany(docs);
+  }
+}
 
 export async function getCategories(typeFilter?: string) {
   try {
     const user = await requireAuthUser();
     await connectToDatabase();
+
+    await ensureDefaultCategories(user.id);
 
     let query: any = { userId: user.id };
     if (typeFilter && typeFilter !== "All") {
@@ -92,10 +122,15 @@ export async function updateCategory(id: string, input: CategoryInput) {
       return { success: false, error: "Category not found or unauthorized." };
     }
 
-    // Sync updated category name across user's existing transactions
+    // Sync updated category name across user's existing transactions matching either string ID or ObjectId
+    const targetIds: any[] = [id];
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      targetIds.push(new mongoose.Types.ObjectId(id));
+    }
+
     const { Transaction } = await import("@/models/Transaction");
     await Transaction.updateMany(
-      { userId: user.id, categoryId: id },
+      { userId: user.id, categoryId: { $in: targetIds } },
       { $set: { categoryName: validated.name } }
     );
 
@@ -119,10 +154,15 @@ export async function deleteCategory(id: string) {
       return { success: false, error: "Category not found or unauthorized." };
     }
 
-    // Update transactions associated with this category
+    // Update transactions associated with this category matching string ID or ObjectId
+    const targetIds: any[] = [id];
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      targetIds.push(new mongoose.Types.ObjectId(id));
+    }
+
     const { Transaction } = await import("@/models/Transaction");
     await Transaction.updateMany(
-      { userId: user.id, categoryId: id },
+      { userId: user.id, categoryId: { $in: targetIds } },
       { $set: { categoryName: "Uncategorized" } }
     );
 

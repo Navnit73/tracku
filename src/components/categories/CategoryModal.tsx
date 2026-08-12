@@ -131,7 +131,7 @@ export function CategoryModal({
       onClose={onClose}
       title={categoryToEdit ? "Edit Category" : "Create Custom Category"}
       description="Custom categories let you classify transactions effectively."
-      maxWidth="md"
+      maxWidth="2xl"
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
@@ -164,7 +164,7 @@ export function CategoryModal({
           </Select>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
+            <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
               Color Token
             </label>
             <div className="flex items-center gap-2">
@@ -172,9 +172,9 @@ export function CategoryModal({
                 type="color"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
-                className="w-9 h-9 p-1 rounded-lg border border-[#e6e6e6] dark:border-[#2f2f2f] cursor-pointer"
+                className="w-9 h-9 p-1 rounded-lg border border-hairline cursor-pointer"
               />
-              <span className="text-xs font-mono text-[#615d59] dark:text-[#9b9b9b]">
+              <span className="text-xs font-mono text-ink-muted">
                 {color}
               </span>
             </div>
@@ -183,7 +183,7 @@ export function CategoryModal({
 
         {/* Color Palette Presets */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
+          <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
             Preset Colors
           </label>
           <div className="flex flex-wrap gap-2">
@@ -193,7 +193,7 @@ export function CategoryModal({
                 type="button"
                 onClick={() => setColor(c)}
                 className={`w-6 h-6 rounded-full transition-transform cursor-pointer ${
-                  color === c ? "ring-2 ring-offset-2 ring-[#0075de] scale-110" : ""
+                  color === c ? "ring-2 ring-offset-2 ring-primary scale-110" : ""
                 }`}
                 style={{ backgroundColor: c }}
               />
@@ -202,7 +202,7 @@ export function CategoryModal({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3 mt-4 pt-3 border-t border-[#e6e6e6] dark:border-[#2f2f2f]">
+        <div className="flex items-center justify-end gap-3 mt-4 pt-3 border-t border-hairline">
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
           </Button>

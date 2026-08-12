@@ -12,28 +12,28 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f6f5f4] dark:bg-[#191919] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
       <div className="w-full max-w-md flex flex-col gap-6">
         {/* Brand Logo Header */}
         <div className="flex flex-col items-center text-center">
-          <div className="p-3 rounded-2xl bg-[#0075de] text-white shadow-md mb-3">
+          <div className="p-3 rounded-2xl bg-primary text-white  mb-3">
             <Wallet className="w-8 h-8" />
           </div>
-          <h1 className="text-2xl font-black text-[#171717] dark:text-[#f7f7f7] tracking-tight">
+          <h1 className="text-2xl font-black text-ink tracking-tight">
             FinanceTrack
           </h1>
-          <p className="text-xs text-[#615d59] dark:text-[#9b9b9b] mt-1 flex items-center gap-1">
-            Personal Expense, Income & Investment Tracker <Sparkles className="w-3 h-3 text-[#0075de]" />
+          <p className="text-xs text-ink-muted mt-1 flex items-center gap-1">
+            Personal Expense, Income & Investment Tracker <Sparkles className="w-3 h-3 text-primary" />
           </p>
         </div>
 
         {/* Google Auth Card */}
         <Card className="p-6 sm:p-8 flex flex-col gap-6">
           <div className="text-center">
-            <h2 className="text-lg font-bold text-[#171717] dark:text-[#f7f7f7]">
+            <h2 className="text-lg font-bold text-ink">
               Welcome Back
             </h2>
-            <p className="text-xs text-[#615d59] dark:text-[#9b9b9b] mt-1">
+            <p className="text-xs text-ink-muted mt-1">
               Sign in with your Google account to access your personal financial dashboard and records.
             </p>
           </div>
@@ -43,7 +43,7 @@ export default function SignInPage() {
             type="button"
             variant="secondary"
             onClick={handleGoogleSignIn}
-            className="w-full h-12 text-sm font-bold border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs flex items-center justify-center gap-3 hover:border-[#0075de] transition-all cursor-pointer"
+            className="w-full h-12 text-sm font-bold border border-hairline  flex items-center justify-center gap-3 hover:border-primary transition-all cursor-pointer"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -66,8 +66,8 @@ export default function SignInPage() {
             Continue with Google
           </Button>
 
-          <div className="p-3 rounded-xl bg-[#f6f5f4] dark:bg-[#191919] border border-[#e6e6e6] dark:border-[#2f2f2f] text-[11px] text-[#615d59] dark:text-[#9b9b9b] flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-[#059669] shrink-0" />
+          <div className="p-3 rounded-xl bg-canvas border border-hairline text-[11px] text-ink-muted flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-income shrink-0" />
             <span>
               All financial records are encrypted and strictly isolated to your authenticated account.
             </span>

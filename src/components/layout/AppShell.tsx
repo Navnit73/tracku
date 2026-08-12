@@ -29,12 +29,12 @@ export function AppShell({
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-[#f6f5f4] dark:bg-[#191919] flex flex-col items-center justify-center gap-3 text-[#171717] dark:text-[#f7f7f7]">
-        <div className="p-3 rounded-2xl bg-[#0075de] text-white shadow-md animate-pulse">
+      <div className="min-h-screen bg-canvas flex flex-col items-center justify-center gap-3 text-ink">
+        <div className="p-3 rounded-2xl bg-primary text-white  animate-pulse">
           <Wallet className="w-8 h-8" />
         </div>
-        <div className="flex items-center gap-2 text-sm font-semibold text-[#615d59] dark:text-[#9b9b9b]">
-          <Loader2 className="w-4 h-4 animate-spin text-[#0075de]" />
+        <div className="flex items-center gap-2 text-sm font-semibold text-ink-muted">
+          <Loader2 className="w-4 h-4 animate-spin text-primary" />
           Verifying session...
         </div>
       </div>
@@ -46,7 +46,7 @@ export function AppShell({
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f5f4] dark:bg-[#191919] text-[#171717] dark:text-[#f7f7f7] flex relative">
+    <div className="min-h-screen bg-canvas text-ink flex relative">
       {/* Sidebar */}
       <Sidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 

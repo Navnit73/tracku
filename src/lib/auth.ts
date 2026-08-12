@@ -16,6 +16,9 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, account }) {
       // Triggered on initial sign-in when account is present
+      if (user?.id) {
+        token.sub = user.id;
+      }
       if (account && user?.email) {
         try {
           await connectToDatabase();
@@ -33,6 +36,9 @@ export const authOptions: NextAuthOptions = {
           token.currency = dbUser.currency || "USD";
         } catch (err) {
           console.error("[REDACTED Auth Error]", err instanceof Error ? err.message : "Authentication processing error");
+          if (user?.id) {
+            token.sub = user.id;
+          }
         }
       }
       return token;

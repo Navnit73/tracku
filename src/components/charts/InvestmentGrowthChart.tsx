@@ -10,6 +10,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import { formatCurrency } from "@/lib/utils";
 
 export interface InvestmentGrowthData {
   date: string;
@@ -17,10 +18,16 @@ export interface InvestmentGrowthData {
   cumulative: number;
 }
 
-export function InvestmentGrowthChart({ data }: { data: InvestmentGrowthData[] }) {
+export function InvestmentGrowthChart({
+  data,
+  currency = "USD",
+}: {
+  data: InvestmentGrowthData[];
+  currency?: string;
+}) {
   if (!data || data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-xs text-[#615d59] dark:text-[#9b9b9b]">
+      <div className="h-64 flex items-center justify-center text-xs text-ink-muted">
         No investment growth history available for this timeframe.
       </div>
     );
@@ -43,31 +50,32 @@ export function InvestmentGrowthChart({ data }: { data: InvestmentGrowthData[] }
         <AreaChart data={formattedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="purpleGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.4} />
-              <stop offset="95%" stopColor="#7c3aed" stopOpacity={0} />
+              <stop offset="5%" stopColor="var(--investment)" stopOpacity={0.4} />
+              <stop offset="95%" stopColor="var(--investment)" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e6e6e6" opacity={0.5} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--hairline)" opacity={0.5} />
           <XAxis
             dataKey="displayDate"
-            tick={{ fontSize: 11, fill: "#615d59" }}
-            axisLine={{ stroke: "#e6e6e6" }}
+            tick={{ fontSize: 11, fill: "var(--ink-muted)" }}
+            axisLine={{ stroke: "var(--hairline)" }}
           />
           <YAxis
-            tick={{ fontSize: 11, fill: "#615d59" }}
-            axisLine={{ stroke: "#e6e6e6" }}
-            tickFormatter={(val) => `$${val}`}
+            tick={{ fontSize: 11, fill: "var(--ink-muted)" }}
+            axisLine={{ stroke: "var(--hairline)" }}
+            tickFormatter={(val) => formatCurrency(val, currency)}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "#ffffff",
-              borderColor: "#e6e6e6",
+              backgroundColor: "var(--surface)",
+              borderColor: "var(--hairline)",
               borderRadius: "8px",
               fontSize: "12px",
+              color: "var(--ink)",
               boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
             }}
             formatter={(value: any, name: any) => [
-              `$${Number(value).toFixed(2)}`,
+              formatCurrency(Number(value) || 0, currency),
               name === "cumulative" ? "Total Portfolio Value" : "Contribution",
             ]}
           />
@@ -75,7 +83,7 @@ export function InvestmentGrowthChart({ data }: { data: InvestmentGrowthData[] }
             type="monotone"
             dataKey="cumulative"
             name="cumulative"
-            stroke="#7c3aed"
+            stroke="var(--investment)"
             fillOpacity={1}
             fill="url(#purpleGrad)"
             strokeWidth={2.5}

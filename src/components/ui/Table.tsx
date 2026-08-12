@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export function Table({ className, children, ...props }: TableHTMLAttributes<HTMLTableElement>) {
   return (
-    <div className="w-full overflow-x-auto rounded-xl border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#ffffff] dark:bg-[#202020] shadow-xs">
+    <div className="w-full overflow-x-auto rounded-xl border border-hairline bg-surface ">
       <table className={cn("w-full text-left border-collapse text-sm", className)} {...props}>
         {children}
       </table>
@@ -14,7 +14,7 @@ export function Table({ className, children, ...props }: TableHTMLAttributes<HTM
 export function TableHeader({ className, children, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
   return (
     <thead
-      className={cn("bg-[#f6f5f4] dark:bg-[#191919] border-b border-[#e6e6e6] dark:border-[#2f2f2f]", className)}
+      className={cn("bg-canvas border-b border-hairline", className)}
       {...props}
     >
       {children}
@@ -24,7 +24,7 @@ export function TableHeader({ className, children, ...props }: HTMLAttributes<HT
 
 export function TableBody({ className, children, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
   return (
-    <tbody className={cn("divide-y divide-[#e6e6e6] dark:divide-[#2f2f2f]", className)} {...props}>
+    <tbody className={cn("divide-y divide-hairline", className)} {...props}>
       {children}
     </tbody>
   );
@@ -34,7 +34,7 @@ export function TableRow({ className, children, ...props }: HTMLAttributes<HTMLT
   return (
     <tr
       className={cn(
-        "hover:bg-[#f6f5f4]/50 dark:hover:bg-[#252525]/50 transition-colors",
+        "hover:bg-canvas/50 transition-colors",
         className
       )}
       {...props}
@@ -48,7 +48,7 @@ export function TableHead({ className, children, ...props }: ThHTMLAttributes<HT
   return (
     <th
       className={cn(
-        "px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]",
+        "px-4 py-3 text-xs font-semibold uppercase tracking-wider text-ink-muted",
         className
       )}
       {...props}
@@ -61,7 +61,7 @@ export function TableHead({ className, children, ...props }: ThHTMLAttributes<HT
 export function TableCell({ className, children, ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
   return (
     <th
-      className={cn("px-4 py-3 text-[#171717] dark:text-[#f7f7f7] font-normal align-middle", className)}
+      className={cn("px-4 py-3 text-ink font-normal align-middle", className)}
       {...props}
     >
       {children}

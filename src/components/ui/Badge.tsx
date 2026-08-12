@@ -17,19 +17,19 @@ export function Badge({
 
   const variants = {
     expense:
-      "bg-[#fff1f2] text-[#e11d48] dark:bg-[#3f1d24] dark:text-[#fda4af] border border-[#fecdd3] dark:border-[#881337]",
+      "bg-expense-bg text-expense border border-expense/20",
     income:
-      "bg-[#ecfdf5] text-[#059669] dark:bg-[#133e2b] dark:text-[#6ee7b7] border border-[#a7f3d0] dark:border-[#065f46]",
+      "bg-income-bg text-income border border-income/20",
     investment:
-      "bg-[#f5f3ff] text-[#7c3aed] dark:bg-[#2e1a47] dark:text-[#c4b5fd] border border-[#ddd6fe] dark:border-[#5b21b6]",
+      "bg-investment-bg text-investment border border-investment/20",
     neutral:
-      "bg-[#f6f5f4] text-[#31302e] dark:bg-[#2a2a2a] dark:text-[#d3d3d3] border border-[#e6e6e6] dark:border-[#2f2f2f]",
+      "bg-canvas text-ink-secondary border border-hairline",
     outline:
-      "bg-transparent text-[#615d59] dark:text-[#9b9b9b] border border-[#e6e6e6] dark:border-[#2f2f2f]",
+      "bg-transparent text-ink-muted border border-hairline",
     sky:
-      "bg-[#f0f9ff] text-[#0284c7] dark:bg-[#0c2a3a] dark:text-[#7dd3fc] border border-[#bae6fd] dark:border-[#075985]",
+      "bg-sky-brand-bg text-sky-brand border border-sky-brand/20",
     orange:
-      "bg-[#fff7ed] text-[#ea580c] dark:bg-[#3b1c0c] dark:text-[#ffedd5] border border-[#ffedd5] dark:border-[#9a3412]",
+      "bg-warning-brand-bg text-warning-brand border border-warning-brand/20",
   };
 
   const sizes = {

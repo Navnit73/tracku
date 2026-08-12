@@ -160,13 +160,13 @@ export default function TransactionsPage() {
     >
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Action & Filter Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-[#ffffff] dark:bg-[#202020] p-4 sm:p-5 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline ">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight">
               Transaction Records
             </h2>
-            <p className="text-xs text-[#615d59] dark:text-[#9b9b9b] mt-0.5">
-              Filtered Total: <strong className="text-[#0075de]">{pagination.totalItems}</strong> entries
+            <p className="text-xs text-ink-muted mt-0.5">
+              Filtered Total: <strong className="text-primary">{pagination.totalItems}</strong> entries
             </p>
           </div>
 
@@ -198,20 +198,19 @@ export default function TransactionsPage() {
         <Card className="p-3.5 sm:p-4">
           <div className="flex items-center justify-between gap-2 sm:hidden mb-2.5">
             <Input
-              placeholder="Search item, notes..."
+              placeholder="Search items..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              leftIcon={<Search className="w-4 h-4" />}
-              className="flex-1"
+              className="py-1 text-xs"
             />
             <Button
-              variant={showMobileFilters ? "primary" : "secondary"}
+              variant="outline"
               size="sm"
               onClick={() => setShowMobileFilters(!showMobileFilters)}
-              leftIcon={<Filter className="w-4 h-4" />}
+              leftIcon={<Filter className="w-3.5 h-3.5" />}
             >
               Filters
             </Button>
@@ -219,24 +218,20 @@ export default function TransactionsPage() {
 
           <div
             className={cn(
-              "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3",
+              "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3",
               !showMobileFilters && "hidden sm:grid"
             )}
           >
-            {/* Search Input (Desktop view / Mobile drawer) */}
-            <div className="hidden sm:block lg:col-span-2">
-              <Input
-                placeholder="Search item, notes, tags..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
-                leftIcon={<Search className="w-4 h-4" />}
-              />
-            </div>
+            <Input
+              placeholder="Search items or notes..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              leftIcon={<Search className="w-4 h-4" />}
+            />
 
-            {/* Type Filter */}
             <Select
               value={type}
               onChange={(e) => {
@@ -244,13 +239,12 @@ export default function TransactionsPage() {
                 setPage(1);
               }}
             >
-              <option value="All">All Types</option>
+              <option value="All">All Transaction Types</option>
               <option value="Expense">Expense</option>
               <option value="Income">Income</option>
               <option value="Investment">Investment</option>
             </Select>
 
-            {/* Category Filter */}
             <Select
               value={categoryId}
               onChange={(e) => {
@@ -266,7 +260,6 @@ export default function TransactionsPage() {
               ))}
             </Select>
 
-            {/* Date Range Picker */}
             <DatePicker
               selectedPreset={dateRange}
               startDate={customStart}
@@ -283,7 +276,7 @@ export default function TransactionsPage() {
           {/* Amount range collapse */}
           <div
             className={cn(
-              "mt-3 pt-3 border-t border-[#e6e6e6] dark:border-[#2f2f2f] flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-[#615d59]",
+              "mt-3 pt-3 border-t border-hairline flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-ink-muted",
               !showMobileFilters && "hidden sm:flex"
             )}
           >
@@ -295,7 +288,7 @@ export default function TransactionsPage() {
               placeholder="Min $"
               value={minAmount}
               onChange={(e) => setMinAmount(e.target.value)}
-              className="w-20 sm:w-24 px-2 py-1 text-xs rounded border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#ffffff] dark:bg-[#191919]"
+              className="w-20 sm:w-24 px-2 py-1 text-xs rounded border border-hairline bg-surface text-ink placeholder-ink-faint"
             />
             <span>to</span>
             <input
@@ -303,7 +296,7 @@ export default function TransactionsPage() {
               placeholder="Max $"
               value={maxAmount}
               onChange={(e) => setMaxAmount(e.target.value)}
-              className="w-20 sm:w-24 px-2 py-1 text-xs rounded border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#ffffff] dark:bg-[#191919]"
+              className="w-20 sm:w-24 px-2 py-1 text-xs rounded border border-hairline bg-surface text-ink placeholder-ink-faint"
             />
             {(search || type !== "All" || categoryId !== "All" || minAmount || maxAmount) && (
               <Button
@@ -386,40 +379,40 @@ export default function TransactionsPage() {
                           {t.type}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-semibold text-xs text-[#31302e] dark:text-[#d3d3d3]">
+                      <TableCell className="font-semibold text-xs text-ink-secondary">
                         {t.categoryName}
                       </TableCell>
                       <TableCell className="font-bold">{t.item}</TableCell>
                       <TableCell
                         className={`text-right font-extrabold text-sm ${
                           t.type === "Income"
-                            ? "text-[#059669]"
+                            ? "text-income"
                             : t.type === "Expense"
-                            ? "text-[#e11d48]"
-                            : "text-[#7c3aed]"
+                            ? "text-expense"
+                            : "text-investment"
                         }`}
                       >
                         {t.type === "Income" ? "+" : "-"}
                         {formatCurrency(t.amount)}
                       </TableCell>
-                      <TableCell className="text-xs text-[#615d59] dark:text-[#9b9b9b]">
+                      <TableCell className="text-xs text-ink-muted">
                         {t.paymentMethod}
                       </TableCell>
-                      <TableCell className="text-xs text-[#615d59] max-w-xs truncate">
+                      <TableCell className="text-xs text-ink-muted max-w-xs truncate">
                         {t.notes || "—"}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => handleEdit(t)}
-                            className="p-1.5 rounded-lg text-[#0075de] hover:bg-[#f0f9ff] dark:hover:bg-[#1a2e40]"
+                            className="p-1.5 rounded-lg text-primary hover:bg-sky-brand-bg"
                             title="Edit Transaction"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(t._id, t.item)}
-                            className="p-1.5 rounded-lg text-[#e11d48] hover:bg-[#fff1f2] dark:hover:bg-[#3b1c24]"
+                            className="p-1.5 rounded-lg text-expense hover:bg-expense-bg"
                             title="Delete Transaction"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -449,25 +442,25 @@ export default function TransactionsPage() {
                     >
                       {t.type}
                     </Badge>
-                    <span className="text-xs text-[#615d59]">{formatDate(t.date)}</span>
+                    <span className="text-xs text-ink-muted">{formatDate(t.date)}</span>
                   </div>
 
                   <div className="flex items-center justify-between mt-1">
                     <div>
-                      <div className="text-base font-bold text-[#171717] dark:text-[#f7f7f7]">
+                      <div className="text-base font-bold text-ink">
                         {t.item}
                       </div>
-                      <div className="text-xs text-[#615d59] font-medium">
+                      <div className="text-xs text-ink-muted font-medium">
                         {t.categoryName} • {t.paymentMethod}
                       </div>
                     </div>
                     <div
                       className={`text-lg font-extrabold ${
                         t.type === "Income"
-                          ? "text-[#059669]"
+                          ? "text-income"
                           : t.type === "Expense"
-                          ? "text-[#e11d48]"
-                          : "text-[#7c3aed]"
+                          ? "text-expense"
+                          : "text-investment"
                       }`}
                     >
                       {formatCurrency(t.amount)}
@@ -475,12 +468,12 @@ export default function TransactionsPage() {
                   </div>
 
                   {t.notes && (
-                    <p className="text-xs text-[#615d59] bg-[#f6f5f4] dark:bg-[#191919] p-2 rounded-lg italic">
+                    <p className="text-xs text-ink-muted bg-canvas p-2 rounded-lg italic">
                       "{t.notes}"
                     </p>
                   )}
 
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#e6e6e6] dark:border-[#2f2f2f] mt-1">
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-hairline mt-1">
                     <Button variant="ghost" size="sm" onClick={() => handleEdit(t)}>
                       Edit
                     </Button>

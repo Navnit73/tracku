@@ -37,7 +37,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="min-h-full flex flex-col font-sans bg-[#f6f5f4] dark:bg-[#191919] text-[#171717] dark:text-[#f7f7f7]">
+      <body className="min-h-full flex flex-col font-sans bg-canvas text-ink">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

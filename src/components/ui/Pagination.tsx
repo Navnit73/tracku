@@ -24,12 +24,12 @@ export function Pagination({
   const endItem = Math.min(currentPage * pageSize, totalItems);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-3 px-1 text-xs text-[#615d59] dark:text-[#9b9b9b]">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-3 px-1 text-xs text-ink-muted">
       <div className="flex items-center gap-3">
         <span>
-          Showing <strong className="text-[#171717] dark:text-[#f7f7f7]">{startItem}</strong> to{" "}
-          <strong className="text-[#171717] dark:text-[#f7f7f7]">{endItem}</strong> of{" "}
-          <strong className="text-[#171717] dark:text-[#f7f7f7]">{totalItems}</strong> items
+          Showing <strong className="text-ink">{startItem}</strong> to{" "}
+          <strong className="text-ink">{endItem}</strong> of{" "}
+          <strong className="text-ink">{totalItems}</strong> items
         </span>
         {onPageSizeChange && (
           <div className="flex items-center gap-1.5 ml-2">
@@ -58,7 +58,7 @@ export function Pagination({
         >
           Previous
         </Button>
-        <span className="px-2 font-medium text-[#171717] dark:text-[#f7f7f7]">
+        <span className="px-2 font-medium text-ink">
           Page {currentPage} of {Math.max(1, totalPages)}
         </span>
         <Button

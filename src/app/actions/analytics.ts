@@ -2,6 +2,7 @@
 
 import { connectToDatabase } from "@/lib/db";
 import { Transaction } from "@/models/Transaction";
+import { User } from "@/models/User";
 import { requireAuthUser } from "@/lib/auth";
 import { getDateRangeBounds } from "@/lib/utils";
 
@@ -15,6 +16,9 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
   try {
     const user = await requireAuthUser();
     await connectToDatabase();
+
+    const dbUser = await User.findById(user.id).select("currency").lean();
+    const currency = (dbUser as any)?.currency || "USD";
 
     const range = filters?.dateRange || "This Month";
     const { startDate, endDate } = getDateRangeBounds(range, filters?.startDate, filters?.endDate);
@@ -172,6 +176,7 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
 
     return {
       success: true,
+      currency,
       summary: {
         balance,
         savings,

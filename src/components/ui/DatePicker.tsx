@@ -68,7 +68,7 @@ export function DatePicker({
         variant="secondary"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
-        leftIcon={<Calendar className="w-4 h-4 text-[#0075de]" />}
+        leftIcon={<Calendar className="w-4 h-4 text-primary" />}
         rightIcon={<ChevronDown className="w-3.5 h-3.5 opacity-60" />}
       >
         <span>{selectedPreset}</span>
@@ -80,8 +80,8 @@ export function DatePicker({
             className="fixed inset-0 z-30"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-72 rounded-xl bg-[#ffffff] dark:bg-[#202020] border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xl z-40 p-3 flex flex-col gap-2 animate-in fade-in zoom-in-95 duration-150">
-            <div className="text-xs font-bold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b] px-2 py-1">
+          <div className="absolute right-0 mt-2 w-72 rounded-xl bg-surface border border-hairline shadow-xl z-40 p-3 flex flex-col gap-2 animate-in fade-in zoom-in-95 duration-150">
+            <div className="text-xs font-bold uppercase tracking-wider text-ink-muted px-2 py-1">
               Select Time Horizon
             </div>
             <div className="grid grid-cols-2 gap-1">
@@ -93,8 +93,8 @@ export function DatePicker({
                   className={cn(
                     "text-left px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer",
                     selectedPreset === preset
-                      ? "bg-[#0075de] text-white"
-                      : "text-[#171717] dark:text-[#f7f7f7] hover:bg-[#f6f5f4] dark:hover:bg-[#2e2e2e]"
+                      ? "bg-primary text-white"
+                      : "text-ink hover:bg-canvas"
                   )}
                 >
                   {preset}
@@ -103,7 +103,7 @@ export function DatePicker({
             </div>
 
             {selectedPreset === "Custom Range" && (
-              <div className="mt-2 pt-2 border-t border-[#e6e6e6] dark:border-[#2f2f2f] flex flex-col gap-2">
+              <div className="mt-2 pt-2 border-t border-hairline flex flex-col gap-2">
                 <Input
                   type="date"
                   label="Start Date"

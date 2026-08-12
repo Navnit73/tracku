@@ -5,7 +5,7 @@ export function Skeleton({ className, ...props }: HTMLAttributes<HTMLDivElement>
   return (
     <div
       className={cn(
-        "animate-pulse rounded-md bg-[#e6e6e6]/60 dark:bg-[#2f2f2f]/60",
+        "animate-pulse rounded-md bg-hairline/60",
         className
       )}
       {...props}
@@ -15,7 +15,7 @@ export function Skeleton({ className, ...props }: HTMLAttributes<HTMLDivElement>
 
 export function CardSkeleton() {
   return (
-    <div className="rounded-xl border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#ffffff] dark:bg-[#202020] p-5 flex flex-col gap-3">
+    <div className="rounded-xl border border-hairline bg-surface p-5 flex flex-col gap-3">
       <Skeleton className="h-4 w-28" />
       <Skeleton className="h-8 w-44" />
       <Skeleton className="h-3 w-32" />
@@ -25,7 +25,7 @@ export function CardSkeleton() {
 
 export function TableSkeleton({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="w-full rounded-xl border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#ffffff] dark:bg-[#202020] p-4 flex flex-col gap-3">
+    <div className="w-full rounded-xl border border-hairline bg-surface p-4 flex flex-col gap-3">
       <Skeleton className="h-6 w-full" />
       {Array.from({ length: rows }).map((_, i) => (
         <Skeleton key={i} className="h-10 w-full" />
@@ -36,7 +36,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
 
 export function ChartSkeleton() {
   return (
-    <div className="w-full rounded-xl border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#ffffff] dark:bg-[#202020] p-5 flex flex-col gap-4">
+    <div className="w-full rounded-xl border border-hairline bg-surface p-5 flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <Skeleton className="h-5 w-36" />
         <Skeleton className="h-8 w-24" />

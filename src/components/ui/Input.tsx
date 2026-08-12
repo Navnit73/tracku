@@ -17,14 +17,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]"
+            className="text-xs font-semibold uppercase tracking-wider text-ink-muted"
           >
             {label}
           </label>
         )}
         <div className="relative flex items-center w-full">
           {leftIcon && (
-            <div className="absolute left-3 text-[#a39e98] pointer-events-none flex items-center justify-center">
+            <div className="absolute left-3 text-ink-faint pointer-events-none flex items-center justify-center">
               {leftIcon}
             </div>
           )}
@@ -32,21 +32,21 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             className={cn(
-              "w-full rounded-md border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#ffffff] dark:bg-[#202020] px-3 py-2 text-sm text-[#171717] dark:text-[#f7f7f7] placeholder-[#a39e98] transition-all focus:border-[#0075de] focus:outline-none focus:ring-1 focus:ring-[#0075de] disabled:opacity-50 disabled:bg-[#f6f5f4] dark:disabled:bg-[#191919]",
+              "w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm text-ink placeholder-ink-faint transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:bg-canvas",
               leftIcon && "pl-9",
               rightIcon && "pr-9",
-              error && "border-[#e11d48] focus:border-[#e11d48] focus:ring-[#e11d48]",
+              error && "border-expense focus:border-expense focus:ring-expense",
               className
             )}
             {...props}
           />
           {rightIcon && (
-            <div className="absolute right-3 text-[#a39e98] flex items-center justify-center">
+            <div className="absolute right-3 text-ink-faint flex items-center justify-center">
               {rightIcon}
             </div>
           )}
         </div>
-        {error && <span className="text-xs text-[#e11d48] font-medium">{error}</span>}
+        {error && <span className="text-xs text-expense font-medium">{error}</span>}
       </div>
     );
   }
@@ -68,7 +68,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]"
+            className="text-xs font-semibold uppercase tracking-wider text-ink-muted"
           >
             {label}
           </label>
@@ -77,13 +77,13 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           id={inputId}
           ref={ref}
           className={cn(
-            "w-full rounded-md border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#ffffff] dark:bg-[#202020] p-3 text-sm text-[#171717] dark:text-[#f7f7f7] placeholder-[#a39e98] transition-all focus:border-[#0075de] focus:outline-none focus:ring-1 focus:ring-[#0075de] min-h-[80px]",
-            error && "border-[#e11d48] focus:border-[#e11d48] focus:ring-[#e11d48]",
+            "w-full rounded-md border border-hairline bg-surface p-3 text-sm text-ink placeholder-ink-faint transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary min-h-[80px]",
+            error && "border-expense focus:border-expense focus:ring-expense",
             className
           )}
           {...props}
         />
-        {error && <span className="text-xs text-[#e11d48] font-medium">{error}</span>}
+        {error && <span className="text-xs text-expense font-medium">{error}</span>}
       </div>
     );
   }

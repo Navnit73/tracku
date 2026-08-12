@@ -11,6 +11,7 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
+import { formatCurrency } from "@/lib/utils";
 
 export interface IncomeExpenseData {
   date: string;
@@ -19,10 +20,16 @@ export interface IncomeExpenseData {
   investment: number;
 }
 
-export function IncomeExpenseChart({ data }: { data: IncomeExpenseData[] }) {
+export function IncomeExpenseChart({
+  data,
+  currency = "USD",
+}: {
+  data: IncomeExpenseData[];
+  currency?: string;
+}) {
   if (!data || data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-xs text-[#615d59] dark:text-[#9b9b9b]">
+      <div className="h-64 flex items-center justify-center text-xs text-ink-muted">
         No trend data available for selected filter period.
       </div>
     );
@@ -45,45 +52,46 @@ export function IncomeExpenseChart({ data }: { data: IncomeExpenseData[] }) {
         <AreaChart data={formattedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#059669" stopOpacity={0.4} />
-              <stop offset="95%" stopColor="#059669" stopOpacity={0} />
+              <stop offset="5%" stopColor="var(--income)" stopOpacity={0.4} />
+              <stop offset="95%" stopColor="var(--income)" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#e11d48" stopOpacity={0.4} />
-              <stop offset="95%" stopColor="#e11d48" stopOpacity={0} />
+              <stop offset="5%" stopColor="var(--expense)" stopOpacity={0.4} />
+              <stop offset="95%" stopColor="var(--expense)" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="investmentGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.4} />
-              <stop offset="95%" stopColor="#7c3aed" stopOpacity={0} />
+              <stop offset="5%" stopColor="var(--investment)" stopOpacity={0.4} />
+              <stop offset="95%" stopColor="var(--investment)" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e6e6e6" opacity={0.5} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--hairline)" opacity={0.5} />
           <XAxis
             dataKey="displayDate"
-            tick={{ fontSize: 11, fill: "#615d59" }}
-            axisLine={{ stroke: "#e6e6e6" }}
+            tick={{ fontSize: 11, fill: "var(--ink-muted)" }}
+            axisLine={{ stroke: "var(--hairline)" }}
           />
           <YAxis
-            tick={{ fontSize: 11, fill: "#615d59" }}
-            axisLine={{ stroke: "#e6e6e6" }}
-            tickFormatter={(val) => `$${val}`}
+            tick={{ fontSize: 11, fill: "var(--ink-muted)" }}
+            axisLine={{ stroke: "var(--hairline)" }}
+            tickFormatter={(val) => formatCurrency(val, currency)}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "#ffffff",
-              borderColor: "#e6e6e6",
+              backgroundColor: "var(--surface)",
+              borderColor: "var(--hairline)",
               borderRadius: "8px",
               fontSize: "12px",
+              color: "var(--ink)",
               boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
             }}
-            formatter={(value: any) => [`$${Number(value).toFixed(2)}`, ""]}
+            formatter={(value: any) => [formatCurrency(Number(value) || 0, currency), ""]}
           />
           <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }} />
           <Area
             type="monotone"
             dataKey="income"
             name="Income"
-            stroke="#059669"
+            stroke="var(--income)"
             fillOpacity={1}
             fill="url(#incomeGrad)"
             strokeWidth={2}
@@ -92,7 +100,7 @@ export function IncomeExpenseChart({ data }: { data: IncomeExpenseData[] }) {
             type="monotone"
             dataKey="expense"
             name="Expenses"
-            stroke="#e11d48"
+            stroke="var(--expense)"
             fillOpacity={1}
             fill="url(#expenseGrad)"
             strokeWidth={2}
@@ -101,7 +109,7 @@ export function IncomeExpenseChart({ data }: { data: IncomeExpenseData[] }) {
             type="monotone"
             dataKey="investment"
             name="Investments"
-            stroke="#7c3aed"
+            stroke="var(--investment)"
             fillOpacity={1}
             fill="url(#investmentGrad)"
             strokeWidth={2}

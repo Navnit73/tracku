@@ -11,16 +11,23 @@ import {
   CartesianGrid,
   Cell,
 } from "recharts";
+import { formatCurrency } from "@/lib/utils";
 
 export interface TopItemData {
   item: string;
   totalAmount: number;
 }
 
-export function TopItemsChart({ data }: { data: TopItemData[] }) {
+export function TopItemsChart({
+  data,
+  currency = "USD",
+}: {
+  data: TopItemData[];
+  currency?: string;
+}) {
   if (!data || data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-xs text-[#615d59] dark:text-[#9b9b9b]">
+      <div className="h-64 flex items-center justify-center text-xs text-ink-muted">
         No item spend data available.
       </div>
     );
@@ -34,27 +41,32 @@ export function TopItemsChart({ data }: { data: TopItemData[] }) {
           data={data}
           margin={{ top: 10, right: 20, left: 20, bottom: 0 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e6e6e6" opacity={0.5} />
-          <XAxis type="number" tick={{ fontSize: 11, fill: "#615d59" }} tickFormatter={(v) => `$${v}`} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--hairline)" opacity={0.5} />
+          <XAxis
+            type="number"
+            tick={{ fontSize: 11, fill: "var(--ink-muted)" }}
+            tickFormatter={(v) => formatCurrency(v, currency)}
+          />
           <YAxis
             type="category"
             dataKey="item"
-            tick={{ fontSize: 11, fill: "#615d59" }}
+            tick={{ fontSize: 11, fill: "var(--ink-muted)" }}
             width={120}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "#ffffff",
-              borderColor: "#e6e6e6",
+              backgroundColor: "var(--surface)",
+              borderColor: "var(--hairline)",
               borderRadius: "8px",
               fontSize: "12px",
+              color: "var(--ink)",
               boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
             }}
-            formatter={(value: any) => [`$${Number(value).toFixed(2)}`, "Total Spend"]}
+            formatter={(value: any) => [formatCurrency(Number(value) || 0, currency), "Total Spend"]}
           />
           <Bar dataKey="totalAmount" radius={[0, 4, 4, 0]}>
             {data.map((_, index) => (
-              <Cell key={`bar-${index}`} fill={index === 0 ? "#e11d48" : "#0075de"} />
+              <Cell key={`bar-${index}`} fill={index === 0 ? "var(--expense)" : "var(--primary)"} />
             ))}
           </Bar>
         </BarChart>

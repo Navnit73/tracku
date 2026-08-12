@@ -59,12 +59,12 @@ export default function ExpensesPage() {
     >
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Control */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-[#ffffff] dark:bg-[#202020] p-3.5 sm:p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-3.5 sm:p-4 rounded-2xl border border-hairline ">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight">
               Expense Tracker & Analysis
             </h2>
-            <p className="text-xs text-[#615d59] dark:text-[#9b9b9b] mt-0.5">
+            <p className="text-xs text-ink-muted mt-0.5">
               Comprehensive spending trends & category distribution
             </p>
           </div>
@@ -104,66 +104,66 @@ export default function ExpensesPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
                   Total Expenses
                 </span>
-                <div className="p-2 rounded-lg bg-[#fff1f2] dark:bg-[#3b1c24] text-[#e11d48]">
+                <div className="p-2 rounded-lg bg-expense-bg text-expense">
                   <TrendingDown className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-[#e11d48]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-expense">
                 {formatCurrency(analytics?.totalExpense || 0)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b]">
+              <div className="mt-2 text-xs text-ink-muted">
                 {analytics?.transactionCount || 0} Total Transactions
               </div>
             </Card>
 
             <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
                   Highest Expense
                 </span>
-                <div className="p-2 rounded-lg bg-[#fff7ed] dark:bg-[#3a2012] text-[#ea580c]">
+                <div className="p-2 rounded-lg bg-warning-brand-bg text-warning-brand">
                   <ShoppingBag className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-ink">
                 {formatCurrency(analytics?.highestExpense || 0)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b] truncate">
+              <div className="mt-2 text-xs text-ink-muted truncate">
                 Item: <strong>{analytics?.highestExpenseItem || "N/A"}</strong>
               </div>
             </Card>
 
             <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
                   Average Expense
                 </span>
-                <div className="p-2 rounded-lg bg-[#f0f9ff] dark:bg-[#0c2a3a] text-[#0075de]">
+                <div className="p-2 rounded-lg bg-sky-brand-bg text-primary">
                   <CreditCard className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-ink">
                 {formatCurrency(analytics?.averageExpense || 0)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b]">Per transaction spend</div>
+              <div className="mt-2 text-xs text-ink-muted">Per transaction spend</div>
             </Card>
 
             <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
                   Transaction Volume
                 </span>
                 <Badge variant="expense" size="sm">
                   Expenses
                 </Badge>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-[#171717] dark:text-[#f7f7f7]">
+              <div className="text-2xl sm:text-3xl font-extrabold text-ink">
                 {analytics?.transactionCount || 0}
               </div>
-              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b]">Expense records logged</div>
+              <div className="mt-2 text-xs text-ink-muted">Expense records logged</div>
             </Card>
           </div>
         )}
@@ -187,7 +187,7 @@ export default function ExpensesPage() {
           <Card className="p-4 sm:p-5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <Sparkles className="w-4 h-4 text-[#e11d48]" />
+                <Sparkles className="w-4 h-4 text-expense" />
                 Frequently Purchased Items
               </CardTitle>
               <CardDescription>Most recurring expense items</CardDescription>
@@ -197,21 +197,21 @@ export default function ExpensesPage() {
                 analytics.frequentlyPurchased.map((item: any, idx: number) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-3 rounded-xl bg-[#f6f5f4] dark:bg-[#191919] border border-[#e6e6e6] dark:border-[#2f2f2f]"
+                    className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-hairline"
                   >
                     <div>
-                      <div className="text-sm font-bold text-[#171717] dark:text-[#f7f7f7]">
+                      <div className="text-sm font-bold text-ink">
                         {item.item}
                       </div>
-                      <div className="text-xs text-[#615d59] dark:text-[#9b9b9b]">
+                      <div className="text-xs text-ink-muted">
                         {item.count} purchases • Avg {formatCurrency(item.averageAmount)}
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-extrabold text-[#e11d48]">
+                      <div className="text-sm font-extrabold text-expense">
                         {formatCurrency(item.totalAmount)}
                       </div>
-                      <div className="text-[10px] text-[#a39e98]">
+                      <div className="text-[10px] text-ink-faint">
                         Last: {formatDate(item.lastPurchaseDate)}
                       </div>
                     </div>

@@ -3,11 +3,11 @@ import Swal from "sweetalert2";
 // Configure SweetAlert2 for Notion design system aesthetic
 const CustomSwal = Swal.mixin({
   customClass: {
-    popup: "font-sans border border-[#e6e6e6] dark:border-[#2f2f2f] rounded-xl shadow-lg bg-[#ffffff] dark:bg-[#202020] text-[#171717] dark:text-[#f7f7f7]",
-    title: "text-lg font-bold text-[#171717] dark:text-[#f7f7f7]",
-    htmlContainer: "text-sm text-[#615d59] dark:text-[#9b9b9b]",
-    confirmButton: "bg-[#0075de] hover:bg-[#005bab] text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition-all",
-    cancelButton: "bg-[#f6f5f4] dark:bg-[#2a2a2a] hover:bg-[#e6e6e6] dark:hover:bg-[#333333] text-[#171717] dark:text-[#f7f7f7] text-sm font-medium px-4 py-2 rounded-lg border border-[#e6e6e6] dark:border-[#2f2f2f] transition-all ml-2",
+    popup: "font-sans border border-hairline rounded-xl shadow-lg bg-surface text-ink",
+    title: "text-lg font-bold text-ink",
+    htmlContainer: "text-sm text-ink-muted",
+    confirmButton: "bg-primary hover:bg-primary-active text-white text-sm font-medium px-4 py-2 rounded-lg transition-all",
+    cancelButton: "bg-canvas hover:bg-hairline text-ink text-sm font-medium px-4 py-2 rounded-lg border border-hairline transition-all ml-2",
   },
   buttonsStyling: false,
 });
@@ -23,7 +23,7 @@ export const showToast = {
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true,
-      iconColor: "#059669",
+      iconColor: "var(--income)",
     });
   },
   error: (title: string, message?: string) => {
@@ -36,7 +36,7 @@ export const showToast = {
       showConfirmButton: false,
       timer: 4000,
       timerProgressBar: true,
-      iconColor: "#e11d48",
+      iconColor: "var(--expense)",
     });
   },
   info: (title: string, message?: string) => {
@@ -49,7 +49,7 @@ export const showToast = {
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true,
-      iconColor: "#0075de",
+      iconColor: "var(--primary)",
     });
   },
   warning: (title: string, message?: string) => {
@@ -62,7 +62,7 @@ export const showToast = {
       showConfirmButton: false,
       timer: 3500,
       timerProgressBar: true,
-      iconColor: "#d97706",
+      iconColor: "var(--warning)",
     });
   },
 };
@@ -81,7 +81,7 @@ export const confirmDialog = async (options: {
     confirmButtonText: options.confirmText || "Yes, delete",
     cancelButtonText: options.cancelText || "Cancel",
     reverseButtons: true,
-    iconColor: "#e11d48",
+    iconColor: "var(--expense)",
   });
   return result.isConfirmed;
 };

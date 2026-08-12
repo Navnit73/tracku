@@ -421,3 +421,38 @@ export async function seedSampleTransactions() {
     return { success: false, error: error.message };
   }
 }
+
+/**
+ * Clears all transaction data for the logged-in user without deleting their account.
+ * Allows users to test cleanly with fresh datasets.
+ */
+export async function clearAllUserData() {
+  try {
+    const user = await requireAuthUser();
+    await connectToDatabase();
+
+    const result = await Transaction.deleteMany({ userId: user.id });
+
+    revalidatePath("/");
+    revalidatePath("/transactions");
+    revalidatePath("/expenses");
+    revalidatePath("/income");
+    revalidatePath("/investments");
+    revalidatePath("/insights");
+    revalidatePath("/reports");
+    revalidatePath("/categories");
+
+    return {
+      success: true,
+      message: `Cleared ${result.deletedCount} transaction records successfully. You can now test with fresh data.`,
+      count: result.deletedCount,
+    };
+  } catch (error: any) {
+    console.error("[Clear Data Error]", error instanceof Error ? error.message : "Failed to clear transactions");
+    return {
+      success: false,
+      error: error?.message || "Failed to clear transaction records.",
+    };
+  }
+}
+

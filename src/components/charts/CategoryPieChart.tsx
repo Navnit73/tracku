@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import { formatCurrency } from "@/lib/utils";
 
 export interface CategoryData {
   name: string;
@@ -9,22 +10,28 @@ export interface CategoryData {
 }
 
 const COLORS = [
-  "#0075de",
-  "#e11d48",
-  "#059669",
-  "#7c3aed",
-  "#eab308",
+  "var(--primary)",
+  "var(--expense)",
+  "var(--income)",
+  "var(--investment)",
+  "var(--warning)",
   "#ec4899",
   "#f97316",
   "#06b6d4",
   "#8b5cf6",
-  "#64748b",
+  "var(--ink-muted)",
 ];
 
-export function CategoryPieChart({ data }: { data: CategoryData[] }) {
+export function CategoryPieChart({
+  data,
+  currency = "USD",
+}: {
+  data: CategoryData[];
+  currency?: string;
+}) {
   if (!data || data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-xs text-[#615d59] dark:text-[#9b9b9b]">
+      <div className="h-64 flex items-center justify-center text-xs text-ink-muted">
         No category data available for selected filter period.
       </div>
     );
@@ -50,13 +57,14 @@ export function CategoryPieChart({ data }: { data: CategoryData[] }) {
           </Pie>
           <Tooltip
             contentStyle={{
-              backgroundColor: "#ffffff",
-              borderColor: "#e6e6e6",
+              backgroundColor: "var(--surface)",
+              borderColor: "var(--hairline)",
               borderRadius: "8px",
               fontSize: "12px",
+              color: "var(--ink)",
               boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
             }}
-            formatter={(value: any) => [`$${Number(value).toFixed(2)}`, "Amount"]}
+            formatter={(value: any) => [formatCurrency(Number(value) || 0, currency), "Amount"]}
           />
           <Legend
             layout="horizontal"

@@ -26,19 +26,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0075de] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none select-none cursor-pointer active:scale-[0.98]";
+      "inline-flex items-center justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none select-none cursor-pointer active:scale-[0.98]";
 
     const variants = {
       primary:
-        "bg-[#0075de] hover:bg-[#005bab] text-white rounded-full shadow-sm",
+        "bg-primary hover:bg-primary-active text-white rounded-full ",
       secondary:
-        "bg-[#ffffff] dark:bg-[#252525] hover:bg-[#f6f5f4] dark:hover:bg-[#303030] text-[#171717] dark:text-[#f7f7f7] border border-[#e6e6e6] dark:border-[#2f2f2f] rounded-full shadow-xs",
+        "bg-surface hover:bg-canvas text-ink border border-hairline rounded-full ",
       outline:
-        "bg-transparent hover:bg-[#f6f5f4] dark:hover:bg-[#252525] text-[#171717] dark:text-[#f7f7f7] border border-[#e6e6e6] dark:border-[#2f2f2f] rounded-md",
+        "bg-transparent hover:bg-canvas text-ink border border-hairline rounded-md",
       ghost:
-        "bg-transparent hover:bg-[#f6f5f4] dark:hover:bg-[#252525] text-[#31302e] dark:text-[#d3d3d3] rounded-md",
+        "bg-transparent hover:bg-canvas text-ink-secondary rounded-md",
       danger:
-        "bg-[#e11d48] hover:bg-[#be123c] text-white rounded-md shadow-sm",
+        "bg-expense hover:bg-expense/90 text-white rounded-md ",
     };
 
     const sizes = {

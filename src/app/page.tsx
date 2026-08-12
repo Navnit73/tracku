@@ -15,6 +15,9 @@ import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getDashboardAnalytics } from "@/app/actions/analytics";
 import { seedSampleTransactions } from "@/app/actions/transactions";
+import { getSpendingInsights } from "@/app/actions/insights";
+import type { InsightItem } from "@/app/actions/insights";
+import { InsightCard } from "@/components/insights/InsightCard";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { showToast } from "@/lib/toast";
 import {
@@ -29,6 +32,7 @@ import {
   Database,
   Calendar,
   Sparkles,
+  Brain,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -38,21 +42,32 @@ export default function DashboardPage() {
 
   const [analytics, setAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [quickInsights, setQuickInsights] = useState<InsightItem[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [seeding, setSeeding] = useState(false);
 
   const fetchAnalytics = useCallback(async () => {
     setLoading(true);
-    const res = await getDashboardAnalytics({
-      dateRange: datePreset,
-      startDate: customStart,
-      endDate: customEnd,
-    });
+    const [res, insightsRes] = await Promise.all([
+      getDashboardAnalytics({
+        dateRange: datePreset,
+        startDate: customStart,
+        endDate: customEnd,
+      }),
+      getSpendingInsights({
+        dateRange: datePreset,
+        startDate: customStart,
+        endDate: customEnd,
+      }),
+    ]);
     if (res.success) {
       setAnalytics(res);
     } else {
       showToast.error("Failed to load dashboard data", res.error);
+    }
+    if (insightsRes.success) {
+      setQuickInsights((insightsRes.insights || []).slice(0, 3));
     }
     setLoading(false);
   }, [datePreset, customStart, customEnd]);
@@ -83,13 +98,13 @@ export default function DashboardPage() {
     <AppShell title="Dashboard" onOpenNewTransaction={() => setIsModalOpen(true)}>
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Top Control Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-[#ffffff] dark:bg-[#202020] p-3.5 sm:p-4 rounded-2xl border border-[#e6e6e6] dark:border-[#2f2f2f] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-3.5 sm:p-4 rounded-2xl border border-hairline ">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight">
               Financial Summary
             </h2>
-            <p className="text-xs text-[#615d59] dark:text-[#9b9b9b] mt-0.5">
-              Metrics horizon: <strong className="text-[#0075de]">{datePreset}</strong>
+            <p className="text-xs text-ink-muted mt-0.5">
+              Metrics horizon: <strong className="text-primary">{datePreset}</strong>
             </p>
           </div>
 
@@ -112,6 +127,30 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Quick Insights Strip */}
+        {!loading && quickInsights.length > 0 && (
+          <div className="bg-surface p-3.5 sm:p-4 rounded-2xl border border-hairline ">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-ink flex items-center gap-2">
+                <Brain className="w-4 h-4 text-primary" />
+                Quick Insights
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => (window.location.href = "/insights")}
+              >
+                View All Insights →
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {quickInsights.map((insight, idx) => (
+                <InsightCard key={insight.id} insight={insight} index={idx} />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Summary Metric Cards */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -133,7 +172,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                {formatCurrency(analytics?.summary?.balance || 0)}
+                {formatCurrency(analytics?.summary?.balance || 0, analytics?.currency)}
               </div>
               <div className="mt-2 text-xs text-blue-100 flex items-center justify-between border-t border-white/10 pt-2">
                 <span>Net = Income - Exp - Inv</span>
@@ -144,20 +183,20 @@ export default function DashboardPage() {
             {/* Savings */}
             <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
                   Net Savings
                 </span>
-                <div className="p-2 rounded-lg bg-[#ecfdf5] dark:bg-[#133e2b] text-[#059669]">
+                <div className="p-2 rounded-lg bg-income-bg text-income">
                   <PiggyBank className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-[#171717] dark:text-[#f7f7f7] tracking-tight">
-                {formatCurrency(analytics?.summary?.savings || 0)}
+              <div className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
+                {formatCurrency(analytics?.summary?.savings || 0, analytics?.currency)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b] flex items-center justify-between border-t border-[#e6e6e6] dark:border-[#2f2f2f] pt-2">
+              <div className="mt-2 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2">
                 <span>Savings = Income - Exp</span>
                 <Badge variant="income" size="sm">
-                  +{formatCurrency(analytics?.summary?.monthlyIncome || 0)}/mo
+                  +{formatCurrency(analytics?.summary?.monthlyIncome || 0, analytics?.currency)}/mo
                 </Badge>
               </div>
             </Card>
@@ -165,31 +204,31 @@ export default function DashboardPage() {
             {/* Total Income & Expenses */}
             <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
                   Income & Expenses
                 </span>
-                <div className="p-2 rounded-lg bg-[#f0f9ff] dark:bg-[#0c2a3a] text-[#0075de]">
+                <div className="p-2 rounded-lg bg-sky-brand-bg text-primary">
                   <TrendingUp className="w-4 h-4" />
                 </div>
               </div>
               <div className="flex items-baseline justify-between gap-1">
                 <div>
-                  <div className="text-xs text-[#615d59] dark:text-[#9b9b9b]">Income</div>
-                  <div className="text-base sm:text-lg font-bold text-[#059669]">
-                    {formatCurrency(analytics?.summary?.totalIncome || 0)}
+                  <div className="text-xs text-ink-muted">Income</div>
+                  <div className="text-base sm:text-lg font-bold text-income">
+                    {formatCurrency(analytics?.summary?.totalIncome || 0, analytics?.currency)}
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs text-[#615d59] dark:text-[#9b9b9b]">Expenses</div>
-                  <div className="text-base sm:text-lg font-bold text-[#e11d48]">
-                    {formatCurrency(analytics?.summary?.totalExpenses || 0)}
+                  <div className="text-xs text-ink-muted">Expenses</div>
+                  <div className="text-base sm:text-lg font-bold text-expense">
+                    {formatCurrency(analytics?.summary?.totalExpenses || 0, analytics?.currency)}
                   </div>
                 </div>
               </div>
-              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b] border-t border-[#e6e6e6] dark:border-[#2f2f2f] pt-2 flex justify-between">
+              <div className="mt-2 text-xs text-ink-muted border-t border-hairline pt-2 flex justify-between">
                 <span>Mo. Expenses:</span>
-                <strong className="text-[#e11d48]">
-                  {formatCurrency(analytics?.summary?.monthlyExpenses || 0)}
+                <strong className="text-expense">
+                  {formatCurrency(analytics?.summary?.monthlyExpenses || 0, analytics?.currency)}
                 </strong>
               </div>
             </Card>
@@ -197,20 +236,20 @@ export default function DashboardPage() {
             {/* Investments */}
             <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
                   Total Investments
                 </span>
-                <div className="p-2 rounded-lg bg-[#f5f3ff] dark:bg-[#2e1a47] text-[#7c3aed]">
+                <div className="p-2 rounded-lg bg-investment-bg text-investment">
                   <LineChart className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-[#7c3aed] dark:text-[#a78bfa] tracking-tight">
-                {formatCurrency(analytics?.summary?.totalInvestments || 0)}
+              <div className="text-2xl sm:text-3xl font-extrabold text-investment tracking-tight">
+                {formatCurrency(analytics?.summary?.totalInvestments || 0, analytics?.currency)}
               </div>
-              <div className="mt-2 text-xs text-[#615d59] dark:text-[#9b9b9b] flex items-center justify-between border-t border-[#e6e6e6] dark:border-[#2f2f2f] pt-2">
+              <div className="mt-2 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2">
                 <span>Mo. Invested:</span>
-                <strong className="text-[#7c3aed]">
-                  {formatCurrency(analytics?.summary?.monthlyInvestments || 0)}
+                <strong className="text-investment">
+                  {formatCurrency(analytics?.summary?.monthlyInvestments || 0, analytics?.currency)}
                 </strong>
               </div>
             </Card>
@@ -236,7 +275,10 @@ export default function DashboardPage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <IncomeExpenseChart data={analytics?.charts?.incomeVsExpense || []} />
+                <IncomeExpenseChart
+                  data={analytics?.charts?.incomeVsExpense || []}
+                  currency={analytics?.currency}
+                />
               )}
             </CardContent>
           </Card>
@@ -251,7 +293,10 @@ export default function DashboardPage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <CategoryPieChart data={analytics?.charts?.categorySpending || []} />
+                <CategoryPieChart
+                  data={analytics?.charts?.categorySpending || []}
+                  currency={analytics?.currency}
+                />
               )}
             </CardContent>
           </Card>
@@ -274,7 +319,10 @@ export default function DashboardPage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <InvestmentGrowthChart data={analytics?.charts?.investmentGrowth || []} />
+                <InvestmentGrowthChart
+                  data={analytics?.charts?.investmentGrowth || []}
+                  currency={analytics?.currency}
+                />
               )}
             </CardContent>
           </Card>
@@ -289,7 +337,10 @@ export default function DashboardPage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <TopItemsChart data={analytics?.charts?.topSpendingItems || []} />
+                <TopItemsChart
+                  data={analytics?.charts?.topSpendingItems || []}
+                  currency={analytics?.currency}
+                />
               )}
             </CardContent>
           </Card>
@@ -301,7 +352,7 @@ export default function DashboardPage() {
           <Card className="lg:col-span-1 p-4 sm:p-5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <Sparkles className="w-4 h-4 text-[#0075de]" />
+                <Sparkles className="w-4 h-4 text-primary" />
                 Frequently Spent Items
               </CardTitle>
               <CardDescription>High frequency recurring purchases</CardDescription>
@@ -311,17 +362,17 @@ export default function DashboardPage() {
                 analytics.frequentlySpentItems.map((item: any, idx: number) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-3 rounded-xl bg-[#f6f5f4] dark:bg-[#191919] border border-[#e6e6e6] dark:border-[#2f2f2f]"
+                    className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-hairline"
                   >
                     <div>
-                      <div className="text-sm font-bold text-[#171717] dark:text-[#f7f7f7]">
+                      <div className="text-sm font-bold text-ink">
                         {item.item}
                       </div>
-                      <div className="text-xs text-[#615d59] dark:text-[#9b9b9b]">
+                      <div className="text-xs text-ink-muted">
                         {item.count} transactions • Avg {formatCurrency(item.averageAmount)}
                       </div>
                     </div>
-                    <div className="text-right font-semibold text-sm text-[#e11d48]">
+                    <div className="text-right font-semibold text-sm text-expense">
                       {formatCurrency(item.totalAmount)}
                     </div>
                   </div>
@@ -352,17 +403,17 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               {analytics?.recentTransactions?.length > 0 ? (
-                <div className="divide-y divide-[#e6e6e6] dark:divide-[#2f2f2f]">
+                <div className="divide-y divide-hairline">
                   {analytics.recentTransactions.map((t: any) => (
                     <div key={t._id} className="py-3 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <div
                           className={`p-2 rounded-xl text-white shrink-0 ${
                             t.type === "Income"
-                              ? "bg-[#059669]"
+                              ? "bg-income"
                               : t.type === "Expense"
-                              ? "bg-[#e11d48]"
-                              : "bg-[#7c3aed]"
+                              ? "bg-expense"
+                              : "bg-investment"
                           }`}
                         >
                           {t.type === "Income" ? (
@@ -372,10 +423,10 @@ export default function DashboardPage() {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <div className="text-sm font-bold text-[#171717] dark:text-[#f7f7f7] truncate">
+                          <div className="text-sm font-bold text-ink truncate">
                             {t.item}
                           </div>
-                          <div className="text-xs text-[#615d59] dark:text-[#9b9b9b] truncate">
+                          <div className="text-xs text-ink-muted truncate">
                             {t.categoryName} • {formatDate(t.date)}
                           </div>
                         </div>
@@ -383,10 +434,10 @@ export default function DashboardPage() {
                       <div
                         className={`text-sm font-bold shrink-0 ${
                           t.type === "Income"
-                            ? "text-[#059669]"
+                            ? "text-income"
                             : t.type === "Expense"
-                            ? "text-[#e11d48]"
-                            : "text-[#7c3aed]"
+                            ? "text-expense"
+                            : "text-investment"
                         }`}
                       >
                         {t.type === "Income" ? "+" : "-"}

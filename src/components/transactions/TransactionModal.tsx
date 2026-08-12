@@ -184,15 +184,15 @@ export function TransactionModal({
       onClose={onClose}
       title={transactionToEdit ? "Edit Transaction" : "Record New Transaction"}
       description="Enter transaction details below. All fields marked with * are required."
-      maxWidth="lg"
+      maxWidth="4xl"
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Transaction Type Selector */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold uppercase tracking-wider text-[#615d59] dark:text-[#9b9b9b]">
+          <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
             Transaction Type *
           </label>
-          <div className="grid grid-cols-3 gap-2 p-1 bg-[#f6f5f4] dark:bg-[#191919] rounded-xl border border-[#e6e6e6] dark:border-[#2f2f2f]">
+          <div className="grid grid-cols-3 gap-2 p-1 bg-canvas rounded-xl border border-hairline">
             {(["Expense", "Income", "Investment"] as const).map((t) => (
               <button
                 key={t}
@@ -201,11 +201,11 @@ export function TransactionModal({
                 className={`py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                   type === t
                     ? t === "Expense"
-                      ? "bg-[#e11d48] text-white shadow-xs"
+                      ? "bg-expense text-white "
                       : t === "Income"
-                      ? "bg-[#059669] text-white shadow-xs"
-                      : "bg-[#7c3aed] text-white shadow-xs"
-                    : "text-[#615d59] dark:text-[#9b9b9b] hover:text-[#171717] dark:hover:text-[#f7f7f7]"
+                      ? "bg-income text-white "
+                      : "bg-investment text-white "
+                    : "text-ink-muted hover:text-ink"
                 }`}
               >
                 {t}
@@ -293,7 +293,7 @@ export function TransactionModal({
         />
 
         {/* Modal Buttons */}
-        <div className="flex items-center justify-end gap-3 mt-4 pt-3 border-t border-[#e6e6e6] dark:border-[#2f2f2f]">
+        <div className="flex items-center justify-end gap-3 mt-4 pt-3 border-t border-hairline">
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
           </Button>

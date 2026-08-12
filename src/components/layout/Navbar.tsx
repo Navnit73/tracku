@@ -49,16 +49,16 @@ export function Navbar({
   };
 
   return (
-    <header className="h-14 sm:h-16 sticky top-0 z-30 bg-[#ffffff]/85 dark:bg-[#202020]/85 backdrop-blur-md border-b border-[#e6e6e6] dark:border-[#2f2f2f] px-3.5 sm:px-6 flex items-center justify-between transition-colors">
+    <header className="h-14 sm:h-16 sticky top-0 z-30 bg-surface/85 backdrop-blur-md border-b border-hairline px-3.5 sm:px-6 flex items-center justify-between transition-colors">
       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
         <button
           onClick={onOpenMobileMenu}
-          className="p-1.5 sm:p-2 rounded-xl text-[#615d59] dark:text-[#9b9b9b] hover:bg-[#f6f5f4] dark:hover:bg-[#2e2e2e] active:scale-95 transition-transform lg:hidden cursor-pointer"
+          className="p-1.5 sm:p-2 rounded-xl text-ink-muted hover:bg-canvas active:scale-95 transition-transform lg:hidden cursor-pointer"
           aria-label="Open Navigation Menu"
         >
           <Menu className="w-5 h-5" />
         </button>
-        <h1 className="text-base sm:text-lg font-bold text-[#171717] dark:text-[#f7f7f7] tracking-tight truncate">
+        <h1 className="text-base sm:text-lg font-bold text-ink tracking-tight truncate">
           {title}
         </h1>
       </div>
@@ -67,20 +67,20 @@ export function Navbar({
         {/* Dark / Light Mode Toggle */}
         <button
           onClick={toggleDarkMode}
-          className="p-2 rounded-xl border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#f6f5f4] dark:bg-[#191919] text-[#171717] dark:text-[#f7f7f7] hover:bg-[#e6e6e6] dark:hover:bg-[#2c2c2c] transition-colors cursor-pointer"
+          className="p-2 rounded-xl border border-hairline bg-canvas text-ink hover:bg-hairline transition-colors cursor-pointer"
           title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
         >
           {isDarkMode ? (
-            <Sun className="w-4 h-4 text-[#eab308]" />
+            <Sun className="w-4 h-4 text-amber-500" />
           ) : (
-            <Moon className="w-4 h-4 text-[#0075de]" />
+            <Moon className="w-4 h-4 text-primary" />
           )}
         </button>
 
         {/* User Account / Auth */}
         {session?.user ? (
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#e6e6e6] dark:border-[#2f2f2f] bg-[#f6f5f4] dark:bg-[#191919]">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-hairline bg-canvas">
               {session.user.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -89,9 +89,9 @@ export function Navbar({
                   className="w-5 h-5 rounded-full"
                 />
               ) : (
-                <UserIcon className="w-4 h-4 text-[#0075de]" />
+                <UserIcon className="w-4 h-4 text-primary" />
               )}
-              <span className="text-xs font-semibold text-[#171717] dark:text-[#f7f7f7] hidden sm:inline">
+              <span className="text-xs font-semibold text-ink hidden sm:inline">
                 {session.user.name || session.user.email}
               </span>
             </div>
