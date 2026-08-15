@@ -1,9 +1,45 @@
 import { connectToDatabase } from "@/lib/db";
+import { User } from "@/models/User";
 import { Subscription, ISubscription } from "@/models/Subscription";
 import { Transaction } from "@/models/Transaction";
 import { PLAN_CONFIGS } from "@/lib/razorpay";
 
 export const FREE_TIER_LIMIT = 10;
+
+/**
+ * Whitelist of email addresses that receive permanent full access (Lifetime Pro VIP)
+ * without requiring payment or subscription renewals.
+ * 
+ * To add more emails in the future, simply add them to this list, or define
+ * FULL_ACCESS_EMAILS="email1@example.com,email2@example.com" in your .env.local file.
+ */
+export const FULL_ACCESS_EMAILS: string[] = [
+  "navnitrai5389@gmail.com",
+];
+
+/**
+ * Checks whether an email address is in the full-access VIP whitelist (case-insensitive).
+ */
+export function isWhitelistedEmail(email?: string | null): boolean {
+  if (!email) return false;
+  const cleanEmail = email.trim().toLowerCase();
+
+  // 1. Check code list
+  if (FULL_ACCESS_EMAILS.some((e) => e.trim().toLowerCase() === cleanEmail)) {
+    return true;
+  }
+
+  // 2. Check environment variables
+  const envEmails = process.env.FULL_ACCESS_EMAILS || process.env.VIP_EMAILS || "";
+  if (envEmails) {
+    const list = envEmails.split(",").map((e) => e.trim().toLowerCase());
+    if (list.includes(cleanEmail)) {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 export interface UserSubscriptionUsage {
   isPremium: boolean;
@@ -23,19 +59,26 @@ export interface UserSubscriptionUsage {
     currentPeriodEnd?: string | null;
     cancelAtPeriodEnd?: boolean;
     cancelledAt?: string | null;
+    isVip?: boolean;
   } | null;
 }
 
 /**
  * Authoritatively determines whether a user currently holds active premium privileges.
- * Checks for status ACTIVE or CANCEL_AT_PERIOD_END with period validity.
+ * Checks if user is VIP whitelisted or has an ACTIVE / CANCEL_AT_PERIOD_END subscription.
  */
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
   await connectToDatabase();
 
+  // 1. Check if user is in VIP whitelist
+  const user = await User.findById(userId).select("email").lean<{ email?: string } | null>();
+  if (user?.email && isWhitelistedEmail(user.email)) {
+    return true;
+  }
+
   const now = new Date();
 
-  // Find the most recent active subscription
+  // 2. Find the most recent active subscription
   const activeSub = await Subscription.findOne({
     userId,
     status: { $in: ["ACTIVE", "CANCEL_AT_PERIOD_END"] },
@@ -79,19 +122,37 @@ export async function getUserSubscription(userId: string): Promise<ISubscription
 export async function getUserTransactionUsage(userId: string): Promise<UserSubscriptionUsage> {
   await connectToDatabase();
 
-  const [isPremium, transactionCount, subRecord] = await Promise.all([
-    hasActiveSubscription(userId),
+  const [user, transactionCount, subRecord] = await Promise.all([
+    User.findById(userId).select("email").lean<{ email?: string } | null>(),
     Transaction.countDocuments({ userId }),
     Subscription.findOne({ userId })
       .sort({ createdAt: -1 })
       .lean<ISubscription | null>(),
   ]);
 
+  const isVip = isWhitelistedEmail(user?.email);
+  const isSubscribed = await hasActiveSubscription(userId);
+  const isPremium = isVip || isSubscribed;
+
   const canCreate = isPremium || transactionCount < FREE_TIER_LIMIT;
-  const remainingFreeTransactions = Math.max(0, FREE_TIER_LIMIT - transactionCount);
+  const remainingFreeTransactions = isPremium ? 999999 : Math.max(0, FREE_TIER_LIMIT - transactionCount);
 
   let formattedSub = null;
-  if (subRecord) {
+  if (isVip) {
+    formattedSub = {
+      id: "vip_lifetime_access",
+      plan: "LIFETIME_VIP",
+      planName: "Lifetime Pro Access (VIP)",
+      status: "ACTIVE",
+      amount: 0,
+      currency: "INR",
+      currentPeriodStart: null,
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+      cancelledAt: null,
+      isVip: true,
+    };
+  } else if (subRecord) {
     const planConfig = subRecord.plan ? PLAN_CONFIGS[subRecord.plan] : undefined;
     formattedSub = {
       id: subRecord._id.toString(),
@@ -111,6 +172,7 @@ export async function getUserTransactionUsage(userId: string): Promise<UserSubsc
       cancelledAt: subRecord.cancelledAt
         ? new Date(subRecord.cancelledAt).toISOString()
         : null,
+      isVip: false,
     };
   }
 
@@ -118,7 +180,7 @@ export async function getUserTransactionUsage(userId: string): Promise<UserSubsc
     isPremium,
     canCreate,
     transactionCount,
-    freeLimit: FREE_TIER_LIMIT,
+    freeLimit: isPremium ? 999999 : FREE_TIER_LIMIT,
     remainingFreeTransactions,
     subscription: formattedSub,
   };

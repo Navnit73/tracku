@@ -251,9 +251,15 @@ export default function SettingsPage() {
 
                 <div className="text-xs text-ink-muted">
                   {isPremium ? (
-                    <span>
-                      ${sub?.amount} USD • Billed via Razorpay Subscriptions
-                    </span>
+                    sub?.isVip ? (
+                      <span className="text-income font-semibold flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5" /> Full Access Granted • Lifetime VIP Privileges (Unlimited)
+                      </span>
+                    ) : (
+                      <span>
+                        ${sub?.amount} USD • Billed via Razorpay Subscriptions
+                      </span>
+                    )
                   ) : (
                     <span>
                       {billingInfo?.transactionCount || 0} of {billingInfo?.freeLimit || 10} free transactions recorded
@@ -293,7 +299,7 @@ export default function SettingsPage() {
                     Upgrade to Pro
                   </Button>
                 ) : (
-                  !isScheduledCancel && (
+                  !isScheduledCancel && !sub?.isVip && (
                     <Button
                       variant="outline"
                       size="sm"
