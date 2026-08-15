@@ -9,6 +9,7 @@ import { TransactionInput } from "@/lib/validations";
 import { createTransaction, updateTransaction } from "@/app/actions/transactions";
 import { getCategories } from "@/app/actions/categories";
 import { showToast } from "@/lib/toast";
+import { PricingModal } from "@/components/billing/PricingModal";
 
 export interface TransactionModalProps {
   isOpen: boolean;
@@ -61,6 +62,7 @@ export function TransactionModal({
 
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
 
   const fetchCategories = useCallback(async (selectedType: string) => {
     const res = await getCategories("All");
@@ -169,6 +171,9 @@ export function TransactionModal({
       );
       onSuccess();
       onClose();
+    } else if ((res as any).code === "TRANSACTION_LIMIT_REACHED") {
+      setIsPricingOpen(true);
+      showToast.error("Free Limit Reached", res.error || "You've used all 10 free transactions. Upgrade to Pro to continue.");
     } else {
       showToast.error("Saving Failed", res.error || "Please check form inputs.");
     }
@@ -179,8 +184,9 @@ export function TransactionModal({
   );
 
   return (
-    <Modal
-      isOpen={isOpen}
+    <>
+      <Modal
+        isOpen={isOpen}
       onClose={onClose}
       title={transactionToEdit ? "Edit Transaction" : "Record New Transaction"}
       description="Enter transaction details below. All fields marked with * are required."
@@ -311,6 +317,17 @@ export function TransactionModal({
         </div>
       </form>
     </Modal>
+
+    <PricingModal
+      isOpen={isPricingOpen}
+      onClose={() => setIsPricingOpen(false)}
+      reason="LIMIT_REACHED"
+      onSuccess={() => {
+        setIsPricingOpen(false);
+        onSuccess();
+      }}
+    />
+    </>
   );
 }
 

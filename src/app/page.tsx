@@ -11,6 +11,7 @@ import { CategoryPieChart } from "@/components/charts/CategoryPieChart";
 import { TopItemsChart } from "@/components/charts/TopItemsChart";
 import { InvestmentGrowthChart } from "@/components/charts/InvestmentGrowthChart";
 import { TransactionModal } from "@/components/transactions/TransactionModal";
+import { FreeTierBanner } from "@/components/billing/FreeTierBanner";
 import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getDashboardAnalytics } from "@/app/actions/analytics";
@@ -97,6 +98,9 @@ export default function DashboardPage() {
   return (
     <AppShell title="Dashboard" onOpenNewTransaction={() => setIsModalOpen(true)}>
       <div className="flex flex-col gap-4 sm:gap-6">
+        {/* Free Tier Usage Banner */}
+        <FreeTierBanner onUpgradeSuccess={fetchAnalytics} />
+
         {/* Top Control Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline ">
           <div>

@@ -11,6 +11,7 @@ import { DatePicker, DateRangePreset } from "@/components/ui/DatePicker";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/Table";
 import { Pagination } from "@/components/ui/Pagination";
 import { TransactionModal } from "@/components/transactions/TransactionModal";
+import { FreeTierBanner } from "@/components/billing/FreeTierBanner";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getTransactions, deleteTransaction } from "@/app/actions/transactions";
@@ -178,6 +179,9 @@ export default function TransactionsPage() {
       }}
     >
       <div className="flex flex-col gap-4 sm:gap-6">
+        {/* Free Tier Usage Banner */}
+        <FreeTierBanner onUpgradeSuccess={fetchLedger} />
+
         {/* Header Action Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline ">
           <div>

@@ -30,5 +30,6 @@ export const config = {
     "/insights",
     "/reports",
     "/settings",
+    "/pricing",
   ],
 };

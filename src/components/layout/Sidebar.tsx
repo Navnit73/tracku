@@ -16,6 +16,7 @@ import {
   X,
   Sparkles,
   Brain,
+  CreditCard,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
@@ -30,6 +31,7 @@ const NAV_ITEMS = [
   { name: "Insights", href: "/insights", icon: Brain },
   { name: "Categories", href: "/categories", icon: Tag },
   { name: "Reports", href: "/reports", icon: FileSpreadsheet },
+  { name: "Plans & Pricing", href: "/pricing", icon: CreditCard },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 

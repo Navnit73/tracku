@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { Menu, Sun, Moon, LogIn, LogOut, User as UserIcon, PanelLeft } from "lucide-react";
+import Link from "next/link";
+import { Menu, Sun, Moon, LogIn, LogOut, User as UserIcon, PanelLeft, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 
 export function Navbar({
@@ -19,9 +21,9 @@ export function Navbar({
 }) {
   const { data: session } = useSession();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isPremium, setIsPremium] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Check saved theme in localStorage (default is light)
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       document.documentElement.classList.add("dark");
@@ -30,7 +32,19 @@ export function Navbar({
       document.documentElement.classList.remove("dark");
       setIsDarkMode(false);
     }
-  }, []);
+
+    // Check premium status
+    if (session?.user) {
+      fetch("/api/billing/status")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setIsPremium(data.isPremium);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [session]);
 
   const toggleDarkMode = () => {
     if (isDarkMode) {
@@ -45,7 +59,7 @@ export function Navbar({
   };
 
   return (
-    <header className="h-14 sm:h-16 sticky top-0 z-30 bg-surface/90 backdrop-blur-md border-b border-hairline px-3.5 sm:px-6 flex items-center justify-between transition-colors ">
+    <header className="h-14 sm:h-16 sticky top-0 z-30 bg-surface/90 backdrop-blur-md border-b border-hairline px-3.5 sm:px-6 flex items-center justify-between transition-colors">
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         {/* Mobile menu trigger */}
         <button
@@ -60,7 +74,7 @@ export function Navbar({
         {onToggleCollapse && (
           <button
             onClick={onToggleCollapse}
-            className="hidden lg:flex p-2 rounded-xl text-ink-muted hover:text-ink hover:bg-canvas active:scale-95 transition-all cursor-pointer min-w-[40px] min-h-[40px] items-center justify-center border border-hairline "
+            className="hidden lg:flex p-2 rounded-xl text-ink-muted hover:text-ink hover:bg-canvas active:scale-95 transition-all cursor-pointer min-w-[40px] min-h-[40px] items-center justify-center border border-hairline"
             title={isCollapsed ? "Expand Sidebar (w-64)" : "Collapse Sidebar (w-20)"}
             aria-label={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
@@ -74,10 +88,31 @@ export function Navbar({
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* Plan status / Upgrade link */}
+        {session?.user && (
+          <>
+            {isPremium === true ? (
+              <Badge variant="income" size="sm" className="hidden sm:inline-flex items-center gap-1 font-bold">
+                <Sparkles className="w-3 h-3" /> PRO
+              </Badge>
+            ) : isPremium === false ? (
+              <Link href="/pricing">
+                <Button
+                  size="sm"
+                  variant="primary"
+                  className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold py-1.5 h-8.5"
+                >
+                  <Zap className="w-3.5 h-3.5" /> Upgrade
+                </Button>
+              </Link>
+            ) : null}
+          </>
+        )}
+
         {/* Dark / Light Mode Toggle */}
         <button
           onClick={toggleDarkMode}
-          className="p-2 rounded-xl border border-hairline bg-canvas text-ink hover:bg-surface active:scale-95 transition-all cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center "
+          className="p-2 rounded-xl border border-hairline bg-canvas text-ink hover:bg-surface active:scale-95 transition-all cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center"
           title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           aria-label={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
         >
@@ -91,7 +126,7 @@ export function Navbar({
         {/* User Account / Auth */}
         {session?.user ? (
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-hairline bg-canvas ">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-hairline bg-canvas">
               {session.user.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -130,5 +165,3 @@ export function Navbar({
     </header>
   );
 }
-
-

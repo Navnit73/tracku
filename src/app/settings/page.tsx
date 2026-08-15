@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { Badge } from "@/components/ui/Badge";
+import { PricingModal } from "@/components/billing/PricingModal";
 import { deleteUserAccountAndData, getUserCurrency, updateUserCurrency } from "@/app/actions/user";
 import { clearAllUserData } from "@/app/actions/transactions";
 import { showToast, confirmDialog } from "@/lib/toast";
@@ -22,10 +23,15 @@ import {
   RefreshCcw,
   Sun,
   Moon,
-  Laptop,
   Sparkles,
   Lock,
+  CreditCard,
+  Zap,
+  Calendar,
+  AlertCircle,
+  ExternalLink,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -35,6 +41,26 @@ export default function SettingsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClearingTx, setIsClearingTx] = useState(false);
   const [activeTheme, setActiveTheme] = useState<"light" | "dark">("light");
+
+  // Subscription state
+  const [billingInfo, setBillingInfo] = useState<any>(null);
+  const [loadingBilling, setLoadingBilling] = useState(true);
+  const [isCancellingSub, setIsCancellingSub] = useState(false);
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+
+  const fetchBillingStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/billing/status");
+      const data = await res.json();
+      if (data.success) {
+        setBillingInfo(data);
+      }
+    } catch {
+      // Ignore
+    } finally {
+      setLoadingBilling(false);
+    }
+  }, []);
 
   // Load saved theme on mount
   useEffect(() => {
@@ -58,13 +84,14 @@ export default function SettingsPage() {
     showToast.success("Theme Updated", `Switched to ${newTheme} mode.`);
   };
 
-  // Load saved currency from DB on mount
+  // Load saved currency & billing status from DB on mount
   useEffect(() => {
     (async () => {
       const res = await getUserCurrency();
       if (res.success && res.currency) setCurrency(res.currency);
+      fetchBillingStatus();
     })();
-  }, []);
+  }, [fetchBillingStatus]);
 
   const handleCurrencyChange = useCallback(async (newCurrency: string) => {
     setCurrency(newCurrency);
@@ -80,6 +107,43 @@ export default function SettingsPage() {
       showToast.error("Failed to Save", res.error);
     }
   }, []);
+
+  const handleCancelSubscription = async () => {
+    const periodEndDate = billingInfo?.subscription?.currentPeriodEnd
+      ? new Date(billingInfo.subscription.currentPeriodEnd).toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        })
+      : "the end of your billing cycle";
+
+    const confirmed = await confirmDialog({
+      title: "Cancel Subscription?",
+      text: `You'll keep full Premium Pro access until ${periodEndDate}. After that date, your account will return to the free plan (10 transaction limit).`,
+      confirmText: "Yes, Cancel at Cycle End",
+    });
+
+    if (confirmed) {
+      setIsCancellingSub(true);
+      try {
+        const res = await fetch("/api/billing/cancel-subscription", {
+          method: "POST",
+        });
+        const data = await res.json();
+        setIsCancellingSub(false);
+
+        if (data.success) {
+          showToast.success("Cancellation Scheduled", data.message);
+          fetchBillingStatus();
+        } else {
+          showToast.error("Cancellation Error", data.error || "Failed to cancel subscription.");
+        }
+      } catch (err: any) {
+        setIsCancellingSub(false);
+        showToast.error("Network Error", err?.message || "Failed to communicate with server.");
+      }
+    }
+  };
 
   const handleDeleteAccount = async () => {
     const confirmed = await confirmDialog({
@@ -102,26 +166,187 @@ export default function SettingsPage() {
     }
   };
 
+  const sub = billingInfo?.subscription;
+  const isPremium = billingInfo?.isPremium;
+  const isScheduledCancel = sub?.cancelAtPeriodEnd || sub?.status === "CANCEL_AT_PERIOD_END";
+
   return (
     <AppShell title="Settings & Preferences">
       <div className="flex flex-col gap-4 sm:gap-6 max-w-4xl mx-auto w-full">
         {/* Top Header Card */}
-        <div className="bg-surface p-4 sm:p-5 rounded-2xl border border-hairline  flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-surface p-4 sm:p-5 rounded-2xl border border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
               <SettingsIcon className="w-5 h-5 text-primary" />
               Settings & Preferences
             </h2>
             <p className="text-xs text-ink-muted mt-0.5 leading-relaxed">
-              Manage your personal profile, display theme, currency formats, and security controls
+              Manage your personal profile, subscription tier, display theme, and currency formats
             </p>
           </div>
-          <Badge variant="primary" size="md">
-            Active Session
+          <Badge variant={isPremium ? "income" : "neutral"} size="md">
+            {isPremium ? "Pro Member" : "Free Plan"}
           </Badge>
         </div>
 
-        {/* Section 1: User Profile */}
+        {/* Section 1: Subscription & Billing */}
+        <Card className="p-4 sm:p-6">
+          <CardHeader>
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <CreditCard className="w-4 h-4 text-primary" />
+                  Subscription & Billing
+                </CardTitle>
+                <CardDescription>
+                  Manage your subscription tier, billing period, and transaction capacity
+                </CardDescription>
+              </div>
+              <Link href="/pricing" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                View Plans <ExternalLink className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Scheduled cancellation alert */}
+            {isScheduledCancel && (
+              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-950 dark:text-amber-200 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-amber-500" />
+                <div className="text-xs">
+                  <strong className="text-sm font-bold block">Cancellation Scheduled</strong>
+                  Your subscription will remain fully active until{" "}
+                  <span className="font-bold underline">
+                    {sub?.currentPeriodEnd
+                      ? new Date(sub.currentPeriodEnd).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "the end of your billing cycle"}
+                  </span>
+                  . After this date, your account will return to the free plan with a 10 transaction limit.
+                </div>
+              </div>
+            )}
+
+            {/* Plan Info Box */}
+            <div className="p-4 rounded-2xl bg-canvas border border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-base font-extrabold text-ink">
+                    {isPremium
+                      ? sub?.planName || "FinanceTrack Pro"
+                      : "Free Tier Plan"}
+                  </span>
+                  <Badge
+                    variant={
+                      isScheduledCancel
+                        ? "warning"
+                        : isPremium
+                        ? "income"
+                        : "neutral"
+                    }
+                    size="sm"
+                  >
+                    {isScheduledCancel
+                      ? "Cancellation Scheduled"
+                      : isPremium
+                      ? "Active"
+                      : "Free Tier"}
+                  </Badge>
+                </div>
+
+                <div className="text-xs text-ink-muted">
+                  {isPremium ? (
+                    <span>
+                      ${sub?.amount} USD • Billed via Razorpay Subscriptions
+                    </span>
+                  ) : (
+                    <span>
+                      {billingInfo?.transactionCount || 0} of {billingInfo?.freeLimit || 10} free transactions recorded
+                    </span>
+                  )}
+                </div>
+
+                {/* Free usage progress bar */}
+                {!isPremium && (
+                  <div className="w-full max-w-xs h-1.5 bg-surface rounded-full mt-2 overflow-hidden border border-hairline">
+                    <div
+                      className="h-full bg-primary rounded-full transition-all"
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          Math.round(
+                            ((billingInfo?.transactionCount || 0) /
+                              (billingInfo?.freeLimit || 10)) *
+                              100
+                          )
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                {!isPremium ? (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => setIsPricingModalOpen(true)}
+                    leftIcon={<Zap className="w-4 h-4" />}
+                    className="w-full sm:w-auto font-bold"
+                  >
+                    Upgrade to Pro
+                  </Button>
+                ) : (
+                  !isScheduledCancel && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCancelSubscription}
+                      isLoading={isCancellingSub}
+                      className="w-full sm:w-auto text-ink-muted hover:text-expense hover:border-expense/40"
+                    >
+                      Cancel Subscription
+                    </Button>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* Subscription Metadata details if active */}
+            {isPremium && sub && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-ink-muted pt-2 border-t border-hairline">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-hairline">
+                  <span className="font-medium flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-primary" /> Current Period Ends
+                  </span>
+                  <strong className="text-ink">
+                    {sub.currentPeriodEnd
+                      ? new Date(sub.currentPeriodEnd).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "—"}
+                  </strong>
+                </div>
+
+                <div className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-hairline">
+                  <span className="font-medium flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-income" /> Razorpay Sub ID
+                  </span>
+                  <code className="text-ink font-mono text-[11px]">
+                    {sub.razorpaySubscriptionId || "—"}
+                  </code>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Section 2: User Profile */}
         <Card className="p-4 sm:p-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -138,10 +363,10 @@ export default function SettingsPage() {
                   <img
                     src={session.user.image}
                     alt={session.user.name || "Google User"}
-                    className="w-12 h-12 rounded-full border-2 border-primary/40 shrink-0 "
+                    className="w-12 h-12 rounded-full border-2 border-primary/40 shrink-0"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg shrink-0 ">
+                  <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg shrink-0">
                     {session?.user?.name?.[0] || "U"}
                   </div>
                 )}
@@ -172,7 +397,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Section 2: Appearance & Theme */}
+        {/* Section 3: Appearance & Theme */}
         <Card className="p-4 sm:p-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -189,7 +414,7 @@ export default function SettingsPage() {
                 onClick={() => handleThemeChange("light")}
                 className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between active:scale-98 ${
                   activeTheme === "light"
-                    ? "bg-surface border-primary ring-2 ring-primary/20 "
+                    ? "bg-surface border-primary ring-2 ring-primary/20"
                     : "bg-canvas border-hairline hover:border-hairline-strong text-ink-muted"
                 }`}
               >
@@ -215,7 +440,7 @@ export default function SettingsPage() {
                 onClick={() => handleThemeChange("dark")}
                 className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between active:scale-98 ${
                   activeTheme === "dark"
-                    ? "bg-surface border-primary ring-2 ring-primary/20 "
+                    ? "bg-surface border-primary ring-2 ring-primary/20"
                     : "bg-canvas border-hairline hover:border-hairline-strong text-ink-muted"
                 }`}
               >
@@ -238,7 +463,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Section 3: Currency & Regional Formatting */}
+        {/* Section 4: Currency & Regional Formatting */}
         <Card className="p-4 sm:p-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -281,7 +506,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Section 4: Data Security & Privacy */}
+        {/* Section 5: Data Security & Privacy */}
         <Card className="p-4 sm:p-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -308,7 +533,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Section 5: Danger Zone */}
+        {/* Section 6: Danger Zone */}
         <Card className="p-4 sm:p-6 border-expense-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-expense text-base sm:text-lg">
@@ -343,6 +568,7 @@ export default function SettingsPage() {
                     setIsClearingTx(false);
                     if (res.success) {
                       showToast.success("Ledger Reset", res.message);
+                      fetchBillingStatus();
                     } else {
                       showToast.error("Error", res.error);
                     }
@@ -378,7 +604,12 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       </div>
+
+      <PricingModal
+        isOpen={isPricingModalOpen}
+        onClose={() => setIsPricingModalOpen(false)}
+        onSuccess={fetchBillingStatus}
+      />
     </AppShell>
   );
 }
-

@@ -7,6 +7,7 @@ import { requireAuthUser } from "@/lib/auth";
 import { transactionSchema, transactionFilterSchema, TransactionInput, TransactionFilterInput } from "@/lib/validations";
 import { getDateRangeBounds } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { assertCanCreateTransaction, getUserTransactionUsage } from "@/lib/subscription";
 
 export async function getTransactions(filters: TransactionFilterInput) {
   try {
@@ -145,6 +146,9 @@ export async function createTransaction(input: TransactionInput) {
 
     await connectToDatabase();
 
+    // 1. Authoritative Backend Freemium Limit Check
+    await assertCanCreateTransaction(user.id);
+
     const txDate = validated.date.includes("T") ? new Date(validated.date) : new Date(validated.date + "T12:00:00");
 
     const transaction = await Transaction.create({
@@ -158,6 +162,8 @@ export async function createTransaction(input: TransactionInput) {
     revalidatePath("/income");
     revalidatePath("/investments");
     revalidatePath("/");
+    revalidatePath("/pricing");
+    revalidatePath("/settings");
 
     return {
       success: true,
@@ -168,8 +174,29 @@ export async function createTransaction(input: TransactionInput) {
       },
     };
   } catch (error: any) {
-    console.error("[REDACTED Transactions Error]", error instanceof Error ? error.message : "Failed to create transaction");
-    return { success: false, error: error.message || "Failed to create transaction" };
+    console.error("[Transactions Action Error]", error instanceof Error ? error.message : "Failed to create transaction");
+    return {
+      success: false,
+      error: error.message || "Failed to create transaction",
+      code: error.code || "CREATE_ERROR",
+    };
+  }
+}
+
+export async function getBillingOverview() {
+  try {
+    const user = await requireAuthUser();
+    return await getUserTransactionUsage(user.id);
+  } catch (error: any) {
+    return {
+      isPremium: false,
+      canCreate: true,
+      transactionCount: 0,
+      freeLimit: 10,
+      remainingFreeTransactions: 10,
+      subscription: null,
+      error: error.message,
+    };
   }
 }
 
