@@ -279,11 +279,11 @@ export default function SignInPage() {
           <div className="hidden lg:flex flex-1 items-end justify-center self-end pb-2 xl:pb-4 translate-y-[10%] animate-in fade-in slide-in-from-left-4 duration-700 select-none pointer-events-none">
             <div className="relative w-[300px] xl:w-[360px] aspect-square">
               <Image
-                src="/tree_leftside.webp"
+                src="/tree.png"
                 alt="Growth and Prosperity Tree"
                 fill
                 priority
-                className="object-contain mix-blend-multiply dark:mix-blend-screen opacity-85 dark:opacity-75"
+                className="object-contain transition-all duration-300 dark:brightness-105"
                 sizes="(max-width: 1280px) 300px, 360px"
               />
             </div>
@@ -762,11 +762,11 @@ export default function SignInPage() {
           <div className="hidden lg:flex flex-1 items-end justify-center self-end pb-2 xl:pb-4 translate-y-[10%] animate-in fade-in slide-in-from-right-4 duration-700 select-none pointer-events-none">
             <div className="relative w-[260px] xl:w-[310px] aspect-[4/5]">
               <Image
-                src="/man_rightside.webp"
+                src="/auth-character-Photoroom.png"
                 alt="Finance User Illustration"
                 fill
                 priority
-                className="object-contain mix-blend-multiply dark:mix-blend-screen opacity-85 dark:opacity-75"
+                className="object-contain transition-all duration-300 dark:brightness-105"
                 sizes="(max-width: 1280px) 260px, 310px"
               />
             </div>
