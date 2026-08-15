@@ -293,7 +293,7 @@ export default function SignInPage() {
           <div className="w-full max-w-[430px] shrink-0 flex flex-col items-center">
 
             {/* Prominent Money Tree Lottie Animation - sits ABOVE the card */}
-            <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 flex items-center justify-center pointer-events-none select-none -mb-8 sm:-mb-10 lg:-mb-12 relative z-10 animate-in fade-in zoom-in-95 duration-700">
+            <div className="w-60 h-60 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 flex items-center justify-center pointer-events-none select-none -mb-8 sm:-mb-10 lg:-mb-12 relative z-10 animate-in fade-in zoom-in-95 duration-700">
               <DotLottieReact
                 src="/Money%20tree.lottie"
                 loop
