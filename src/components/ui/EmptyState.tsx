@@ -19,7 +19,7 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center p-6 sm:p-8 text-center rounded-2xl bg-surface/50 border border-dashed border-hairline min-h-[200px] w-full">
-      <div className="p-3.5 rounded-2xl bg-canvas border border-hairline text-primary mb-3 shadow-xs">
+      <div className="p-3.5 rounded-2xl bg-canvas border border-hairline text-primary mb-3 ">
         {icon || <FolderOpen className="w-6 h-6" />}
       </div>
       <h3 className="text-base font-bold text-ink tracking-tight">{title}</h3>

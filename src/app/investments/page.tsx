@@ -57,7 +57,7 @@ export default function InvestmentsPage() {
     >
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline ">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
               <LineChart className="w-5 h-5 text-investment" />
@@ -108,7 +108,7 @@ export default function InvestmentsPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Total Portfolio
                   </span>
-                  <div className="p-2 rounded-xl bg-investment-bg text-investment shadow-xs">
+                  <div className="p-2 rounded-xl bg-investment-bg text-investment ">
                     <LineChart className="w-4 h-4" />
                   </div>
                 </div>
@@ -129,7 +129,7 @@ export default function InvestmentsPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Largest Holding
                   </span>
-                  <div className="p-2 rounded-xl bg-investment-bg text-investment shadow-xs">
+                  <div className="p-2 rounded-xl bg-investment-bg text-investment ">
                     <Coins className="w-4 h-4" />
                   </div>
                 </div>
@@ -149,7 +149,7 @@ export default function InvestmentsPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Average Allocation
                   </span>
-                  <div className="p-2 rounded-xl bg-sky-brand-bg text-primary shadow-xs">
+                  <div className="p-2 rounded-xl bg-sky-brand-bg text-primary ">
                     <TrendingUp className="w-4 h-4" />
                   </div>
                 </div>
@@ -169,7 +169,7 @@ export default function InvestmentsPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Asset Classes
                   </span>
-                  <div className="p-2 rounded-xl bg-income-bg text-income shadow-xs">
+                  <div className="p-2 rounded-xl bg-income-bg text-income ">
                     <ShieldCheck className="w-4 h-4" />
                   </div>
                 </div>

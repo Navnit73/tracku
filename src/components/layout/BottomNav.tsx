@@ -91,7 +91,7 @@ export function BottomNav({
                     className={cn(
                       "flex items-center gap-3 p-3.5 rounded-2xl border transition-all active:scale-98 min-h-[48px]",
                       isActive
-                        ? "bg-primary/10 border-primary text-primary font-bold shadow-xs"
+                        ? "bg-primary/10 border-primary text-primary font-bold "
                         : "border-hairline bg-canvas text-ink hover:bg-surface"
                     )}
                   >

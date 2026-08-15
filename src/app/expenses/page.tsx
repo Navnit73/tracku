@@ -59,7 +59,7 @@ export default function ExpensesPage() {
     >
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Control */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline ">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
               <TrendingDown className="w-5 h-5 text-expense" />
@@ -111,7 +111,7 @@ export default function ExpensesPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Total Expenses
                   </span>
-                  <div className="p-2 rounded-xl bg-expense-bg text-expense shadow-xs">
+                  <div className="p-2 rounded-xl bg-expense-bg text-expense ">
                     <TrendingDown className="w-4 h-4" />
                   </div>
                 </div>
@@ -132,7 +132,7 @@ export default function ExpensesPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Highest Single Outlay
                   </span>
-                  <div className="p-2 rounded-xl bg-warning-brand-bg text-warning-brand shadow-xs">
+                  <div className="p-2 rounded-xl bg-warning-brand-bg text-warning-brand ">
                     <ShoppingBag className="w-4 h-4" />
                   </div>
                 </div>
@@ -152,7 +152,7 @@ export default function ExpensesPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Average Expense
                   </span>
-                  <div className="p-2 rounded-xl bg-sky-brand-bg text-primary shadow-xs">
+                  <div className="p-2 rounded-xl bg-sky-brand-bg text-primary ">
                     <CreditCard className="w-4 h-4" />
                   </div>
                 </div>
@@ -172,7 +172,7 @@ export default function ExpensesPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Transaction Count
                   </span>
-                  <div className="p-2 rounded-xl bg-canvas text-ink shadow-xs">
+                  <div className="p-2 rounded-xl bg-canvas text-ink ">
                     <Receipt className="w-4 h-4 text-primary" />
                   </div>
                 </div>

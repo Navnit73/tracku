@@ -98,7 +98,7 @@ export default function DashboardPage() {
     <AppShell title="Dashboard" onOpenNewTransaction={() => setIsModalOpen(true)}>
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Top Control Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline ">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight">
               Financial Summary
@@ -169,7 +169,7 @@ export default function DashboardPage() {
                   <span className="text-xs font-bold text-emerald-100 uppercase tracking-wider">
                     Total Net Balance
                   </span>
-                  <div className="p-2 rounded-xl bg-white/15 text-white backdrop-blur-xs shadow-xs">
+                  <div className="p-2 rounded-xl bg-white/15 text-white backdrop-blur-xs ">
                     <Wallet className="w-4 h-4" />
                   </div>
                 </div>
@@ -192,7 +192,7 @@ export default function DashboardPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Net Savings
                   </span>
-                  <div className="p-2 rounded-xl bg-income-bg text-income shadow-xs">
+                  <div className="p-2 rounded-xl bg-income-bg text-income ">
                     <PiggyBank className="w-4 h-4" />
                   </div>
                 </div>
@@ -215,7 +215,7 @@ export default function DashboardPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Income vs Expenses
                   </span>
-                  <div className="p-2 rounded-xl bg-sky-brand-bg text-sky-brand shadow-xs">
+                  <div className="p-2 rounded-xl bg-sky-brand-bg text-sky-brand ">
                     <TrendingUp className="w-4 h-4" />
                   </div>
                 </div>
@@ -249,7 +249,7 @@ export default function DashboardPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Total Investments
                   </span>
-                  <div className="p-2 rounded-xl bg-investment-bg text-investment shadow-xs">
+                  <div className="p-2 rounded-xl bg-investment-bg text-investment ">
                     <LineChart className="w-4 h-4" />
                   </div>
                 </div>

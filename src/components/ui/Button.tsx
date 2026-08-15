@@ -32,15 +32,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       primary:
-        "bg-primary hover:bg-primary-active text-white shadow-xs",
+        "bg-primary hover:bg-primary-active text-white ",
       secondary:
-        "bg-surface hover:bg-canvas text-ink border border-hairline shadow-xs",
+        "bg-surface hover:bg-canvas text-ink border border-hairline ",
       outline:
         "bg-transparent hover:bg-canvas text-ink border border-hairline",
       ghost:
         "bg-transparent hover:bg-canvas text-ink-secondary hover:text-ink",
       danger:
-        "bg-expense hover:bg-expense/90 text-white shadow-xs",
+        "bg-expense hover:bg-expense/90 text-white ",
     };
 
     const sizes = {

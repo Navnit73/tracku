@@ -104,7 +104,7 @@ export default function InsightsPage() {
     <AppShell title="Financial Insights">
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline ">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
               <Brain className="w-5 h-5 text-primary" />
@@ -363,7 +363,7 @@ export default function InsightsPage() {
               ) : netWorth ? (
                 <div className="space-y-4">
                   {/* Top-level net worth */}
-                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#7c3aed] to-[#5b21b6] text-white shadow-xs">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#7c3aed] to-[#5b21b6] text-white ">
                     <div className="text-[10px] uppercase font-bold text-purple-200 tracking-wider">
                       Net Surplus Balance
                     </div>

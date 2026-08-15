@@ -173,7 +173,7 @@ export function CategoryModal({
                 type="color"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
-                className="w-10 h-10 p-1 rounded-xl border border-hairline bg-surface cursor-pointer shadow-xs"
+                className="w-10 h-10 p-1 rounded-xl border border-hairline bg-surface cursor-pointer "
               />
               <span className="text-xs font-mono font-semibold text-ink">
                 {color}
@@ -193,7 +193,7 @@ export function CategoryModal({
                 key={c}
                 type="button"
                 onClick={() => setColor(c)}
-                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl transition-all cursor-pointer shadow-xs active:scale-90 ${
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl transition-all cursor-pointer  active:scale-90 ${
                   color.toLowerCase() === c.toLowerCase()
                     ? "ring-2 ring-offset-2 ring-primary scale-110"
                     : "hover:scale-105"

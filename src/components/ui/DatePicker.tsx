@@ -95,7 +95,7 @@ export function DatePicker({
                   className={cn(
                     "text-left px-3 py-2 text-xs font-semibold rounded-xl transition-all select-none cursor-pointer active:scale-98 min-h-[36px]",
                     selectedPreset === preset
-                      ? "bg-primary text-white shadow-xs"
+                      ? "bg-primary text-white "
                       : "text-ink bg-canvas/60 hover:bg-canvas hover:text-primary"
                   )}
                 >

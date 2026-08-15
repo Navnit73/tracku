@@ -2,15 +2,20 @@
 
 import React, { useEffect, useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { Menu, Sun, Moon, LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { Menu, Sun, Moon, LogIn, LogOut, User as UserIcon, PanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 
 export function Navbar({
   onOpenMobileMenu,
   title = "Dashboard",
+  isCollapsed = false,
+  onToggleCollapse,
 }: {
   onOpenMobileMenu: () => void;
   title?: string;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }) {
   const { data: session } = useSession();
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -40,8 +45,9 @@ export function Navbar({
   };
 
   return (
-    <header className="h-14 sm:h-16 sticky top-0 z-30 bg-surface/90 backdrop-blur-md border-b border-hairline px-3.5 sm:px-6 flex items-center justify-between transition-colors shadow-xs">
+    <header className="h-14 sm:h-16 sticky top-0 z-30 bg-surface/90 backdrop-blur-md border-b border-hairline px-3.5 sm:px-6 flex items-center justify-between transition-colors ">
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        {/* Mobile menu trigger */}
         <button
           onClick={onOpenMobileMenu}
           className="p-2 rounded-xl text-ink-muted hover:text-ink hover:bg-canvas active:scale-95 transition-transform lg:hidden cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center"
@@ -49,6 +55,19 @@ export function Navbar({
         >
           <Menu className="w-5 h-5" />
         </button>
+
+        {/* Desktop Sidebar Collapse / Expand Trigger */}
+        {onToggleCollapse && (
+          <button
+            onClick={onToggleCollapse}
+            className="hidden lg:flex p-2 rounded-xl text-ink-muted hover:text-ink hover:bg-canvas active:scale-95 transition-all cursor-pointer min-w-[40px] min-h-[40px] items-center justify-center border border-hairline "
+            title={isCollapsed ? "Expand Sidebar (w-64)" : "Collapse Sidebar (w-20)"}
+            aria-label={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            <PanelLeft className={cn("w-4 h-4 transition-transform", isCollapsed && "text-primary")} />
+          </button>
+        )}
+
         <h1 className="text-base sm:text-lg font-bold text-ink tracking-tight truncate">
           {title}
         </h1>
@@ -58,7 +77,7 @@ export function Navbar({
         {/* Dark / Light Mode Toggle */}
         <button
           onClick={toggleDarkMode}
-          className="p-2 rounded-xl border border-hairline bg-canvas text-ink hover:bg-surface active:scale-95 transition-all cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center shadow-xs"
+          className="p-2 rounded-xl border border-hairline bg-canvas text-ink hover:bg-surface active:scale-95 transition-all cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center "
           title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           aria-label={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
         >
@@ -72,7 +91,7 @@ export function Navbar({
         {/* User Account / Auth */}
         {session?.user ? (
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-hairline bg-canvas shadow-xs">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-hairline bg-canvas ">
               {session.user.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -111,4 +130,5 @@ export function Navbar({
     </header>
   );
 }
+
 

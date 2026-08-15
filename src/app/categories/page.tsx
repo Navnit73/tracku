@@ -87,7 +87,7 @@ export default function CategoriesPage() {
     >
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline ">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
               <FolderTree className="w-5 h-5 text-primary" />
@@ -132,7 +132,7 @@ export default function CategoriesPage() {
               onClick={() => setActiveType(type)}
               className={`px-4 py-2 text-xs font-bold rounded-xl transition-all select-none cursor-pointer border whitespace-nowrap active:scale-95 min-h-[38px] ${
                 activeType === type
-                  ? "bg-primary text-white border-primary shadow-xs"
+                  ? "bg-primary text-white border-primary "
                   : "bg-surface text-ink-muted border-hairline hover:text-ink hover:bg-canvas"
               }`}
             >
@@ -149,11 +149,11 @@ export default function CategoriesPage() {
             {categories.map((cat) => (
               <Card
                 key={cat._id}
-                className="flex items-center justify-between p-4 sm:p-5 hover:border-primary/40 transition-all shadow-xs"
+                className="flex items-center justify-between p-4 sm:p-5 hover:border-primary/40 transition-all "
               >
                 <div className="flex items-center gap-3.5 min-w-0 pr-2">
                   <div
-                    className="w-11 h-11 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-xs"
+                    className="w-11 h-11 rounded-2xl flex items-center justify-center text-white shrink-0 "
                     style={{ backgroundColor: cat.color || "var(--primary)" }}
                   >
                     <CategoryIcon iconName={cat.icon} className="w-5 h-5" />

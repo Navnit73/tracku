@@ -8,7 +8,7 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 export function Card({ className, variant = "default", children, ...props }: CardProps) {
   const base = "rounded-2xl p-4 sm:p-5 lg:p-6 transition-all duration-200";
   const variants = {
-    default: "bg-surface border border-hairline shadow-xs",
+    default: "bg-surface border border-hairline ",
     flat: "bg-canvas border border-hairline",
     elevated: "bg-surface-raised border border-hairline shadow-md",
     hero: "bg-gradient-to-br from-[#00874C] to-[#005c33] dark:from-[#00A860] dark:to-[#005c33] text-white rounded-2xl shadow-lg border border-primary/30",

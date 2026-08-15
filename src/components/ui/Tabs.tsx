@@ -68,7 +68,7 @@ export function TabsTrigger({
       className={cn(
         "px-4 py-2 text-xs font-bold rounded-xl transition-all select-none cursor-pointer min-h-[36px] whitespace-nowrap active:scale-98",
         isActive
-          ? "bg-surface text-primary shadow-xs border border-hairline"
+          ? "bg-surface text-primary  border border-hairline"
           : "text-ink-muted hover:text-ink hover:bg-surface/50",
         className
       )}

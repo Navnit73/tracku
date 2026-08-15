@@ -81,7 +81,7 @@ export default function ReportsPage() {
     <AppShell title="Financial Reports">
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline ">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
               <FileSpreadsheet className="w-5 h-5 text-primary" />
@@ -173,7 +173,7 @@ export default function ReportsPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-primary text-white shadow-xs">
+            <div className="p-4 rounded-2xl bg-primary text-white ">
               <div className="text-xs font-bold text-emerald-100 uppercase tracking-wider">Net Balance</div>
               <div className="text-xl sm:text-2xl font-black mt-1 truncate">
                 {formatCurrency(analytics?.summary?.balance || 0)}

@@ -106,7 +106,7 @@ export default function SettingsPage() {
     <AppShell title="Settings & Preferences">
       <div className="flex flex-col gap-4 sm:gap-6 max-w-4xl mx-auto w-full">
         {/* Top Header Card */}
-        <div className="bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-surface p-4 sm:p-5 rounded-2xl border border-hairline  flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
               <SettingsIcon className="w-5 h-5 text-primary" />
@@ -138,10 +138,10 @@ export default function SettingsPage() {
                   <img
                     src={session.user.image}
                     alt={session.user.name || "Google User"}
-                    className="w-12 h-12 rounded-full border-2 border-primary/40 shrink-0 shadow-xs"
+                    className="w-12 h-12 rounded-full border-2 border-primary/40 shrink-0 "
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
+                  <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg shrink-0 ">
                     {session?.user?.name?.[0] || "U"}
                   </div>
                 )}
@@ -189,7 +189,7 @@ export default function SettingsPage() {
                 onClick={() => handleThemeChange("light")}
                 className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between active:scale-98 ${
                   activeTheme === "light"
-                    ? "bg-surface border-primary ring-2 ring-primary/20 shadow-xs"
+                    ? "bg-surface border-primary ring-2 ring-primary/20 "
                     : "bg-canvas border-hairline hover:border-hairline-strong text-ink-muted"
                 }`}
               >
@@ -215,7 +215,7 @@ export default function SettingsPage() {
                 onClick={() => handleThemeChange("dark")}
                 className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between active:scale-98 ${
                   activeTheme === "dark"
-                    ? "bg-surface border-primary ring-2 ring-primary/20 shadow-xs"
+                    ? "bg-surface border-primary ring-2 ring-primary/20 "
                     : "bg-canvas border-hairline hover:border-hairline-strong text-ink-muted"
                 }`}
               >

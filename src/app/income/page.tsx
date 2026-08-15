@@ -46,7 +46,7 @@ export default function IncomePage() {
     >
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Control Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline ">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-income" />
@@ -97,7 +97,7 @@ export default function IncomePage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Total Inflow
                   </span>
-                  <div className="p-2 rounded-xl bg-income-bg text-income shadow-xs">
+                  <div className="p-2 rounded-xl bg-income-bg text-income ">
                     <TrendingUp className="w-4 h-4" />
                   </div>
                 </div>
@@ -118,7 +118,7 @@ export default function IncomePage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Top Income Source
                   </span>
-                  <div className="p-2 rounded-xl bg-sky-brand-bg text-primary shadow-xs">
+                  <div className="p-2 rounded-xl bg-sky-brand-bg text-primary ">
                     <Banknote className="w-4 h-4" />
                   </div>
                 </div>
@@ -138,7 +138,7 @@ export default function IncomePage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Average Deposit
                   </span>
-                  <div className="p-2 rounded-xl bg-income-bg text-income shadow-xs">
+                  <div className="p-2 rounded-xl bg-income-bg text-income ">
                     <DollarSign className="w-4 h-4" />
                   </div>
                 </div>
@@ -158,7 +158,7 @@ export default function IncomePage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Active Streams
                   </span>
-                  <div className="p-2 rounded-xl bg-investment-bg text-investment shadow-xs">
+                  <div className="p-2 rounded-xl bg-investment-bg text-investment ">
                     <Layers className="w-4 h-4" />
                   </div>
                 </div>
@@ -205,7 +205,7 @@ export default function IncomePage() {
                     className="flex items-center justify-between p-3.5 rounded-2xl bg-canvas border border-hairline"
                   >
                     <div className="flex items-center gap-3 min-w-0 pr-3">
-                      <div className="p-2 rounded-xl bg-income-bg text-income shrink-0 shadow-xs">
+                      <div className="p-2 rounded-xl bg-income-bg text-income shrink-0 ">
                         <Banknote className="w-4 h-4" />
                       </div>
                       <div className="font-bold text-sm text-ink truncate">

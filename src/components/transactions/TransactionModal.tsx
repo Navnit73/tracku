@@ -201,10 +201,10 @@ export function TransactionModal({
                 className={`py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer select-none active:scale-98 min-h-[40px] ${
                   type === t
                     ? t === "Expense"
-                      ? "bg-expense text-white shadow-xs"
+                      ? "bg-expense text-white "
                       : t === "Income"
-                      ? "bg-income text-white shadow-xs"
-                      : "bg-investment text-white shadow-xs"
+                      ? "bg-income text-white "
+                      : "bg-investment text-white "
                     : "text-ink-muted hover:text-ink hover:bg-surface/50"
                 }`}
               >
