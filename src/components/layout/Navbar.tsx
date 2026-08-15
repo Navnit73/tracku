@@ -16,23 +16,14 @@ export function Navbar({
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    // Check saved theme in localStorage or OS preference
+    // Check saved theme in localStorage (default is light)
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       document.documentElement.classList.add("dark");
       setIsDarkMode(true);
-    } else if (savedTheme === "light") {
+    } else {
       document.documentElement.classList.remove("dark");
       setIsDarkMode(false);
-    } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      if (prefersDark) {
-        document.documentElement.classList.add("dark");
-        setIsDarkMode(true);
-      } else {
-        document.documentElement.classList.remove("dark");
-        setIsDarkMode(false);
-      }
     }
   }, []);
 

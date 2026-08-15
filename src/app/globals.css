@@ -3,42 +3,62 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --canvas: #f6f5f4;
+  /* Brand Palette Tokens */
+  --brand-whitesmoke: #f6f5f4;
+  --brand-mediumseagreen: #00A860;
+  --brand-mediumspringgreen: #00D27B;
+  --brand-seagreen: #00874C;
+
+  /* Homepage Palette Tokens */
+  --homepage-mintcream: #EBF5F0;
+  --homepage-black: #182622;
+  --homepage-darkseagreen: #5B9B80;
+  --homepage-whitesmoke: #F1ECEF;
+  --homepage-snow: #FDF5F5;
+  --homepage-ghostwhite: #F8FBFF;
+
+  /* Application UI Mappings (Light Mode) */
+  --canvas: var(--brand-whitesmoke);
   --surface: #ffffff;
-  --ink: #171717;
-  --ink-secondary: #31302e;
-  --ink-muted: #615d59;
-  --ink-faint: #a39e98;
-  --hairline: #e6e6e6;
-  --primary: #0075de;
-  --primary-active: #005bab;
-  --secondary: #213183;
-  --income: #059669;
-  --income-bg: #ecfdf5;
+  --ink: var(--homepage-black);
+  --ink-secondary: #2d3e38;
+  --ink-muted: var(--homepage-darkseagreen);
+  --ink-faint: #94b8ab;
+  --hairline: #e2ede8;
+
+  --primary: var(--brand-mediumseagreen);
+  --primary-active: var(--brand-seagreen);
+  --secondary: var(--brand-mediumspringgreen);
+
+  --income: var(--brand-mediumseagreen);
+  --income-bg: var(--homepage-mintcream);
   --expense: #e11d48;
-  --expense-bg: #fff1f2;
+  --expense-bg: var(--homepage-snow);
   --investment: #7c3aed;
   --investment-bg: #f5f3ff;
   --sky: #0075de;
-  --sky-bg: #f0f9ff;
+  --sky-bg: var(--homepage-ghostwhite);
   --warning: #d97706;
   --warning-bg: #fef3c7;
 }
 
 .dark {
-  --canvas: #191919;
-  --surface: #202020;
-  --ink: #f7f7f7;
-  --ink-secondary: #d3d3d3;
-  --ink-muted: #9b9b9b;
-  --ink-faint: #656565;
-  --hairline: #2f2f2f;
-  --primary: #2383e2;
-  --primary-active: #005bab;
-  --secondary: #213183;
-  --income: #059669;
-  --income-bg: #133e2b;
-  --expense: #e11d48;
+  /* Application UI Mappings (Dark Mode) */
+  --canvas: var(--homepage-black);
+  --surface: #1e2e2a;
+  --ink: #f0f7f4;
+  --ink-secondary: #c5ded5;
+  --ink-muted: var(--homepage-darkseagreen);
+  --ink-faint: #436657;
+  --hairline: #273d36;
+
+  --primary: var(--brand-mediumspringgreen);
+  --primary-active: var(--brand-mediumseagreen);
+  --secondary: var(--brand-mediumseagreen);
+
+  --income: var(--brand-mediumspringgreen);
+  --income-bg: #112920;
+  --expense: #f43f5e;
   --expense-bg: #3b1c24;
   --investment: #a78bfa;
   --investment-bg: #2e1a47;
@@ -69,6 +89,20 @@
   --color-sky-brand-bg: var(--sky-bg);
   --color-warning-brand: var(--warning);
   --color-warning-brand-bg: var(--warning-bg);
+
+  /* Direct Brand Utility Classes */
+  --color-brand-whitesmoke: var(--brand-whitesmoke);
+  --color-brand-mediumseagreen: var(--brand-mediumseagreen);
+  --color-brand-mediumspringgreen: var(--brand-mediumspringgreen);
+  --color-brand-seagreen: var(--brand-seagreen);
+
+  /* Direct Homepage Utility Classes */
+  --color-homepage-mintcream: var(--homepage-mintcream);
+  --color-homepage-black: var(--homepage-black);
+  --color-homepage-darkseagreen: var(--homepage-darkseagreen);
+  --color-homepage-whitesmoke: var(--homepage-whitesmoke);
+  --color-homepage-snow: var(--homepage-snow);
+  --color-homepage-ghostwhite: var(--homepage-ghostwhite);
 }
 
 body {
