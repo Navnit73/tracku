@@ -65,7 +65,10 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
+      if (trigger === "update" && session?.currency) {
+        token.currency = session.currency;
+      }
       if (user?.id) {
         token.sub = user.id;
       }

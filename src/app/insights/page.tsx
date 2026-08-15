@@ -13,6 +13,8 @@ import { MonthComparisonChart } from "@/components/insights/MonthComparison";
 import { SavingsGauge } from "@/components/insights/SavingsGauge";
 import { getComprehensiveFinancialInsights } from "@/app/actions/insights";
 import { clearAllUserData } from "@/app/actions/transactions";
+import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/components/providers/CurrencyProvider";
 import type {
   InsightItem,
   RecurringExpense,
@@ -37,6 +39,7 @@ import {
 import { Button } from "@/components/ui/Button";
 
 export default function InsightsPage() {
+  const { currency } = useCurrency();
   const [datePreset, setDatePreset] = useState<DateRangePreset>("This Month");
   const [customStart, setCustomStart] = useState<string | undefined>();
   const [customEnd, setCustomEnd] = useState<string | undefined>();
@@ -48,9 +51,12 @@ export default function InsightsPage() {
   const [savings, setSavings] = useState<SavingsAnalysis | null>(null);
   const [netWorth, setNetWorth] = useState<NetWorthSnapshot | null>(null);
   const [healthScore, setHealthScore] = useState<HealthScore | null>(null);
+  const [serverCurrency, setServerCurrency] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [clearing, setClearing] = useState(false);
+
+  const activeCurrency = serverCurrency || currency;
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -62,6 +68,7 @@ export default function InsightsPage() {
     });
 
     if (res.success) {
+      if (res.currency) setServerCurrency(res.currency);
       setInsights(res.insights || []);
       setRecurring(res.recurring || []);
       setTotalMonthlyRecurring(res.totalMonthlyRecurring || 0);
@@ -289,7 +296,7 @@ export default function InsightsPage() {
               </div>
               {recurring.length > 0 && (
                 <Badge variant="expense" size="sm">
-                  ~{totalMonthlyRecurring.toLocaleString("en-US", { maximumFractionDigits: 0 })}/mo
+                  ~{formatCurrency(totalMonthlyRecurring, activeCurrency)}/mo
                 </Badge>
               )}
             </CardHeader>
@@ -323,10 +330,10 @@ export default function InsightsPage() {
                       </div>
                       <div className="text-right shrink-0">
                         <div className="text-sm font-black text-expense">
-                          {item.estimatedMonthly.toLocaleString("en-US", { maximumFractionDigits: 0 })}/mo
+                          {formatCurrency(item.estimatedMonthly, activeCurrency)}/mo
                         </div>
                         <div className="text-[10px] text-ink-faint">
-                          avg {item.averageAmount.toLocaleString("en-US", { maximumFractionDigits: 0 })} each
+                          avg {formatCurrency(item.averageAmount, activeCurrency)} each
                         </div>
                       </div>
                     </div>
@@ -368,7 +375,7 @@ export default function InsightsPage() {
                       Net Surplus Balance
                     </div>
                     <div className="text-2xl sm:text-3xl font-black tracking-tight mt-0.5">
-                      {netWorth.netBalance.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                      {formatCurrency(netWorth.netBalance, activeCurrency)}
                     </div>
                     <div className="text-[11px] text-purple-200 mt-1">
                       Income − Expenses − Investments
@@ -382,7 +389,7 @@ export default function InsightsPage() {
                         Income
                       </div>
                       <div className="text-sm sm:text-base font-black text-income mt-0.5 truncate">
-                        {netWorth.totalIncome.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                        {formatCurrency(netWorth.totalIncome, activeCurrency)}
                       </div>
                     </div>
                     <div className="p-3 rounded-xl bg-expense-bg border border-expense-border">
@@ -390,7 +397,7 @@ export default function InsightsPage() {
                         Expenses
                       </div>
                       <div className="text-sm sm:text-base font-black text-expense mt-0.5 truncate">
-                        {netWorth.totalExpenses.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                        {formatCurrency(netWorth.totalExpenses, activeCurrency)}
                       </div>
                     </div>
                     <div className="p-3 rounded-xl bg-investment-bg border border-investment-border">
@@ -398,7 +405,7 @@ export default function InsightsPage() {
                         Invested
                       </div>
                       <div className="text-sm sm:text-base font-black text-investment mt-0.5 truncate">
-                        {netWorth.totalInvestments.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                        {formatCurrency(netWorth.totalInvestments, activeCurrency)}
                       </div>
                     </div>
                   </div>
@@ -430,7 +437,7 @@ export default function InsightsPage() {
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
                               <span className="font-bold text-ink">
-                                {cat.amount.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                                {formatCurrency(cat.amount, activeCurrency)}
                               </span>
                               <span className="text-[10px] text-ink-muted font-medium bg-surface px-1.5 py-0.5 rounded border border-hairline">{pct}%</span>
                             </div>

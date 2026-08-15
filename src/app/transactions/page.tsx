@@ -18,6 +18,7 @@ import { getTransactions, deleteTransaction } from "@/app/actions/transactions";
 import { getCategories } from "@/app/actions/categories";
 import { downloadTransactionsCSV } from "@/lib/csvExport";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
+import { useCurrency } from "@/components/providers/CurrencyProvider";
 import { showToast, confirmDialog } from "@/lib/toast";
 import {
   Search,
@@ -33,6 +34,7 @@ import {
 } from "lucide-react";
 
 export default function TransactionsPage() {
+  const { currency, currencySymbol } = useCurrency();
   const [search, setSearch] = useState("");
   const [type, setType] = useState("All");
   const [categoryId, setCategoryId] = useState("All");
@@ -317,7 +319,7 @@ export default function TransactionsPage() {
               </span>
               <input
                 type="number"
-                placeholder="Min $"
+                placeholder={`Min ${currencySymbol}`}
                 value={minAmount}
                 onChange={(e) => setMinAmount(e.target.value)}
                 className="w-24 sm:w-28 px-3 py-1.5 text-xs rounded-xl border border-hairline bg-surface text-ink placeholder-ink-faint focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary min-h-[36px]"
@@ -325,7 +327,7 @@ export default function TransactionsPage() {
               <span className="text-ink-faint">to</span>
               <input
                 type="number"
-                placeholder="Max $"
+                placeholder={`Max ${currencySymbol}`}
                 value={maxAmount}
                 onChange={(e) => setMaxAmount(e.target.value)}
                 className="w-24 sm:w-28 px-3 py-1.5 text-xs rounded-xl border border-hairline bg-surface text-ink placeholder-ink-faint focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary min-h-[36px]"
@@ -379,7 +381,7 @@ export default function TransactionsPage() {
                       onClick={() => toggleSort("amount")}
                     >
                       <div className="flex items-center justify-end gap-1.5">
-                        Amount <ArrowUpDown className="w-3.5 h-3.5 text-ink-muted" />
+                        Amount ({currencySymbol}) <ArrowUpDown className="w-3.5 h-3.5 text-ink-muted" />
                       </div>
                     </TableHead>
                     <TableHead>Payment Method</TableHead>
@@ -421,7 +423,7 @@ export default function TransactionsPage() {
                         }`}
                       >
                         {t.type === "Income" ? "+" : "-"}
-                        {formatCurrency(t.amount)}
+                        {formatCurrency(t.amount, currency)}
                       </TableCell>
                       <TableCell className="text-xs text-ink-muted whitespace-nowrap">
                         {t.paymentMethod}
@@ -494,7 +496,7 @@ export default function TransactionsPage() {
                       }`}
                     >
                       {t.type === "Income" ? "+" : "-"}
-                      {formatCurrency(t.amount)}
+                      {formatCurrency(t.amount, currency)}
                     </div>
                   </div>
 

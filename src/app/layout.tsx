@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import AuthProvider from "@/components/providers/AuthProvider";
 import { SidebarProvider } from "@/components/providers/SidebarProvider";
+import { CurrencyProvider } from "@/components/providers/CurrencyProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -46,7 +47,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-sans bg-canvas text-ink">
         <AuthProvider>
-          <SidebarProvider>{children}</SidebarProvider>
+          <CurrencyProvider>
+            <SidebarProvider>{children}</SidebarProvider>
+          </CurrencyProvider>
         </AuthProvider>
       </body>
     </html>

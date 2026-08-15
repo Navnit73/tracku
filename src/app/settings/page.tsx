@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { Badge } from "@/components/ui/Badge";
 import { PricingModal } from "@/components/billing/PricingModal";
-import { deleteUserAccountAndData, getUserCurrency, updateUserCurrency } from "@/app/actions/user";
+import { deleteUserAccountAndData } from "@/app/actions/user";
 import { clearAllUserData } from "@/app/actions/transactions";
 import { showToast, confirmDialog } from "@/lib/toast";
+import { useCurrency } from "@/components/providers/CurrencyProvider";
 import {
   Settings as SettingsIcon,
   Globe,
@@ -35,8 +36,7 @@ import Link from "next/link";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
-  const [currency, setCurrency] = useState("USD");
-  const [isSavingCurrency, setIsSavingCurrency] = useState(false);
+  const { currency, setCurrency: setGlobalCurrency, isSaving: isSavingCurrency } = useCurrency();
   const [currencySaved, setCurrencySaved] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClearingTx, setIsClearingTx] = useState(false);
@@ -84,29 +84,22 @@ export default function SettingsPage() {
     showToast.success("Theme Updated", `Switched to ${newTheme} mode.`);
   };
 
-  // Load saved currency & billing status from DB on mount
+  // Load billing status on mount
   useEffect(() => {
-    (async () => {
-      const res = await getUserCurrency();
-      if (res.success && res.currency) setCurrency(res.currency);
-      fetchBillingStatus();
-    })();
+    fetchBillingStatus();
   }, [fetchBillingStatus]);
 
   const handleCurrencyChange = useCallback(async (newCurrency: string) => {
-    setCurrency(newCurrency);
-    setIsSavingCurrency(true);
     setCurrencySaved(false);
-    const res = await updateUserCurrency(newCurrency);
-    setIsSavingCurrency(false);
-    if (res.success) {
+    const success = await setGlobalCurrency(newCurrency);
+    if (success) {
       setCurrencySaved(true);
       showToast.success("Currency Updated", `Display currency set to ${newCurrency}.`);
       setTimeout(() => setCurrencySaved(false), 2000);
     } else {
-      showToast.error("Failed to Save", res.error);
+      showToast.error("Failed to Save", "Could not update currency preference.");
     }
-  }, []);
+  }, [setGlobalCurrency]);
 
   const handleCancelSubscription = async () => {
     const periodEndDate = billingInfo?.subscription?.currentPeriodEnd

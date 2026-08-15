@@ -13,9 +13,11 @@ import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getInvestmentAnalytics } from "@/app/actions/analytics";
 import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/components/providers/CurrencyProvider";
 import { LineChart, Plus, ShieldCheck, Coins, TrendingUp } from "lucide-react";
 
 export default function InvestmentsPage() {
+  const { currency } = useCurrency();
   const [datePreset, setDatePreset] = useState<DateRangePreset>("All Time");
   const [customStart, setCustomStart] = useState<string | undefined>();
   const [customEnd, setCustomEnd] = useState<string | undefined>();
@@ -25,6 +27,8 @@ export default function InvestmentsPage() {
   const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const activeCurrency = analytics?.currency || currency;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -108,7 +112,7 @@ export default function InvestmentsPage() {
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-investment tracking-tight truncate">
-                  {formatCurrency(analytics?.totalInvested || 0)}
+                  {formatCurrency(analytics?.totalInvested || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2 flex items-center justify-between">
@@ -129,7 +133,7 @@ export default function InvestmentsPage() {
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-ink tracking-tight truncate">
-                  {formatCurrency(analytics?.largestInvestment || 0)}
+                  {formatCurrency(analytics?.largestInvestment || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted truncate border-t border-hairline pt-2">
@@ -149,7 +153,7 @@ export default function InvestmentsPage() {
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-ink tracking-tight truncate">
-                  {formatCurrency(analytics?.averageInvestment || 0)}
+                  {formatCurrency(analytics?.averageInvestment || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2">
@@ -192,7 +196,11 @@ export default function InvestmentsPage() {
               </Badge>
             </CardHeader>
             <CardContent>
-              {loading ? <ChartSkeleton /> : <InvestmentGrowthChart data={growthData} />}
+              {loading ? (
+                <ChartSkeleton />
+              ) : (
+                <InvestmentGrowthChart data={growthData} currency={activeCurrency} />
+              )}
             </CardContent>
           </Card>
 
@@ -205,7 +213,10 @@ export default function InvestmentsPage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <CategoryPieChart data={analytics?.investmentByCategory || []} />
+                <CategoryPieChart
+                  data={analytics?.investmentByCategory || []}
+                  currency={activeCurrency}
+                />
               )}
             </CardContent>
           </Card>
@@ -232,7 +243,7 @@ export default function InvestmentsPage() {
                       <div className="text-xs text-ink-muted mt-0.5">Asset Holding</div>
                     </div>
                     <div className="text-right font-black text-sm text-investment shrink-0">
-                      {formatCurrency(item.amount)}
+                      {formatCurrency(item.amount, activeCurrency)}
                     </div>
                   </div>
                 ))}

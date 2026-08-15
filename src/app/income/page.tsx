@@ -12,9 +12,11 @@ import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getIncomeAnalytics } from "@/app/actions/analytics";
 import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/components/providers/CurrencyProvider";
 import { TrendingUp, Banknote, Plus, ArrowUpRight, DollarSign, Layers } from "lucide-react";
 
 export default function IncomePage() {
+  const { currency } = useCurrency();
   const [datePreset, setDatePreset] = useState<DateRangePreset>("This Month");
   const [customStart, setCustomStart] = useState<string | undefined>();
   const [customEnd, setCustomEnd] = useState<string | undefined>();
@@ -23,6 +25,8 @@ export default function IncomePage() {
   const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const activeCurrency = analytics?.currency || currency;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -102,7 +106,7 @@ export default function IncomePage() {
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-income tracking-tight truncate">
-                  {formatCurrency(analytics?.totalIncome || 0)}
+                  {formatCurrency(analytics?.totalIncome || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2 flex items-center justify-between">
@@ -123,7 +127,7 @@ export default function IncomePage() {
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-ink tracking-tight truncate">
-                  {formatCurrency(analytics?.highestIncome || 0)}
+                  {formatCurrency(analytics?.highestIncome || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted truncate border-t border-hairline pt-2">
@@ -143,7 +147,7 @@ export default function IncomePage() {
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-ink tracking-tight truncate">
-                  {formatCurrency(analytics?.averageIncome || 0)}
+                  {formatCurrency(analytics?.averageIncome || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2">
@@ -184,7 +188,10 @@ export default function IncomePage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <CategoryPieChart data={analytics?.incomeByCategory || []} />
+                <CategoryPieChart
+                  data={analytics?.incomeByCategory || []}
+                  currency={activeCurrency}
+                />
               )}
             </CardContent>
           </Card>
@@ -213,7 +220,7 @@ export default function IncomePage() {
                       </div>
                     </div>
                     <div className="font-black text-sm text-income shrink-0">
-                      +{formatCurrency(src.amount)}
+                      +{formatCurrency(src.amount, activeCurrency)}
                     </div>
                   </div>
                 ))

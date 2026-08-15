@@ -5,19 +5,57 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: "$",
+  INR: "₹",
+  EUR: "€",
+  GBP: "£",
+  CAD: "CA$",
+  AUD: "A$",
+  JPY: "¥",
+};
+
+export const CURRENCY_LOCALES: Record<string, string> = {
+  USD: "en-US",
+  INR: "en-IN",
+  EUR: "de-DE",
+  GBP: "en-GB",
+  CAD: "en-CA",
+  AUD: "en-AU",
+  JPY: "ja-JP",
+};
+
+export function getCurrencySymbol(currency: string = "USD"): string {
+  const code = (currency || "USD").toUpperCase();
+  return CURRENCY_SYMBOLS[code] || "$";
+}
+
 const numberFormatters = new Map<string, Intl.NumberFormat>();
 
 export function formatCurrency(amount: number, currency: string = "USD"): string {
-  let formatter = numberFormatters.get(currency);
+  const code = (currency || "USD").toUpperCase();
+  const locale = CURRENCY_LOCALES[code] || "en-US";
+  const key = `${locale}_${code}`;
+
+  let formatter = numberFormatters.get(key);
   if (!formatter) {
-    formatter = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency,
-      maximumFractionDigits: 2,
-    });
-    numberFormatters.set(currency, formatter);
+    try {
+      formatter = new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: code,
+        maximumFractionDigits: code === "JPY" ? 0 : 2,
+      });
+      numberFormatters.set(key, formatter);
+    } catch {
+      formatter = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 2,
+      });
+      numberFormatters.set(key, formatter);
+    }
   }
-  return formatter.format(amount);
+  return formatter.format(Number(amount) || 0);
 }
 
 const defaultDateFormatter = new Intl.DateTimeFormat("en-US", {

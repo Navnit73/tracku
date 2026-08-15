@@ -14,6 +14,7 @@ import { getComprehensiveFinancialInsights } from "@/app/actions/insights";
 import type { InsightItem, MonthComparisonCategory, HealthScore } from "@/app/actions/insights";
 import { downloadTransactionsCSV } from "@/lib/csvExport";
 import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/components/providers/CurrencyProvider";
 import {
   FileSpreadsheet,
   Download,
@@ -26,6 +27,7 @@ import {
 } from "lucide-react";
 
 export default function ReportsPage() {
+  const { currency } = useCurrency();
   const [datePreset, setDatePreset] = useState<DateRangePreset>("This Month");
   const [customStart, setCustomStart] = useState<string | undefined>();
   const [customEnd, setCustomEnd] = useState<string | undefined>();
@@ -37,6 +39,8 @@ export default function ReportsPage() {
   const [savingsRate, setSavingsRate] = useState<number>(0);
   const [healthScore, setHealthScore] = useState<HealthScore | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const activeCurrency = analytics?.currency || currency;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -154,28 +158,28 @@ export default function ReportsPage() {
             <div className="p-4 rounded-2xl bg-canvas border border-hairline">
               <div className="text-xs font-bold text-ink-muted uppercase tracking-wider">Total Inflow</div>
               <div className="text-xl sm:text-2xl font-black text-income mt-1 truncate">
-                {formatCurrency(analytics?.summary?.totalIncome || 0)}
+                {formatCurrency(analytics?.summary?.totalIncome || 0, activeCurrency)}
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-canvas border border-hairline">
               <div className="text-xs font-bold text-ink-muted uppercase tracking-wider">Total Outflow</div>
               <div className="text-xl sm:text-2xl font-black text-expense mt-1 truncate">
-                {formatCurrency(analytics?.summary?.totalExpenses || 0)}
+                {formatCurrency(analytics?.summary?.totalExpenses || 0, activeCurrency)}
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-canvas border border-hairline">
               <div className="text-xs font-bold text-ink-muted uppercase tracking-wider">Total Invested</div>
               <div className="text-xl sm:text-2xl font-black text-investment mt-1 truncate">
-                {formatCurrency(analytics?.summary?.totalInvestments || 0)}
+                {formatCurrency(analytics?.summary?.totalInvestments || 0, activeCurrency)}
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-primary text-white ">
               <div className="text-xs font-bold text-emerald-100 uppercase tracking-wider">Net Balance</div>
               <div className="text-xl sm:text-2xl font-black mt-1 truncate">
-                {formatCurrency(analytics?.summary?.balance || 0)}
+                {formatCurrency(analytics?.summary?.balance || 0, activeCurrency)}
               </div>
             </div>
 
@@ -238,10 +242,10 @@ export default function ReportsPage() {
                           {cat.category}
                         </td>
                         <td className="py-3 px-3.5 text-right font-black text-ink">
-                          {formatCurrency(cat.currentAmount)}
+                          {formatCurrency(cat.currentAmount, activeCurrency)}
                         </td>
                         <td className="py-3 px-3.5 text-right text-ink-muted font-medium">
-                          {formatCurrency(cat.previousAmount)}
+                          {formatCurrency(cat.previousAmount, activeCurrency)}
                         </td>
                         <td className="py-3 px-3.5 text-right">
                           {cat.delta !== 0 ? (

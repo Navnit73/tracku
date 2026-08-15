@@ -1,10 +1,17 @@
 "use client";
 
 import React from "react";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/components/providers/CurrencyProvider";
 import type { MonthComparison as MonthComparisonType, MonthComparisonCategory } from "@/app/actions/insights";
 
-function ComparisonBar({ category }: { category: MonthComparisonCategory }) {
+function ComparisonBar({
+  category,
+  currency,
+}: {
+  category: MonthComparisonCategory;
+  currency?: string;
+}) {
   const maxAmount = Math.max(category.currentAmount, category.previousAmount, 1);
   const currentWidth = (category.currentAmount / maxAmount) * 100;
   const previousWidth = (category.previousAmount / maxAmount) * 100;
@@ -17,7 +24,7 @@ function ComparisonBar({ category }: { category: MonthComparisonCategory }) {
         </span>
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-xs font-bold text-ink">
-            {category.currentAmount.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+            {formatCurrency(category.currentAmount, currency)}
           </span>
           {category.delta !== 0 && (
             <span
@@ -53,7 +60,16 @@ function ComparisonBar({ category }: { category: MonthComparisonCategory }) {
   );
 }
 
-export function MonthComparisonChart({ comparison }: { comparison: MonthComparisonType }) {
+export function MonthComparisonChart({
+  comparison,
+  currency: propCurrency,
+}: {
+  comparison: MonthComparisonType;
+  currency?: string;
+}) {
+  const { currency: globalCurrency } = useCurrency();
+  const currency = propCurrency || globalCurrency;
+
   return (
     <div className="space-y-5">
       {/* Period labels */}
@@ -77,7 +93,7 @@ export function MonthComparisonChart({ comparison }: { comparison: MonthComparis
         <div className="p-3 rounded-xl bg-income-bg border border-income/20">
           <div className="text-[10px] uppercase font-bold text-income tracking-wider">Income</div>
           <div className="text-base font-extrabold text-income mt-0.5">
-            {comparison.currentIncome.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+            {formatCurrency(comparison.currentIncome, currency)}
           </div>
           {comparison.incomeDelta !== 0 && (
             <div className={cn("text-[10px] font-bold mt-0.5", comparison.incomeDelta > 0 ? "text-income" : "text-expense")}>
@@ -88,7 +104,7 @@ export function MonthComparisonChart({ comparison }: { comparison: MonthComparis
         <div className="p-3 rounded-xl bg-expense-bg border border-expense/20">
           <div className="text-[10px] uppercase font-bold text-expense tracking-wider">Expenses</div>
           <div className="text-base font-extrabold text-expense mt-0.5">
-            {comparison.currentExpenses.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+            {formatCurrency(comparison.currentExpenses, currency)}
           </div>
           {comparison.expensesDelta !== 0 && (
             <div className={cn("text-[10px] font-bold mt-0.5", comparison.expensesDelta > 0 ? "text-expense" : "text-income")}>
@@ -99,7 +115,7 @@ export function MonthComparisonChart({ comparison }: { comparison: MonthComparis
         <div className="p-3 rounded-xl bg-investment-bg border border-investment/20">
           <div className="text-[10px] uppercase font-bold text-investment tracking-wider">Investments</div>
           <div className="text-base font-extrabold text-investment mt-0.5">
-            {comparison.currentInvestments.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+            {formatCurrency(comparison.currentInvestments, currency)}
           </div>
           {comparison.investmentsDelta !== 0 && (
             <div className={cn("text-[10px] font-bold mt-0.5", comparison.investmentsDelta > 0 ? "text-income" : "text-expense")}>
@@ -112,7 +128,7 @@ export function MonthComparisonChart({ comparison }: { comparison: MonthComparis
       {/* Category breakdown */}
       <div className="space-y-4">
         {comparison.categories.slice(0, 8).map((cat) => (
-          <ComparisonBar key={cat.category} category={cat} />
+          <ComparisonBar key={cat.category} category={cat} currency={currency} />
         ))}
       </div>
     </div>

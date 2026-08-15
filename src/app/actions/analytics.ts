@@ -270,7 +270,8 @@ export async function getExpenseAnalytics(filters?: AnalyticsFilter) {
       if (endDate) queryMatch.date.$lte = endDate;
     }
 
-    const [facetResult, highestTx] = await Promise.all([
+    const [dbUser, facetResult, highestTx] = await Promise.all([
+      User.findById(user.id).select("currency").lean(),
       Transaction.aggregate([
         { $match: queryMatch },
         {
@@ -313,6 +314,7 @@ export async function getExpenseAnalytics(filters?: AnalyticsFilter) {
       Transaction.findOne(queryMatch).sort({ amount: -1 }).select("item amount").lean(),
     ]);
 
+    const currency = (dbUser as any)?.currency || "USD";
     const facet = facetResult[0] || {};
     const stats = facet.stats?.[0] || { totalExpense: 0, highestExpense: 0, averageExpense: 0, count: 0 };
 
@@ -332,6 +334,7 @@ export async function getExpenseAnalytics(filters?: AnalyticsFilter) {
 
     return {
       success: true,
+      currency,
       totalExpense: stats.totalExpense || 0,
       highestExpense: stats.highestExpense || 0,
       highestExpenseItem: (highestTx as any)?.item || "",
@@ -360,7 +363,8 @@ export async function getIncomeAnalytics(filters?: AnalyticsFilter) {
       if (endDate) queryMatch.date.$lte = endDate;
     }
 
-    const [facetResult, highestTx] = await Promise.all([
+    const [dbUser, facetResult, highestTx] = await Promise.all([
+      User.findById(user.id).select("currency").lean(),
       Transaction.aggregate([
         { $match: queryMatch },
         {
@@ -400,6 +404,7 @@ export async function getIncomeAnalytics(filters?: AnalyticsFilter) {
       Transaction.findOne(queryMatch).sort({ amount: -1 }).select("item amount").lean(),
     ]);
 
+    const currency = (dbUser as any)?.currency || "USD";
     const facet = facetResult[0] || {};
     const stats = facet.stats?.[0] || { totalIncome: 0, highestIncome: 0, averageIncome: 0, count: 0 };
 
@@ -415,6 +420,7 @@ export async function getIncomeAnalytics(filters?: AnalyticsFilter) {
 
     return {
       success: true,
+      currency,
       totalIncome: stats.totalIncome || 0,
       highestIncome: stats.highestIncome || 0,
       highestIncomeSource: (highestTx as any)?.item || "",
@@ -443,7 +449,8 @@ export async function getInvestmentAnalytics(filters?: AnalyticsFilter) {
       if (endDate) queryMatch.date.$lte = endDate;
     }
 
-    const [facetResult, highestTx] = await Promise.all([
+    const [dbUser, facetResult, highestTx] = await Promise.all([
+      User.findById(user.id).select("currency").lean(),
       Transaction.aggregate([
         { $match: queryMatch },
         {
@@ -492,6 +499,7 @@ export async function getInvestmentAnalytics(filters?: AnalyticsFilter) {
       Transaction.findOne(queryMatch).sort({ amount: -1 }).select("item amount").lean(),
     ]);
 
+    const currency = (dbUser as any)?.currency || "USD";
     const facet = facetResult[0] || {};
     const stats = facet.stats?.[0] || { totalInvested: 0, largestInvestment: 0, averageInvestment: 0, count: 0 };
 
@@ -517,6 +525,7 @@ export async function getInvestmentAnalytics(filters?: AnalyticsFilter) {
 
     return {
       success: true,
+      currency,
       totalInvested: stats.totalInvested || 0,
       largestInvestment: stats.largestInvestment || 0,
       largestInvestmentItem: (highestTx as any)?.item || "",

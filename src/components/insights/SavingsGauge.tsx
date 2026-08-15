@@ -2,8 +2,18 @@
 
 import React from "react";
 import type { SavingsAnalysis } from "@/app/actions/insights";
+import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/components/providers/CurrencyProvider";
 
-export function SavingsGauge({ analysis }: { analysis: SavingsAnalysis }) {
+export function SavingsGauge({
+  analysis,
+  currency: propCurrency,
+}: {
+  analysis: SavingsAnalysis;
+  currency?: string;
+}) {
+  const { currency: globalCurrency } = useCurrency();
+  const currency = propCurrency || globalCurrency;
   const { savingsRate, totalIncome, totalExpenses, dailyBurnRate, projectedMonthEndTotal, daysElapsed, daysInMonth, trend, previousSavingsRate, currentSavings, projectedMonthlySavings } = analysis;
 
   // Gauge configuration
@@ -80,7 +90,7 @@ export function SavingsGauge({ analysis }: { analysis: SavingsAnalysis }) {
             Saved So Far
           </div>
           <div className="text-sm font-extrabold text-income mt-0.5">
-            {currentSavings >= 0 ? "" : "-"}{Math.abs(currentSavings).toLocaleString("en-US", { maximumFractionDigits: 0 })}
+            {formatCurrency(currentSavings, currency)}
           </div>
         </div>
 
@@ -89,7 +99,7 @@ export function SavingsGauge({ analysis }: { analysis: SavingsAnalysis }) {
             Daily Burn
           </div>
           <div className="text-sm font-extrabold text-expense mt-0.5">
-            {dailyBurnRate.toLocaleString("en-US", { maximumFractionDigits: 0 })}/day
+            {formatCurrency(dailyBurnRate, currency)}/day
           </div>
         </div>
 
@@ -98,7 +108,7 @@ export function SavingsGauge({ analysis }: { analysis: SavingsAnalysis }) {
             Projected Expenses
           </div>
           <div className="text-sm font-extrabold text-ink mt-0.5">
-            {projectedMonthEndTotal.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+            {formatCurrency(projectedMonthEndTotal, currency)}
           </div>
         </div>
 
@@ -107,7 +117,7 @@ export function SavingsGauge({ analysis }: { analysis: SavingsAnalysis }) {
             Projected Savings
           </div>
           <div className={`text-sm font-extrabold mt-0.5 ${projectedMonthlySavings >= 0 ? "text-income" : "text-expense"}`}>
-            {projectedMonthlySavings >= 0 ? "" : "-"}{Math.abs(projectedMonthlySavings).toLocaleString("en-US", { maximumFractionDigits: 0 })}
+            {formatCurrency(projectedMonthlySavings, currency)}
           </div>
         </div>
       </div>

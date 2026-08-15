@@ -13,9 +13,11 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { getExpenseAnalytics } from "@/app/actions/analytics";
 import { getTransactions } from "@/app/actions/transactions";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { useCurrency } from "@/components/providers/CurrencyProvider";
 import { TrendingDown, ShoppingBag, Plus, Sparkles, CreditCard, Receipt } from "lucide-react";
 
 export default function ExpensesPage() {
+  const { currency } = useCurrency();
   const [datePreset, setDatePreset] = useState<DateRangePreset>("This Month");
   const [customStart, setCustomStart] = useState<string | undefined>();
   const [customEnd, setCustomEnd] = useState<string | undefined>();
@@ -25,6 +27,8 @@ export default function ExpensesPage() {
   const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const activeCurrency = analytics?.currency || currency;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -116,7 +120,7 @@ export default function ExpensesPage() {
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-expense tracking-tight truncate">
-                  {formatCurrency(analytics?.totalExpense || 0)}
+                  {formatCurrency(analytics?.totalExpense || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2 flex items-center justify-between">
@@ -137,7 +141,7 @@ export default function ExpensesPage() {
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-ink tracking-tight truncate">
-                  {formatCurrency(analytics?.highestExpense || 0)}
+                  {formatCurrency(analytics?.highestExpense || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted truncate border-t border-hairline pt-2">
@@ -157,7 +161,7 @@ export default function ExpensesPage() {
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-ink tracking-tight truncate">
-                  {formatCurrency(analytics?.averageExpense || 0)}
+                  {formatCurrency(analytics?.averageExpense || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2">
@@ -198,7 +202,10 @@ export default function ExpensesPage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <CategoryPieChart data={analytics?.categorySpending || []} />
+                <CategoryPieChart
+                  data={analytics?.categorySpending || []}
+                  currency={activeCurrency}
+                />
               )}
             </CardContent>
           </Card>
@@ -223,12 +230,12 @@ export default function ExpensesPage() {
                         {item.item}
                       </div>
                       <div className="text-xs text-ink-muted mt-0.5">
-                        {item.count} purchases • Avg {formatCurrency(item.averageAmount)}
+                        {item.count} purchases • Avg {formatCurrency(item.averageAmount, activeCurrency)}
                       </div>
                     </div>
                     <div className="text-right shrink-0">
                       <div className="text-sm font-black text-expense">
-                        {formatCurrency(item.totalAmount)}
+                        {formatCurrency(item.totalAmount, activeCurrency)}
                       </div>
                       <div className="text-[10px] text-ink-faint">
                         Last: {formatDate(item.lastPurchaseDate)}

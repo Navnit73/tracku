@@ -20,6 +20,7 @@ import { getSpendingInsights } from "@/app/actions/insights";
 import type { InsightItem } from "@/app/actions/insights";
 import { InsightCard } from "@/components/insights/InsightCard";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { useCurrency } from "@/components/providers/CurrencyProvider";
 import { showToast } from "@/lib/toast";
 import {
   Wallet,
@@ -37,6 +38,7 @@ import {
 } from "lucide-react";
 
 export default function DashboardPage() {
+  const { currency } = useCurrency();
   const [datePreset, setDatePreset] = useState<DateRangePreset>("This Month");
   const [customStart, setCustomStart] = useState<string | undefined>();
   const [customEnd, setCustomEnd] = useState<string | undefined>();
@@ -47,6 +49,8 @@ export default function DashboardPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [seeding, setSeeding] = useState(false);
+
+  const activeCurrency = analytics?.currency || currency;
 
   const fetchAnalytics = useCallback(async () => {
     setLoading(true);
@@ -178,7 +182,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl xl:text-2xl 2xl:text-3xl font-black tracking-tight text-white truncate">
-                  {formatCurrency(analytics?.summary?.balance || 0, analytics?.currency)}
+                  {formatCurrency(analytics?.summary?.balance || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-emerald-100 flex items-center justify-between border-t border-white/15 pt-2">
@@ -201,13 +205,13 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl xl:text-2xl 2xl:text-3xl font-black text-income tracking-tight truncate">
-                  {formatCurrency(analytics?.summary?.savings || 0, analytics?.currency)}
+                  {formatCurrency(analytics?.summary?.savings || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2 gap-1">
                 <span className="text-[11px] truncate">Monthly Inflow:</span>
                 <Badge variant="income" size="sm">
-                  +{formatCurrency(analytics?.summary?.monthlyIncome || 0, analytics?.currency)}
+                  +{formatCurrency(analytics?.summary?.monthlyIncome || 0, activeCurrency)}
                 </Badge>
               </div>
             </Card>
@@ -227,13 +231,13 @@ export default function DashboardPage() {
                   <div className="min-w-0">
                     <div className="text-[11px] text-ink-muted font-medium">Inflow</div>
                     <div className="text-base sm:text-lg font-extrabold text-income truncate">
-                      +{formatCurrency(analytics?.summary?.totalIncome || 0, analytics?.currency)}
+                      +{formatCurrency(analytics?.summary?.totalIncome || 0, activeCurrency)}
                     </div>
                   </div>
                   <div className="text-right min-w-0">
                     <div className="text-[11px] text-ink-muted font-medium">Outflow</div>
                     <div className="text-base sm:text-lg font-extrabold text-expense truncate">
-                      -{formatCurrency(analytics?.summary?.totalExpenses || 0, analytics?.currency)}
+                      -{formatCurrency(analytics?.summary?.totalExpenses || 0, activeCurrency)}
                     </div>
                   </div>
                 </div>
@@ -241,7 +245,7 @@ export default function DashboardPage() {
               <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2 flex items-center justify-between">
                 <span className="text-[11px] truncate">Mo. Spend:</span>
                 <strong className="text-expense text-[11px]">
-                  {formatCurrency(analytics?.summary?.monthlyExpenses || 0, analytics?.currency)}
+                  {formatCurrency(analytics?.summary?.monthlyExpenses || 0, activeCurrency)}
                 </strong>
               </div>
             </Card>
@@ -258,13 +262,13 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="text-2xl sm:text-3xl xl:text-2xl 2xl:text-3xl font-black text-investment tracking-tight truncate">
-                  {formatCurrency(analytics?.summary?.totalInvestments || 0, analytics?.currency)}
+                  {formatCurrency(analytics?.summary?.totalInvestments || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2 gap-1">
                 <span className="text-[11px] truncate">Mo. Invested:</span>
                 <strong className="text-investment text-[11px]">
-                  +{formatCurrency(analytics?.summary?.monthlyInvestments || 0, analytics?.currency)}
+                  +{formatCurrency(analytics?.summary?.monthlyInvestments || 0, activeCurrency)}
                 </strong>
               </div>
             </Card>
@@ -292,7 +296,7 @@ export default function DashboardPage() {
               ) : (
                 <IncomeExpenseChart
                   data={analytics?.charts?.incomeVsExpense || []}
-                  currency={analytics?.currency}
+                  currency={activeCurrency}
                 />
               )}
             </CardContent>
@@ -310,7 +314,7 @@ export default function DashboardPage() {
               ) : (
                 <CategoryPieChart
                   data={analytics?.charts?.categorySpending || []}
-                  currency={analytics?.currency}
+                  currency={activeCurrency}
                 />
               )}
             </CardContent>
@@ -336,7 +340,7 @@ export default function DashboardPage() {
               ) : (
                 <InvestmentGrowthChart
                   data={analytics?.charts?.investmentGrowth || []}
-                  currency={analytics?.currency}
+                  currency={activeCurrency}
                 />
               )}
             </CardContent>
@@ -354,7 +358,7 @@ export default function DashboardPage() {
               ) : (
                 <TopItemsChart
                   data={analytics?.charts?.topSpendingItems || []}
-                  currency={analytics?.currency}
+                  currency={activeCurrency}
                 />
               )}
             </CardContent>
@@ -384,11 +388,11 @@ export default function DashboardPage() {
                         {item.item}
                       </div>
                       <div className="text-xs text-ink-muted">
-                        {item.count} transactions • Avg {formatCurrency(item.averageAmount)}
+                        {item.count} transactions • Avg {formatCurrency(item.averageAmount, activeCurrency)}
                       </div>
                     </div>
                     <div className="text-right font-semibold text-sm text-expense">
-                      {formatCurrency(item.totalAmount)}
+                      {formatCurrency(item.totalAmount, activeCurrency)}
                     </div>
                   </div>
                 ))
@@ -456,7 +460,7 @@ export default function DashboardPage() {
                         }`}
                       >
                         {t.type === "Income" ? "+" : "-"}
-                        {formatCurrency(t.amount)}
+                        {formatCurrency(t.amount, activeCurrency)}
                       </div>
                     </div>
                   ))}

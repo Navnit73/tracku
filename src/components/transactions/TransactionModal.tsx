@@ -9,6 +9,8 @@ import { TransactionInput } from "@/lib/validations";
 import { createTransaction, updateTransaction } from "@/app/actions/transactions";
 import { getCategories } from "@/app/actions/categories";
 import { showToast } from "@/lib/toast";
+import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/components/providers/CurrencyProvider";
 import { PricingModal } from "@/components/billing/PricingModal";
 
 export interface TransactionModalProps {
@@ -31,6 +33,7 @@ export interface TransactionModalProps {
 }
 
 const PAYMENT_METHODS = [
+  "UPI",
   "Cash",
   "Credit Card",
   "Debit Card",
@@ -50,6 +53,7 @@ export function TransactionModal({
   transactionToEdit,
   defaultType = "Expense",
 }: TransactionModalProps) {
+  const { currency, currencySymbol } = useCurrency();
   const [type, setType] = useState<"Expense" | "Income" | "Investment">(defaultType);
   const [categories, setCategories] = useState<{ _id: string; name: string; type: string }[]>([]);
   const [categoryId, setCategoryId] = useState("");
@@ -167,7 +171,7 @@ export function TransactionModal({
     if (res.success) {
       showToast.success(
         transactionToEdit ? "Transaction Updated" : "Transaction Created",
-        `Successfully saved ${payload.item} ($${payload.amount.toFixed(2)})`
+        `Successfully saved ${payload.item} (${formatCurrency(payload.amount, currency)})`
       );
       onSuccess();
       onClose();
@@ -225,7 +229,7 @@ export function TransactionModal({
           <Input
             type="number"
             step="0.01"
-            label="Amount ($) *"
+            label={`Amount (${currencySymbol}) *`}
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}

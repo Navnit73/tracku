@@ -3,6 +3,7 @@
 import { connectToDatabase } from "@/lib/db";
 import { Transaction } from "@/models/Transaction";
 import { Category } from "@/models/Category";
+import { User } from "@/models/User";
 import { requireAuthUser } from "@/lib/auth";
 import { transactionSchema, transactionFilterSchema, TransactionInput, TransactionFilterInput } from "@/lib/validations";
 import { getDateRangeBounds } from "@/lib/utils";
@@ -14,7 +15,12 @@ export async function getTransactions(filters: TransactionFilterInput) {
     const user = await requireAuthUser();
     await connectToDatabase();
 
-    const parsedFilters = transactionFilterSchema.parse(filters);
+    const [dbUser, parsedFilters] = await Promise.all([
+      User.findById(user.id).select("currency").lean(),
+      Promise.resolve(transactionFilterSchema.parse(filters)),
+    ]);
+    const currency = (dbUser as any)?.currency || "USD";
+
     const {
       search,
       type,
@@ -106,6 +112,7 @@ export async function getTransactions(filters: TransactionFilterInput) {
 
     return {
       success: true,
+      currency,
       transactions: transactions.map((t: any) => ({
         _id: t._id.toString(),
         userId: t.userId,
