@@ -20,7 +20,7 @@ export interface IncomeExpenseData {
   investment: number;
 }
 
-export function IncomeExpenseChart({
+export const IncomeExpenseChart = React.memo(function IncomeExpenseChart({
   data,
   currency = "USD",
 }: {
@@ -121,5 +121,5 @@ export function IncomeExpenseChart({
       </ResponsiveContainer>
     </div>
   );
-}
+});
 

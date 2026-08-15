@@ -11,7 +11,7 @@ import { CategoryPieChart } from "@/components/charts/CategoryPieChart";
 import { TransactionModal } from "@/components/transactions/TransactionModal";
 import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { getInvestmentAnalytics, getDashboardAnalytics } from "@/app/actions/analytics";
+import { getInvestmentAnalytics } from "@/app/actions/analytics";
 import { formatCurrency } from "@/lib/utils";
 import { LineChart, Plus, ShieldCheck, Coins, TrendingUp } from "lucide-react";
 
@@ -28,21 +28,16 @@ export default function InvestmentsPage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const [invRes, dashRes] = await Promise.all([
-      getInvestmentAnalytics({
-        dateRange: datePreset,
-        startDate: customStart,
-        endDate: customEnd,
-      }),
-      getDashboardAnalytics({
-        dateRange: datePreset,
-        startDate: customStart,
-        endDate: customEnd,
-      }),
-    ]);
+    const invRes = await getInvestmentAnalytics({
+      dateRange: datePreset,
+      startDate: customStart,
+      endDate: customEnd,
+    });
 
-    if (invRes.success) setAnalytics(invRes);
-    if (dashRes.success) setGrowthData(dashRes.charts?.investmentGrowth || []);
+    if (invRes.success) {
+      setAnalytics(invRes);
+      setGrowthData(invRes.investmentGrowth || []);
+    }
     setLoading(false);
   }, [datePreset, customStart, customEnd]);
 

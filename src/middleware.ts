@@ -27,6 +27,7 @@ export const config = {
     "/income",
     "/investments",
     "/categories",
+    "/insights",
     "/reports",
     "/settings",
   ],

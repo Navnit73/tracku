@@ -5,21 +5,30 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const numberFormatters = new Map<string, Intl.NumberFormat>();
+
 export function formatCurrency(amount: number, currency: string = "USD"): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  let formatter = numberFormatters.get(currency);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency,
+      maximumFractionDigits: 2,
+    });
+    numberFormatters.set(currency, formatter);
+  }
+  return formatter.format(amount);
 }
+
+const defaultDateFormatter = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+});
 
 export function formatDate(dateInput: string | Date | number): string {
   const d = new Date(dateInput);
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(d);
+  return defaultDateFormatter.format(d);
 }
 
 export function getDateRangeBounds(dateRange: string, customStart?: string, customEnd?: string) {

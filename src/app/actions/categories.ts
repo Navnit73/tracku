@@ -39,14 +39,18 @@ export async function getCategories(typeFilter?: string) {
     const user = await requireAuthUser();
     await connectToDatabase();
 
-    await ensureDefaultCategories(user.id);
-
     let query: any = { userId: user.id };
     if (typeFilter && typeFilter !== "All") {
       query.type = typeFilter;
     }
 
-    const categories = await Category.find(query).sort({ name: 1 }).lean();
+    let categories = await Category.find(query).sort({ name: 1 }).lean();
+
+    // Lazy initialization: only check and populate defaults if no categories returned
+    if (categories.length === 0 && (!typeFilter || typeFilter === "All")) {
+      await ensureDefaultCategories(user.id);
+      categories = await Category.find(query).sort({ name: 1 }).lean();
+    }
 
     return {
       success: true,

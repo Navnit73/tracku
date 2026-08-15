@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
@@ -62,6 +62,18 @@ export function TransactionModal({
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const fetchCategories = useCallback(async (selectedType: string) => {
+    const res = await getCategories("All");
+    if (res.success && res.categories) {
+      setCategories(res.categories);
+      // Auto select first category matching type
+      const matching = res.categories.filter((c: any) => c.type === selectedType || c.type === "All");
+      if (matching.length > 0 && !transactionToEdit) {
+        setCategoryId(matching[0]._id);
+      }
+    }
+  }, [transactionToEdit]);
+
   useEffect(() => {
     if (isOpen) {
       const initialType = transactionToEdit ? transactionToEdit.type : defaultType;
@@ -85,19 +97,7 @@ export function TransactionModal({
       }
       setErrors({});
     }
-  }, [isOpen, transactionToEdit, defaultType]);
-
-  const fetchCategories = async (selectedType: string) => {
-    const res = await getCategories("All");
-    if (res.success && res.categories) {
-      setCategories(res.categories);
-      // Auto select first category matching type
-      const matching = res.categories.filter((c: any) => c.type === selectedType || c.type === "All");
-      if (matching.length > 0 && !transactionToEdit) {
-        setCategoryId(matching[0]._id);
-      }
-    }
-  };
+  }, [isOpen, transactionToEdit, defaultType, fetchCategories]);
 
   const handleTypeChange = (newType: "Expense" | "Income" | "Investment") => {
     setType(newType);

@@ -18,7 +18,7 @@ export interface InvestmentGrowthData {
   cumulative: number;
 }
 
-export function InvestmentGrowthChart({
+export const InvestmentGrowthChart = React.memo(function InvestmentGrowthChart({
   data,
   currency = "USD",
 }: {
@@ -95,5 +95,5 @@ export function InvestmentGrowthChart({
       </ResponsiveContainer>
     </div>
   );
-}
+});
 

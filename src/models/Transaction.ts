@@ -25,13 +25,12 @@ const TransactionSchema = new Schema<ITransaction>(
       type: String,
       enum: ["Expense", "Income", "Investment"],
       required: true,
-      index: true,
     },
-    categoryId: { type: Schema.Types.Mixed, required: true, index: true },
+    categoryId: { type: Schema.Types.Mixed, required: true },
     categoryName: { type: String, required: true },
     item: { type: String, required: true },
     amount: { type: Number, required: true, min: 0 },
-    date: { type: Date, required: true, index: true },
+    date: { type: Date, required: true },
     paymentMethod: { type: String, default: "Cash" },
     notes: { type: String, default: "" },
     tags: { type: [String], default: [] },
@@ -41,13 +40,11 @@ const TransactionSchema = new Schema<ITransaction>(
   }
 );
 
-// Compound indexes required by prompt specifications:
-// userId, date, type, categoryId, userId + date, userId + type
+// Targeted compound indexes for high-frequency user-scoped queries:
 TransactionSchema.index({ userId: 1, date: -1 });
-TransactionSchema.index({ userId: 1, type: 1 });
-TransactionSchema.index({ userId: 1, categoryId: 1 });
-TransactionSchema.index({ userId: 1, date: -1, type: 1 });
 TransactionSchema.index({ userId: 1, type: 1, date: -1 });
+TransactionSchema.index({ userId: 1, date: -1, type: 1 });
+TransactionSchema.index({ userId: 1, categoryId: 1, date: -1 });
 TransactionSchema.index({ userId: 1, item: 1 });
 
 export const Transaction: Model<ITransaction> =

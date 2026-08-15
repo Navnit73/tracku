@@ -18,7 +18,7 @@ export interface TopItemData {
   totalAmount: number;
 }
 
-export function TopItemsChart({
+export const TopItemsChart = React.memo(function TopItemsChart({
   data,
   currency = "USD",
 }: {
@@ -78,5 +78,5 @@ export function TopItemsChart({
       </ResponsiveContainer>
     </div>
   );
-}
+});
 

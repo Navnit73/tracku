@@ -17,160 +17,210 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
     const user = await requireAuthUser();
     await connectToDatabase();
 
-    const dbUser = await User.findById(user.id).select("currency").lean();
-    const currency = (dbUser as any)?.currency || "USD";
-
     const range = filters?.dateRange || "This Month";
     const { startDate, endDate } = getDateRangeBounds(range, filters?.startDate, filters?.endDate);
 
-    const query: any = { userId: user.id };
+    const queryMatch: any = { userId: user.id };
     if (startDate || endDate) {
-      query.date = {};
-      if (startDate) query.date.$gte = startDate;
-      if (endDate) query.date.$lte = endDate;
+      queryMatch.date = {};
+      if (startDate) queryMatch.date.$gte = startDate;
+      if (endDate) queryMatch.date.$lte = endDate;
     }
 
-    // Fetch all transactions matching filter
-    const transactions = await Transaction.find(query).sort({ date: 1 }).lean();
+    const now = new Date();
+    const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // Parallel execution of all required queries using optimized MongoDB aggregations
+    const [dbUser, facetResult, monthlyResult, recentTxns] = await Promise.all([
+      User.findById(user.id).select("currency").lean(),
+      Transaction.aggregate([
+        { $match: queryMatch },
+        {
+          $facet: {
+            totalsByType: [
+              {
+                $group: {
+                  _id: "$type",
+                  total: { $sum: "$amount" },
+                },
+              },
+            ],
+            expenseCategories: [
+              { $match: { type: "Expense" } },
+              {
+                $group: {
+                  _id: "$categoryName",
+                  amount: { $sum: "$amount" },
+                },
+              },
+              { $sort: { amount: -1 } },
+            ],
+            incomeCategories: [
+              { $match: { type: "Income" } },
+              {
+                $group: {
+                  _id: "$categoryName",
+                  amount: { $sum: "$amount" },
+                },
+              },
+            ],
+            investmentCategories: [
+              { $match: { type: "Investment" } },
+              {
+                $group: {
+                  _id: "$categoryName",
+                  amount: { $sum: "$amount" },
+                },
+              },
+            ],
+            expenseItems: [
+              { $match: { type: "Expense" } },
+              {
+                $group: {
+                  _id: "$item",
+                  totalAmount: { $sum: "$amount" },
+                  count: { $sum: 1 },
+                  lastDate: { $max: "$date" },
+                  categoryName: { $first: "$categoryName" },
+                },
+              },
+              { $sort: { totalAmount: -1 } },
+              { $limit: 20 },
+            ],
+            dailyTrends: [
+              {
+                $group: {
+                  _id: {
+                    date: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+                    type: "$type",
+                  },
+                  total: { $sum: "$amount" },
+                },
+              },
+              { $sort: { "_id.date": 1 } },
+            ],
+            dailyInvestments: [
+              { $match: { type: "Investment" } },
+              {
+                $group: {
+                  _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+                  amount: { $sum: "$amount" },
+                },
+              },
+              { $sort: { _id: 1 } },
+            ],
+          },
+        },
+      ]),
+      Transaction.aggregate([
+        {
+          $match: {
+            userId: user.id,
+            date: { $gte: startOfCurrentMonth },
+          },
+        },
+        {
+          $group: {
+            _id: "$type",
+            total: { $sum: "$amount" },
+          },
+        },
+      ]),
+      Transaction.find(queryMatch)
+        .select("type categoryName item amount date paymentMethod")
+        .sort({ date: -1 })
+        .limit(6)
+        .lean(),
+    ]);
+
+    const currency = (dbUser as any)?.currency || "USD";
+    const facet = facetResult[0] || {};
 
     let totalIncome = 0;
     let totalExpenses = 0;
     let totalInvestments = 0;
 
-    const expenseCategoryMap: Record<string, { name: string; amount: number; color?: string }> = {};
-    const incomeCategoryMap: Record<string, number> = {};
-    const investmentCategoryMap: Record<string, number> = {};
-
-    const itemSpendMap: Record<
-      string,
-      { item: string; count: number; totalAmount: number; lastDate: Date; categoryName: string }
-    > = {};
-
-    const dailyTrendMap: Record<string, { date: string; income: number; expense: number; investment: number }> = {};
-    const investmentGrowthMap: Record<string, { date: string; amount: number; cumulative: number }> = {};
-
-    let cumulativeInvestment = 0;
-
-    transactions.forEach((t: any) => {
-      const amt = Number(t.amount) || 0;
-      const dateKey = t.date ? new Date(t.date).toISOString().split("T")[0] : "";
-
-      if (!dailyTrendMap[dateKey]) {
-        dailyTrendMap[dateKey] = { date: dateKey, income: 0, expense: 0, investment: 0 };
-      }
-
-      if (t.type === "Income") {
-        totalIncome += amt;
-        incomeCategoryMap[t.categoryName] = (incomeCategoryMap[t.categoryName] || 0) + amt;
-        dailyTrendMap[dateKey].income += amt;
-      } else if (t.type === "Expense") {
-        totalExpenses += amt;
-        if (!expenseCategoryMap[t.categoryName]) {
-          expenseCategoryMap[t.categoryName] = { name: t.categoryName, amount: 0 };
-        }
-        expenseCategoryMap[t.categoryName].amount += amt;
-        dailyTrendMap[dateKey].expense += amt;
-
-        // Frequently / Top item tracking for expenses
-        if (!itemSpendMap[t.item]) {
-          itemSpendMap[t.item] = {
-            item: t.item,
-            count: 0,
-            totalAmount: 0,
-            lastDate: new Date(t.date),
-            categoryName: t.categoryName,
-          };
-        }
-        itemSpendMap[t.item].count += 1;
-        itemSpendMap[t.item].totalAmount += amt;
-        if (new Date(t.date) > itemSpendMap[t.item].lastDate) {
-          itemSpendMap[t.item].lastDate = new Date(t.date);
-        }
-      } else if (t.type === "Investment") {
-        totalInvestments += amt;
-        investmentCategoryMap[t.categoryName] = (investmentCategoryMap[t.categoryName] || 0) + amt;
-        dailyTrendMap[dateKey].investment += amt;
-
-        cumulativeInvestment += amt;
-        const prevAmount = investmentGrowthMap[dateKey]?.amount || 0;
-        investmentGrowthMap[dateKey] = {
-          date: dateKey,
-          amount: prevAmount + amt,
-          cumulative: cumulativeInvestment,
-        };
-      }
+    (facet.totalsByType || []).forEach((t: any) => {
+      if (t._id === "Income") totalIncome = t.total || 0;
+      else if (t._id === "Expense") totalExpenses = t.total || 0;
+      else if (t._id === "Investment") totalInvestments = t.total || 0;
     });
 
-    // Required formulas:
-    // Balance = Income - Expenses - Investments
-    // Savings = Income - Expenses
     const balance = totalIncome - totalExpenses - totalInvestments;
     const savings = totalIncome - totalExpenses;
-
-    // Monthly totals (current calendar month)
-    const now = new Date();
-    const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthlyTransactions = await Transaction.find({
-      userId: user.id,
-      date: { $gte: startOfCurrentMonth },
-    }).lean();
 
     let monthlyIncome = 0;
     let monthlyExpenses = 0;
     let monthlyInvestments = 0;
 
-    monthlyTransactions.forEach((t: any) => {
-      const amt = Number(t.amount) || 0;
-      if (t.type === "Income") monthlyIncome += amt;
-      else if (t.type === "Expense") monthlyExpenses += amt;
-      else if (t.type === "Investment") monthlyInvestments += amt;
+    (monthlyResult || []).forEach((m: any) => {
+      if (m._id === "Income") monthlyIncome = m.total || 0;
+      else if (m._id === "Expense") monthlyExpenses = m.total || 0;
+      else if (m._id === "Investment") monthlyInvestments = m.total || 0;
     });
 
-    // Frequently spent items list
-    const frequentlySpentItems = Object.values(itemSpendMap)
-      .map((item) => ({
-        item: item.item,
+    // Top spending items & frequently spent items
+    const expenseItems = facet.expenseItems || [];
+    const topSpendingItems = expenseItems
+      .slice(0, 5)
+      .map((item: any) => ({
+        item: item._id,
+        totalAmount: item.totalAmount,
+      }));
+
+    const frequentlySpentItems = [...expenseItems]
+      .sort((a: any, b: any) => b.count - a.count)
+      .slice(0, 5)
+      .map((item: any) => ({
+        item: item._id,
         count: item.count,
         totalAmount: item.totalAmount,
-        averageAmount: item.totalAmount / item.count,
-        lastPurchaseDate: item.lastDate.toISOString(),
+        averageAmount: item.count > 0 ? item.totalAmount / item.count : 0,
+        lastPurchaseDate: item.lastDate ? new Date(item.lastDate).toISOString() : new Date().toISOString(),
         categoryName: item.categoryName,
-      }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
+      }));
 
-    // Top spending items by total amount
-    const topSpendingItems = Object.values(itemSpendMap)
-      .map((item) => ({
-        item: item.item,
-        totalAmount: item.totalAmount,
-      }))
-      .sort((a, b) => b.totalAmount - a.totalAmount)
-      .slice(0, 5);
+    // Build Daily Trend Series (Income vs Expense vs Investment)
+    const dailyMap: Record<string, { date: string; income: number; expense: number; investment: number }> = {};
+    (facet.dailyTrends || []).forEach((d: any) => {
+      const dateKey = d._id.date;
+      if (!dailyMap[dateKey]) {
+        dailyMap[dateKey] = { date: dateKey, income: 0, expense: 0, investment: 0 };
+      }
+      if (d._id.type === "Income") dailyMap[dateKey].income += d.total || 0;
+      else if (d._id.type === "Expense") dailyMap[dateKey].expense += d.total || 0;
+      else if (d._id.type === "Investment") dailyMap[dateKey].investment += d.total || 0;
+    });
 
-    // Income vs Expense chart series
-    const incomeVsExpenseChart = Object.values(dailyTrendMap).sort(
+    const incomeVsExpenseChart = Object.values(dailyMap).sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
-    // Category spending chart series
-    const categorySpendingChart = Object.values(expenseCategoryMap).sort(
-      (a, b) => b.amount - a.amount
-    );
+    // Category Spending Series
+    const categorySpendingChart = (facet.expenseCategories || []).map((c: any) => ({
+      name: c._id,
+      amount: c.amount,
+    }));
 
-    // Investment growth chart series
-    const investmentGrowthChart = Object.values(investmentGrowthMap).sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
+    // Investment Growth Series
+    let cumulative = 0;
+    const investmentGrowthChart = (facet.dailyInvestments || []).map((inv: any) => {
+      cumulative += inv.amount || 0;
+      return {
+        date: inv._id,
+        amount: inv.amount,
+        cumulative,
+      };
+    });
 
-    // Recent transactions feed (top 6)
-    const recentTransactions = transactions.slice(-6).reverse().map((t: any) => ({
+    // Recent 6 transactions formatted
+    const recentTransactions = (recentTxns || []).map((t: any) => ({
       _id: t._id.toString(),
       type: t.type,
       categoryName: t.categoryName,
       item: t.item,
       amount: t.amount,
-      date: t.date ? t.date.toISOString() : new Date().toISOString(),
+      date: t.date ? new Date(t.date).toISOString() : new Date().toISOString(),
       paymentMethod: t.paymentMethod,
     }));
 
@@ -213,77 +263,80 @@ export async function getExpenseAnalytics(filters?: AnalyticsFilter) {
     const range = filters?.dateRange || "This Month";
     const { startDate, endDate } = getDateRangeBounds(range, filters?.startDate, filters?.endDate);
 
-    const query: any = { userId: user.id, type: "Expense" };
+    const queryMatch: any = { userId: user.id, type: "Expense" };
     if (startDate || endDate) {
-      query.date = {};
-      if (startDate) query.date.$gte = startDate;
-      if (endDate) query.date.$lte = endDate;
+      queryMatch.date = {};
+      if (startDate) queryMatch.date.$gte = startDate;
+      if (endDate) queryMatch.date.$lte = endDate;
     }
 
-    const expenses = await Transaction.find(query).sort({ date: 1 }).lean();
+    const [facetResult, highestTx] = await Promise.all([
+      Transaction.aggregate([
+        { $match: queryMatch },
+        {
+          $facet: {
+            stats: [
+              {
+                $group: {
+                  _id: null,
+                  totalExpense: { $sum: "$amount" },
+                  highestExpense: { $max: "$amount" },
+                  averageExpense: { $avg: "$amount" },
+                  count: { $sum: 1 },
+                },
+              },
+            ],
+            byCategory: [
+              {
+                $group: {
+                  _id: "$categoryName",
+                  amount: { $sum: "$amount" },
+                },
+              },
+              { $sort: { amount: -1 } },
+            ],
+            byItem: [
+              {
+                $group: {
+                  _id: "$item",
+                  count: { $sum: 1 },
+                  totalAmount: { $sum: "$amount" },
+                  lastDate: { $max: "$date" },
+                  categoryName: { $first: "$categoryName" },
+                },
+              },
+              { $sort: { count: -1 } },
+            ],
+          },
+        },
+      ]),
+      Transaction.findOne(queryMatch).sort({ amount: -1 }).select("item amount").lean(),
+    ]);
 
-    let totalExpense = 0;
-    let highestExpense = 0;
-    let highestExpenseItem = "";
+    const facet = facetResult[0] || {};
+    const stats = facet.stats?.[0] || { totalExpense: 0, highestExpense: 0, averageExpense: 0, count: 0 };
 
-    const categoryMap: Record<string, number> = {};
-    const itemMap: Record<
-      string,
-      { item: string; count: number; totalAmount: number; lastDate: Date; categoryName: string }
-    > = {};
+    const categorySpending = (facet.byCategory || []).map((c: any) => ({
+      name: c._id,
+      amount: c.amount,
+    }));
 
-    expenses.forEach((e: any) => {
-      const amt = Number(e.amount) || 0;
-      totalExpense += amt;
-
-      if (amt > highestExpense) {
-        highestExpense = amt;
-        highestExpenseItem = e.item;
-      }
-
-      categoryMap[e.categoryName] = (categoryMap[e.categoryName] || 0) + amt;
-
-      if (!itemMap[e.item]) {
-        itemMap[e.item] = {
-          item: e.item,
-          count: 0,
-          totalAmount: 0,
-          lastDate: new Date(e.date),
-          categoryName: e.categoryName,
-        };
-      }
-      itemMap[e.item].count += 1;
-      itemMap[e.item].totalAmount += amt;
-      if (new Date(e.date) > itemMap[e.item].lastDate) {
-        itemMap[e.item].lastDate = new Date(e.date);
-      }
-    });
-
-    const averageExpense = expenses.length > 0 ? totalExpense / expenses.length : 0;
-
-    const frequentlyPurchased = Object.values(itemMap)
-      .map((item) => ({
-        item: item.item,
-        count: item.count,
-        totalAmount: item.totalAmount,
-        averageAmount: item.totalAmount / item.count,
-        lastPurchaseDate: item.lastDate.toISOString(),
-        categoryName: item.categoryName,
-      }))
-      .sort((a, b) => b.count - a.count);
-
-    const categorySpending = Object.entries(categoryMap).map(([name, amount]) => ({
-      name,
-      amount,
+    const frequentlyPurchased = (facet.byItem || []).map((item: any) => ({
+      item: item._id,
+      count: item.count,
+      totalAmount: item.totalAmount,
+      averageAmount: item.count > 0 ? item.totalAmount / item.count : 0,
+      lastPurchaseDate: item.lastDate ? new Date(item.lastDate).toISOString() : new Date().toISOString(),
+      categoryName: item.categoryName,
     }));
 
     return {
       success: true,
-      totalExpense,
-      highestExpense,
-      highestExpenseItem,
-      averageExpense,
-      transactionCount: expenses.length,
+      totalExpense: stats.totalExpense || 0,
+      highestExpense: stats.highestExpense || 0,
+      highestExpenseItem: (highestTx as any)?.item || "",
+      averageExpense: stats.averageExpense || 0,
+      transactionCount: stats.count || 0,
       categorySpending,
       frequentlyPurchased,
     };
@@ -300,53 +353,73 @@ export async function getIncomeAnalytics(filters?: AnalyticsFilter) {
     const range = filters?.dateRange || "This Month";
     const { startDate, endDate } = getDateRangeBounds(range, filters?.startDate, filters?.endDate);
 
-    const query: any = { userId: user.id, type: "Income" };
+    const queryMatch: any = { userId: user.id, type: "Income" };
     if (startDate || endDate) {
-      query.date = {};
-      if (startDate) query.date.$gte = startDate;
-      if (endDate) query.date.$lte = endDate;
+      queryMatch.date = {};
+      if (startDate) queryMatch.date.$gte = startDate;
+      if (endDate) queryMatch.date.$lte = endDate;
     }
 
-    const incomeRecords = await Transaction.find(query).sort({ date: 1 }).lean();
+    const [facetResult, highestTx] = await Promise.all([
+      Transaction.aggregate([
+        { $match: queryMatch },
+        {
+          $facet: {
+            stats: [
+              {
+                $group: {
+                  _id: null,
+                  totalIncome: { $sum: "$amount" },
+                  highestIncome: { $max: "$amount" },
+                  averageIncome: { $avg: "$amount" },
+                  count: { $sum: 1 },
+                },
+              },
+            ],
+            byCategory: [
+              {
+                $group: {
+                  _id: "$categoryName",
+                  amount: { $sum: "$amount" },
+                },
+              },
+              { $sort: { amount: -1 } },
+            ],
+            byItem: [
+              {
+                $group: {
+                  _id: "$item",
+                  amount: { $sum: "$amount" },
+                },
+              },
+              { $sort: { amount: -1 } },
+            ],
+          },
+        },
+      ]),
+      Transaction.findOne(queryMatch).sort({ amount: -1 }).select("item amount").lean(),
+    ]);
 
-    let totalIncome = 0;
-    let highestIncome = 0;
-    let highestIncomeSource = "";
+    const facet = facetResult[0] || {};
+    const stats = facet.stats?.[0] || { totalIncome: 0, highestIncome: 0, averageIncome: 0, count: 0 };
 
-    const categoryMap: Record<string, number> = {};
-    const itemMap: Record<string, number> = {};
-
-    incomeRecords.forEach((i: any) => {
-      const amt = Number(i.amount) || 0;
-      totalIncome += amt;
-
-      if (amt > highestIncome) {
-        highestIncome = amt;
-        highestIncomeSource = i.item;
-      }
-
-      categoryMap[i.categoryName] = (categoryMap[i.categoryName] || 0) + amt;
-      itemMap[i.item] = (itemMap[i.item] || 0) + amt;
-    });
-
-    const averageIncome = incomeRecords.length > 0 ? totalIncome / incomeRecords.length : 0;
-
-    const incomeByCategory = Object.entries(categoryMap).map(([name, amount]) => ({
-      name,
-      amount,
+    const incomeByCategory = (facet.byCategory || []).map((c: any) => ({
+      name: c._id,
+      amount: c.amount,
     }));
 
-    const incomeByItem = Object.entries(itemMap)
-      .map(([item, amount]) => ({ item, amount }))
-      .sort((a, b) => b.amount - a.amount);
+    const incomeByItem = (facet.byItem || []).map((item: any) => ({
+      item: item._id,
+      amount: item.amount,
+    }));
 
     return {
       success: true,
-      totalIncome,
-      highestIncome,
-      highestIncomeSource,
-      averageIncome,
-      transactionCount: incomeRecords.length,
+      totalIncome: stats.totalIncome || 0,
+      highestIncome: stats.highestIncome || 0,
+      highestIncomeSource: (highestTx as any)?.item || "",
+      averageIncome: stats.averageIncome || 0,
+      transactionCount: stats.count || 0,
       incomeByCategory,
       incomeByItem,
     };
@@ -363,55 +436,95 @@ export async function getInvestmentAnalytics(filters?: AnalyticsFilter) {
     const range = filters?.dateRange || "This Month";
     const { startDate, endDate } = getDateRangeBounds(range, filters?.startDate, filters?.endDate);
 
-    const query: any = { userId: user.id, type: "Investment" };
+    const queryMatch: any = { userId: user.id, type: "Investment" };
     if (startDate || endDate) {
-      query.date = {};
-      if (startDate) query.date.$gte = startDate;
-      if (endDate) query.date.$lte = endDate;
+      queryMatch.date = {};
+      if (startDate) queryMatch.date.$gte = startDate;
+      if (endDate) queryMatch.date.$lte = endDate;
     }
 
-    const investments = await Transaction.find(query).sort({ date: 1 }).lean();
+    const [facetResult, highestTx] = await Promise.all([
+      Transaction.aggregate([
+        { $match: queryMatch },
+        {
+          $facet: {
+            stats: [
+              {
+                $group: {
+                  _id: null,
+                  totalInvested: { $sum: "$amount" },
+                  largestInvestment: { $max: "$amount" },
+                  averageInvestment: { $avg: "$amount" },
+                  count: { $sum: 1 },
+                },
+              },
+            ],
+            byCategory: [
+              {
+                $group: {
+                  _id: "$categoryName",
+                  amount: { $sum: "$amount" },
+                },
+              },
+              { $sort: { amount: -1 } },
+            ],
+            byItem: [
+              {
+                $group: {
+                  _id: "$item",
+                  amount: { $sum: "$amount" },
+                },
+              },
+              { $sort: { amount: -1 } },
+            ],
+            dailyInvestments: [
+              {
+                $group: {
+                  _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+                  amount: { $sum: "$amount" },
+                },
+              },
+              { $sort: { _id: 1 } },
+            ],
+          },
+        },
+      ]),
+      Transaction.findOne(queryMatch).sort({ amount: -1 }).select("item amount").lean(),
+    ]);
 
-    let totalInvested = 0;
-    let largestInvestment = 0;
-    let largestInvestmentItem = "";
+    const facet = facetResult[0] || {};
+    const stats = facet.stats?.[0] || { totalInvested: 0, largestInvestment: 0, averageInvestment: 0, count: 0 };
 
-    const categoryMap: Record<string, number> = {};
-    const itemMap: Record<string, number> = {};
-
-    investments.forEach((inv: any) => {
-      const amt = Number(inv.amount) || 0;
-      totalInvested += amt;
-
-      if (amt > largestInvestment) {
-        largestInvestment = amt;
-        largestInvestmentItem = inv.item;
-      }
-
-      categoryMap[inv.categoryName] = (categoryMap[inv.categoryName] || 0) + amt;
-      itemMap[inv.item] = (itemMap[inv.item] || 0) + amt;
-    });
-
-    const averageInvestment = investments.length > 0 ? totalInvested / investments.length : 0;
-
-    const investmentByCategory = Object.entries(categoryMap).map(([name, amount]) => ({
-      name,
-      amount,
+    const investmentByCategory = (facet.byCategory || []).map((c: any) => ({
+      name: c._id,
+      amount: c.amount,
     }));
 
-    const investmentByItem = Object.entries(itemMap)
-      .map(([item, amount]) => ({ item, amount }))
-      .sort((a, b) => b.amount - a.amount);
+    const investmentByItem = (facet.byItem || []).map((item: any) => ({
+      item: item._id,
+      amount: item.amount,
+    }));
+
+    let cumulative = 0;
+    const investmentGrowth = (facet.dailyInvestments || []).map((inv: any) => {
+      cumulative += inv.amount || 0;
+      return {
+        date: inv._id,
+        amount: inv.amount,
+        cumulative,
+      };
+    });
 
     return {
       success: true,
-      totalInvested,
-      largestInvestment,
-      largestInvestmentItem,
-      averageInvestment,
-      investmentCount: investments.length,
+      totalInvested: stats.totalInvested || 0,
+      largestInvestment: stats.largestInvestment || 0,
+      largestInvestmentItem: (highestTx as any)?.item || "",
+      averageInvestment: stats.averageInvestment || 0,
+      investmentCount: stats.count || 0,
       investmentByCategory,
       investmentByItem,
+      investmentGrowth,
     };
   } catch (error: any) {
     return { success: false, error: error.message };

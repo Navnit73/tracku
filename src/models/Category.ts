@@ -15,7 +15,7 @@ export interface ICategory extends Document {
 
 const CategorySchema = new Schema<ICategory>(
   {
-    userId: { type: String, required: true, index: true },
+    userId: { type: String, required: true },
     name: { type: String, required: true },
     type: {
       type: String,

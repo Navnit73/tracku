@@ -10,7 +10,7 @@ import { CardSkeleton } from "@/components/ui/Skeleton";
 import { InsightCard } from "@/components/insights/InsightCard";
 import { getDashboardAnalytics } from "@/app/actions/analytics";
 import { getTransactions } from "@/app/actions/transactions";
-import { getSpendingInsights, getMonthComparison, getSavingsAnalysis, getFinancialHealthScore } from "@/app/actions/insights";
+import { getComprehensiveFinancialInsights } from "@/app/actions/insights";
 import type { InsightItem, MonthComparisonCategory, HealthScore } from "@/app/actions/insights";
 import { downloadTransactionsCSV } from "@/lib/csvExport";
 import { formatCurrency } from "@/lib/utils";
@@ -42,21 +42,20 @@ export default function ReportsPage() {
     setLoading(true);
     const filters = { dateRange: datePreset, startDate: customStart, endDate: customEnd };
 
-    const [analyticsRes, transRes, insightsRes, compRes, savingsRes, healthRes] = await Promise.all([
+    const [analyticsRes, transRes, comprehensiveInsightsRes] = await Promise.all([
       getDashboardAnalytics(filters),
       getTransactions({ ...filters, limit: 500 }),
-      getSpendingInsights(filters),
-      getMonthComparison(filters),
-      getSavingsAnalysis(filters),
-      getFinancialHealthScore(filters),
+      getComprehensiveFinancialInsights(filters),
     ]);
 
     if (analyticsRes.success) setAnalytics(analyticsRes);
     if (transRes.success) setTransactions(transRes.transactions);
-    if (insightsRes.success) setInsights((insightsRes.insights || []).slice(0, 3));
-    if (compRes.success && compRes.comparison) setCategories(compRes.comparison.categories || []);
-    if (savingsRes.success && savingsRes.analysis) setSavingsRate(savingsRes.analysis.savingsRate);
-    if (healthRes.success && healthRes.healthScore) setHealthScore(healthRes.healthScore);
+    if (comprehensiveInsightsRes.success) {
+      setInsights((comprehensiveInsightsRes.insights || []).slice(0, 3));
+      if (comprehensiveInsightsRes.comparison) setCategories(comprehensiveInsightsRes.comparison.categories || []);
+      if (comprehensiveInsightsRes.savings) setSavingsRate(comprehensiveInsightsRes.savings.savingsRate);
+      if (comprehensiveInsightsRes.healthScore) setHealthScore(comprehensiveInsightsRes.healthScore);
+    }
 
     setLoading(false);
   }, [datePreset, customStart, customEnd]);

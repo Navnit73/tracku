@@ -77,10 +77,29 @@ export async function getTransactions(filters: TransactionFilterInput) {
 
     const skip = (page - 1) * limit;
 
-    const [transactions, totalCount] = await Promise.all([
-      Transaction.find(query).sort(sortOption).skip(skip).limit(limit).lean(),
-      Transaction.countDocuments(query),
-    ]);
+    const txPromise = Transaction.find(query)
+      .select("_id userId type categoryId categoryName item amount date paymentMethod notes tags createdAt updatedAt")
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    let transactions: any[];
+    let totalCount: number;
+
+    if (page === 1) {
+      transactions = await txPromise;
+      if (transactions.length < limit) {
+        totalCount = transactions.length;
+      } else {
+        totalCount = await Transaction.countDocuments(query);
+      }
+    } else {
+      [transactions, totalCount] = await Promise.all([
+        txPromise,
+        Transaction.countDocuments(query),
+      ]);
+    }
 
     const totalPages = Math.ceil(totalCount / limit);
 
@@ -94,12 +113,12 @@ export async function getTransactions(filters: TransactionFilterInput) {
         categoryName: t.categoryName,
         item: t.item,
         amount: t.amount,
-        date: t.date ? t.date.toISOString() : new Date().toISOString(),
+        date: t.date ? (t.date instanceof Date ? t.date.toISOString() : new Date(t.date).toISOString()) : new Date().toISOString(),
         paymentMethod: t.paymentMethod,
         notes: t.notes || "",
         tags: t.tags || [],
-        createdAt: t.createdAt ? t.createdAt.toISOString() : new Date().toISOString(),
-        updatedAt: t.updatedAt ? t.updatedAt.toISOString() : new Date().toISOString(),
+        createdAt: t.createdAt ? (t.createdAt instanceof Date ? t.createdAt.toISOString() : new Date(t.createdAt).toISOString()) : new Date().toISOString(),
+        updatedAt: t.updatedAt ? (t.updatedAt instanceof Date ? t.updatedAt.toISOString() : new Date(t.updatedAt).toISOString()) : new Date().toISOString(),
       })),
       pagination: {
         currentPage: page,

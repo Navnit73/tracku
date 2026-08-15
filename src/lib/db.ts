@@ -28,7 +28,15 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
   }
 
   if (!cached!.promise || mongoose.connection.readyState === 0) {
-    cached!.promise = mongoose.connect(MONGODB_URI).then((mongooseInstance) => {
+    const opts = {
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      maxIdleTimeMS: 30000,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      bufferCommands: false,
+    };
+    cached!.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
       return mongooseInstance;
     });
   }

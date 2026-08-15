@@ -22,7 +22,7 @@ const COLORS = [
   "#64748b",
 ];
 
-export function CategoryPieChart({
+export const CategoryPieChart = React.memo(function CategoryPieChart({
   data,
   currency = "USD",
 }: {
@@ -77,5 +77,5 @@ export function CategoryPieChart({
       </ResponsiveContainer>
     </div>
   );
-}
+});
 
