@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, ReactNode } from "react";
+import React, { useEffect, ReactNode } from "react";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { Navbar } from "./Navbar";
 import { BottomNav } from "./BottomNav";
-import { Loader2, Wallet } from "lucide-react";
+import { useSidebar } from "@/components/providers/SidebarProvider";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function AppShell({
@@ -20,24 +22,7 @@ export function AppShell({
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  // Initialize and persist collapsed state from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("sidebarCollapsed");
-    if (saved === "true") {
-      setIsCollapsed(true);
-    }
-  }, []);
-
-  const handleToggleCollapse = () => {
-    setIsCollapsed((prev) => {
-      const next = !prev;
-      localStorage.setItem("sidebarCollapsed", String(next));
-      return next;
-    });
-  };
+  const { isCollapsed, toggleCollapse, mobileOpen, setMobileOpen } = useSidebar();
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -48,8 +33,15 @@ export function AppShell({
   if (status === "loading") {
     return (
       <div className="min-h-screen bg-canvas flex flex-col items-center justify-center gap-3 text-ink">
-        <div className="p-3 rounded-2xl bg-primary text-white shadow-lg animate-pulse">
-          <Wallet className="w-8 h-8" />
+        <div className="p-3  animate-pulse">
+          <Image
+            src="/asset-management.png"
+            alt="FinanceTrack"
+            width={40}
+            height={40}
+            className="w-10 h-10 object-contain drop-shadow"
+            priority
+          />
         </div>
         <div className="flex items-center gap-2 text-sm font-semibold text-ink-muted">
           <Loader2 className="w-4 h-4 animate-spin text-primary" />
@@ -70,7 +62,7 @@ export function AppShell({
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
         isCollapsed={isCollapsed}
-        onToggleCollapse={handleToggleCollapse}
+        onToggleCollapse={toggleCollapse}
       />
 
       {/* Main Content Workspace with dynamic left padding */}
@@ -84,7 +76,7 @@ export function AppShell({
           onOpenMobileMenu={() => setMobileOpen(true)}
           title={title}
           isCollapsed={isCollapsed}
-          onToggleCollapse={handleToggleCollapse}
+          onToggleCollapse={toggleCollapse}
         />
         <main className="flex-1 p-3.5 sm:p-6 lg:p-8 pb-24 lg:pb-8 max-w-7xl w-full mx-auto">
           {children}
