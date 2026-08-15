@@ -51,41 +51,45 @@ export function Modal({
   };
 
   const content = (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Modal Dialog Surface */}
       <div
+        role="dialog"
+        aria-modal="true"
         className={cn(
-          "relative w-full rounded-t-3xl sm:rounded-2xl bg-surface border-t sm:border border-hairline shadow-2xl transition-all animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 z-10 flex flex-col max-h-[85vh] sm:max-h-[90vh]",
+          "relative w-full rounded-t-3xl sm:rounded-2xl bg-surface border-t sm:border border-hairline shadow-2xl transition-all animate-in slide-in-from-bottom-8 sm:zoom-in-95 duration-200 z-10 flex flex-col max-h-[85vh] sm:max-h-[90vh]",
           maxWidths[maxWidth]
         )}
       >
-        {/* Mobile Pull Indicator */}
-        <div className="w-12 h-1 bg-hairline rounded-full mx-auto my-2.5 sm:hidden" />
+        {/* Mobile Drag Indicator */}
+        <div className="w-12 h-1 bg-hairline-strong rounded-full mx-auto mt-3 mb-1 sm:hidden shrink-0" />
 
         {/* Header */}
         {(title || description) && (
-          <div className="flex items-start justify-between px-5 sm:px-6 pt-2 sm:pt-6 pb-3 sm:pb-4 border-b border-hairline">
-            <div>
+          <div className="flex items-start justify-between px-5 sm:px-6 pt-2 sm:pt-5 pb-3.5 sm:pb-4 border-b border-hairline shrink-0">
+            <div className="pr-4">
               {title && (
                 <h2 className="text-base sm:text-lg font-bold text-ink tracking-tight">
                   {title}
                 </h2>
               )}
               {description && (
-                <p className="text-xs text-ink-muted mt-0.5">
+                <p className="text-xs text-ink-muted mt-0.5 leading-relaxed">
                   {description}
                 </p>
               )}
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-full sm:rounded-lg text-ink-muted hover:bg-canvas transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-ink-muted hover:bg-canvas active:scale-95 transition-all cursor-pointer shrink-0"
+              aria-label="Close dialog"
             >
               <X className="w-4 h-4" />
             </button>
@@ -97,7 +101,7 @@ export function Modal({
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-2.5 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-hairline bg-canvas/60 rounded-b-none sm:rounded-b-2xl">
+          <div className="flex items-center justify-end gap-2.5 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-hairline bg-canvas/60 rounded-b-none sm:rounded-b-2xl shrink-0">
             {footer}
           </div>
         )}
@@ -107,3 +111,4 @@ export function Modal({
 
   return typeof window !== "undefined" ? createPortal(content, document.body) : null;
 }
+

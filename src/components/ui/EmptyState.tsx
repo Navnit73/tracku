@@ -18,12 +18,12 @@ export function EmptyState({
   onAction,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center rounded-xl bg-canvas/50 border border-dashed border-hairline min-h-[220px]">
-      <div className="p-3 rounded-full bg-surface border border-hairline text-primary mb-3 ">
+    <div className="flex flex-col items-center justify-center p-6 sm:p-8 text-center rounded-2xl bg-surface/50 border border-dashed border-hairline min-h-[200px] w-full">
+      <div className="p-3.5 rounded-2xl bg-canvas border border-hairline text-primary mb-3 shadow-xs">
         {icon || <FolderOpen className="w-6 h-6" />}
       </div>
-      <h3 className="text-base font-bold text-ink">{title}</h3>
-      <p className="text-xs text-ink-muted max-w-sm mt-1 mb-4">
+      <h3 className="text-base font-bold text-ink tracking-tight">{title}</h3>
+      <p className="text-xs text-ink-muted max-w-sm mt-1 mb-4 leading-relaxed">
         {description}
       </p>
       {actionLabel && onAction && (
@@ -34,3 +34,4 @@ export function EmptyState({
     </div>
   );
 }
+

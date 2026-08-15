@@ -104,18 +104,18 @@ export default function InsightsPage() {
     <AppShell title="Financial Insights">
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-3.5 sm:p-4 rounded-2xl border border-hairline ">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
               <Brain className="w-5 h-5 text-primary" />
-              Financial Intelligence
+              Financial Intelligence & Analytics
             </h2>
             <p className="text-xs text-ink-muted mt-0.5">
               Smart analysis of your spending patterns, savings, and financial health
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap w-full sm:w-auto">
             <DatePicker
               selectedPreset={datePreset}
               startDate={customStart}
@@ -125,13 +125,14 @@ export default function InsightsPage() {
                 setCustomStart(s);
                 setCustomEnd(e);
               }}
+              className="w-full sm:w-auto"
             />
             <Button
               variant="outline"
               size="sm"
               onClick={fetchAll}
               leftIcon={<RefreshCw className="w-4 h-4" />}
-              className="w-full sm:w-auto"
+              className="flex-1 sm:flex-none"
             >
               Refresh
             </Button>
@@ -141,9 +142,9 @@ export default function InsightsPage() {
               onClick={handleClearData}
               isLoading={clearing}
               leftIcon={<Trash2 className="w-4 h-4" />}
-              className="w-full sm:w-auto"
+              className="flex-1 sm:flex-none shrink-0"
             >
-              Clear All Data
+              Clear Ledger
             </Button>
           </div>
         </div>
@@ -151,14 +152,14 @@ export default function InsightsPage() {
         {/* Row 1: Health Score + Smart Insights Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Health Score */}
-          <Card className="p-4 sm:p-5">
+          <Card className="p-4 sm:p-5 flex flex-col justify-between">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <ShieldCheck className="w-4 h-4 text-primary" />
                 Financial Health Score
               </CardTitle>
               <CardDescription>
-                Composite score based on savings, spending, investments & trends
+                Composite metric based on savings, spending ratio, investments & momentum
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -184,7 +185,7 @@ export default function InsightsPage() {
                   Smart Insights
                 </CardTitle>
                 <CardDescription>
-                  AI-powered analysis of your financial behavior
+                  Automated intelligence detecting spending patterns and milestones
                 </CardDescription>
               </div>
               <Badge variant="sky" size="sm">
@@ -222,7 +223,7 @@ export default function InsightsPage() {
               <div>
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                   <ArrowLeftRight className="w-4 h-4 text-primary" />
-                  Month-over-Month
+                  Month-over-Month Comparison
                 </CardTitle>
                 <CardDescription>
                   Compare spending categories between current and previous period
@@ -247,14 +248,14 @@ export default function InsightsPage() {
           </Card>
 
           {/* Savings Gauge */}
-          <Card className="p-4 sm:p-5">
+          <Card className="p-4 sm:p-5 flex flex-col justify-between">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <PiggyBank className="w-4 h-4 text-income" />
                 Savings Rate
               </CardTitle>
               <CardDescription>
-                How much you&apos;re saving relative to income
+                Ratio of net savings relative to total income
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -280,7 +281,7 @@ export default function InsightsPage() {
               <div>
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                   <Repeat className="w-4 h-4 text-warning-brand" />
-                  Recurring Expenses
+                  Recurring Outlays
                 </CardTitle>
                 <CardDescription>
                   Auto-detected subscriptions and regular bills (last 90 days)
@@ -303,17 +304,17 @@ export default function InsightsPage() {
                   {recurring.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-hairline"
+                      className="flex items-center justify-between p-3.5 rounded-2xl bg-canvas border border-hairline"
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="p-2 rounded-lg bg-warning-brand-bg text-warning-brand shrink-0">
-                          <Repeat className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-3 min-w-0 pr-2">
+                        <div className="p-2 rounded-xl bg-warning-brand-bg text-warning-brand shrink-0">
+                          <Repeat className="w-4 h-4" />
                         </div>
                         <div className="min-w-0">
                           <div className="text-sm font-bold text-ink truncate">
                             {item.item}
                           </div>
-                          <div className="text-[10px] text-ink-muted flex items-center gap-1.5">
+                          <div className="text-xs text-ink-muted flex items-center gap-1.5 mt-0.5">
                             <span>{item.categoryName}</span>
                             <span>•</span>
                             <span>{item.occurrences}× in 90d</span>
@@ -321,7 +322,7 @@ export default function InsightsPage() {
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <div className="text-sm font-extrabold text-expense">
+                        <div className="text-sm font-black text-expense">
                           {item.estimatedMonthly.toLocaleString("en-US", { maximumFractionDigits: 0 })}/mo
                         </div>
                         <div className="text-[10px] text-ink-faint">
@@ -362,41 +363,41 @@ export default function InsightsPage() {
               ) : netWorth ? (
                 <div className="space-y-4">
                   {/* Top-level net worth */}
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-[#7c3aed] to-[#5b21b6] text-white">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#7c3aed] to-[#5b21b6] text-white shadow-xs">
                     <div className="text-[10px] uppercase font-bold text-purple-200 tracking-wider">
-                      Net Balance
+                      Net Surplus Balance
                     </div>
-                    <div className="text-2xl font-black tracking-tight mt-0.5">
+                    <div className="text-2xl sm:text-3xl font-black tracking-tight mt-0.5">
                       {netWorth.netBalance.toLocaleString("en-US", { maximumFractionDigits: 0 })}
                     </div>
-                    <div className="text-[10px] text-purple-200 mt-1">
+                    <div className="text-[11px] text-purple-200 mt-1">
                       Income − Expenses − Investments
                     </div>
                   </div>
 
                   {/* Summary grid */}
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="p-2.5 rounded-lg bg-income-bg border border-income/20">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                    <div className="p-3 rounded-xl bg-income-bg border border-income-border">
                       <div className="text-[10px] uppercase font-bold text-income tracking-wider">
                         Income
                       </div>
-                      <div className="text-sm font-extrabold text-income mt-0.5">
+                      <div className="text-sm sm:text-base font-black text-income mt-0.5 truncate">
                         {netWorth.totalIncome.toLocaleString("en-US", { maximumFractionDigits: 0 })}
                       </div>
                     </div>
-                    <div className="p-2.5 rounded-lg bg-expense-bg border border-expense/20">
+                    <div className="p-3 rounded-xl bg-expense-bg border border-expense-border">
                       <div className="text-[10px] uppercase font-bold text-expense tracking-wider">
                         Expenses
                       </div>
-                      <div className="text-sm font-extrabold text-expense mt-0.5">
+                      <div className="text-sm sm:text-base font-black text-expense mt-0.5 truncate">
                         {netWorth.totalExpenses.toLocaleString("en-US", { maximumFractionDigits: 0 })}
                       </div>
                     </div>
-                    <div className="p-2.5 rounded-lg bg-investment-bg border border-investment/20">
+                    <div className="p-3 rounded-xl bg-investment-bg border border-investment-border">
                       <div className="text-[10px] uppercase font-bold text-investment tracking-wider">
                         Invested
                       </div>
-                      <div className="text-sm font-extrabold text-investment mt-0.5">
+                      <div className="text-sm sm:text-base font-black text-investment mt-0.5 truncate">
                         {netWorth.totalInvestments.toLocaleString("en-US", { maximumFractionDigits: 0 })}
                       </div>
                     </div>
@@ -404,8 +405,8 @@ export default function InsightsPage() {
 
                   {/* Investment allocation breakdown */}
                   {netWorth.investmentsByCategory.length > 0 && (
-                    <div className="space-y-2">
-                      <div className="text-xs font-bold text-ink">
+                    <div className="space-y-2 pt-1">
+                      <div className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                         Investment Allocation
                       </div>
                       {netWorth.investmentsByCategory.map((cat, idx) => {
@@ -413,17 +414,17 @@ export default function InsightsPage() {
                           ? Math.round((cat.amount / netWorth.totalInvestments) * 100)
                           : 0;
                         return (
-                          <div key={idx} className="flex items-center justify-between text-xs">
+                          <div key={idx} className="flex items-center justify-between text-xs p-2 rounded-xl bg-canvas border border-hairline">
                             <div className="flex items-center gap-2 min-w-0">
                               <div
-                                className="w-2 h-2 rounded-full shrink-0"
+                                className="w-2.5 h-2.5 rounded-full shrink-0"
                                 style={{
                                   backgroundColor: [
                                     "#7c3aed", "#0075de", "#059669", "#d97706", "#e11d48", "#2a9d99",
                                   ][idx % 6],
                                 }}
                               />
-                              <span className="text-ink-muted truncate">
+                              <span className="font-semibold text-ink truncate">
                                 {cat.name}
                               </span>
                             </div>
@@ -431,7 +432,7 @@ export default function InsightsPage() {
                               <span className="font-bold text-ink">
                                 {cat.amount.toLocaleString("en-US", { maximumFractionDigits: 0 })}
                               </span>
-                              <span className="text-[10px] text-ink-faint">{pct}%</span>
+                              <span className="text-[10px] text-ink-muted font-medium bg-surface px-1.5 py-0.5 rounded border border-hairline">{pct}%</span>
                             </div>
                           </div>
                         );
@@ -452,3 +453,4 @@ export default function InsightsPage() {
     </AppShell>
   );
 }
+

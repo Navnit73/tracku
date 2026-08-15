@@ -40,11 +40,11 @@ export function Navbar({
   };
 
   return (
-    <header className="h-14 sm:h-16 sticky top-0 z-30 bg-surface/85 backdrop-blur-md border-b border-hairline px-3.5 sm:px-6 flex items-center justify-between transition-colors">
-      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+    <header className="h-14 sm:h-16 sticky top-0 z-30 bg-surface/90 backdrop-blur-md border-b border-hairline px-3.5 sm:px-6 flex items-center justify-between transition-colors shadow-xs">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         <button
           onClick={onOpenMobileMenu}
-          className="p-1.5 sm:p-2 rounded-xl text-ink-muted hover:bg-canvas active:scale-95 transition-transform lg:hidden cursor-pointer"
+          className="p-2 rounded-xl text-ink-muted hover:text-ink hover:bg-canvas active:scale-95 transition-transform lg:hidden cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center"
           aria-label="Open Navigation Menu"
         >
           <Menu className="w-5 h-5" />
@@ -54,12 +54,13 @@ export function Navbar({
         </h1>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         {/* Dark / Light Mode Toggle */}
         <button
           onClick={toggleDarkMode}
-          className="p-2 rounded-xl border border-hairline bg-canvas text-ink hover:bg-hairline transition-colors cursor-pointer"
+          className="p-2 rounded-xl border border-hairline bg-canvas text-ink hover:bg-surface active:scale-95 transition-all cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center shadow-xs"
           title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          aria-label={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
         >
           {isDarkMode ? (
             <Sun className="w-4 h-4 text-amber-500" />
@@ -71,18 +72,18 @@ export function Navbar({
         {/* User Account / Auth */}
         {session?.user ? (
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-hairline bg-canvas">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-hairline bg-canvas shadow-xs">
               {session.user.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={session.user.image}
                   alt={session.user.name || "User"}
-                  className="w-5 h-5 rounded-full"
+                  className="w-5 h-5 rounded-full object-cover"
                 />
               ) : (
                 <UserIcon className="w-4 h-4 text-primary" />
               )}
-              <span className="text-xs font-semibold text-ink hidden sm:inline">
+              <span className="text-xs font-bold text-ink hidden sm:inline max-w-[120px] truncate">
                 {session.user.name || session.user.email}
               </span>
             </div>
@@ -91,9 +92,10 @@ export function Navbar({
               size="sm"
               onClick={() => signOut()}
               title="Sign Out"
-              className="px-2.5 h-8"
+              aria-label="Sign Out"
+              className="px-2.5 h-9"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <LogOut className="w-4 h-4" />
             </Button>
           </div>
         ) : (
@@ -109,3 +111,4 @@ export function Navbar({
     </header>
   );
 }
+

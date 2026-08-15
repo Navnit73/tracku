@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { AppShell } from "@/components/layout/AppShell";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -26,8 +26,9 @@ import {
   Edit2,
   Trash2,
   ArrowUpDown,
-  Tag,
+  RotateCcw,
   Calendar,
+  X,
 } from "lucide-react";
 
 export default function TransactionsPage() {
@@ -57,6 +58,7 @@ export default function TransactionsPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any | null>(null);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const fetchCategories = async () => {
     const res = await getCategories("All");
@@ -120,8 +122,8 @@ export default function TransactionsPage() {
   const handleDelete = async (id: string, item: string) => {
     const confirmed = await confirmDialog({
       title: `Delete ${item}?`,
-      text: "This action cannot be undone. Permanent deletion from database.",
-      confirmText: "Delete Transaction",
+      text: "This action cannot be undone. The entry will be permanently deleted.",
+      confirmText: "Yes, Delete",
     });
 
     if (confirmed) {
@@ -148,7 +150,24 @@ export default function TransactionsPage() {
     }
   };
 
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const activeFilterCount = [
+    search.trim() !== "",
+    type !== "All",
+    categoryId !== "All",
+    dateRange !== "All Time",
+    minAmount !== "",
+    maxAmount !== "",
+  ].filter(Boolean).length;
+
+  const resetAllFilters = () => {
+    setSearch("");
+    setType("All");
+    setCategoryId("All");
+    setMinAmount("");
+    setMaxAmount("");
+    setDateRange("All Time");
+    setPage(1);
+  };
 
   return (
     <AppShell
@@ -159,18 +178,18 @@ export default function TransactionsPage() {
       }}
     >
       <div className="flex flex-col gap-4 sm:gap-6">
-        {/* Action & Filter Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline ">
+        {/* Header Action Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight">
               Transaction Records
             </h2>
             <p className="text-xs text-ink-muted mt-0.5">
-              Filtered Total: <strong className="text-primary">{pagination.totalItems}</strong> entries
+              Filtered Total: <strong className="text-primary font-semibold">{pagination.totalItems}</strong> entries
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap w-full sm:w-auto">
             <Button
               variant="outline"
               size="sm"
@@ -194,43 +213,50 @@ export default function TransactionsPage() {
           </div>
         </div>
 
-        {/* Filters Bar */}
-        <Card className="p-3.5 sm:p-4">
-          <div className="flex items-center justify-between gap-2 sm:hidden mb-2.5">
-            <Input
-              placeholder="Search items..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              className="py-1 text-xs"
-            />
+        {/* Filters Bar Card */}
+        <Card className="p-4 sm:p-5">
+          {/* Mobile search + filter trigger row */}
+          <div className="flex items-center gap-2 sm:hidden mb-3">
+            <div className="flex-1">
+              <Input
+                placeholder="Search items..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                leftIcon={<Search className="w-4 h-4" />}
+              />
+            </div>
             <Button
-              variant="outline"
+              variant={showMobileFilters ? "primary" : "secondary"}
               size="sm"
               onClick={() => setShowMobileFilters(!showMobileFilters)}
-              leftIcon={<Filter className="w-3.5 h-3.5" />}
+              leftIcon={<Filter className="w-4 h-4" />}
+              className="shrink-0"
             >
-              Filters
+              Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
             </Button>
           </div>
 
+          {/* Desktop & Collapsed Mobile Filter Controls */}
           <div
             className={cn(
               "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3",
               !showMobileFilters && "hidden sm:grid"
             )}
           >
-            <Input
-              placeholder="Search items or notes..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              leftIcon={<Search className="w-4 h-4" />}
-            />
+            <div className="hidden sm:block">
+              <Input
+                placeholder="Search items or notes..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                leftIcon={<Search className="w-4 h-4" />}
+              />
+            </div>
 
             <Select
               value={type}
@@ -240,9 +266,9 @@ export default function TransactionsPage() {
               }}
             >
               <option value="All">All Transaction Types</option>
-              <option value="Expense">Expense</option>
-              <option value="Income">Income</option>
-              <option value="Investment">Investment</option>
+              <option value="Expense">Expenses Only</option>
+              <option value="Income">Income Only</option>
+              <option value="Investment">Investments Only</option>
             </Select>
 
             <Select
@@ -270,49 +296,47 @@ export default function TransactionsPage() {
                 setCustomEnd(end);
                 setPage(1);
               }}
+              className="w-full"
             />
           </div>
 
           {/* Amount range collapse */}
           <div
             className={cn(
-              "mt-3 pt-3 border-t border-hairline flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-ink-muted",
+              "mt-3 pt-3 border-t border-hairline flex flex-wrap items-center justify-between gap-2.5 text-xs text-ink-muted",
               !showMobileFilters && "hidden sm:flex"
             )}
           >
-            <span className="font-semibold flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5" /> Amount Range:
-            </span>
-            <input
-              type="number"
-              placeholder="Min $"
-              value={minAmount}
-              onChange={(e) => setMinAmount(e.target.value)}
-              className="w-20 sm:w-24 px-2 py-1 text-xs rounded border border-hairline bg-surface text-ink placeholder-ink-faint"
-            />
-            <span>to</span>
-            <input
-              type="number"
-              placeholder="Max $"
-              value={maxAmount}
-              onChange={(e) => setMaxAmount(e.target.value)}
-              className="w-20 sm:w-24 px-2 py-1 text-xs rounded border border-hairline bg-surface text-ink placeholder-ink-faint"
-            />
-            {(search || type !== "All" || categoryId !== "All" || minAmount || maxAmount) && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-semibold text-ink flex items-center gap-1.5">
+                <Filter className="w-3.5 h-3.5 text-primary" /> Amount Range:
+              </span>
+              <input
+                type="number"
+                placeholder="Min $"
+                value={minAmount}
+                onChange={(e) => setMinAmount(e.target.value)}
+                className="w-24 sm:w-28 px-3 py-1.5 text-xs rounded-xl border border-hairline bg-surface text-ink placeholder-ink-faint focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary min-h-[36px]"
+              />
+              <span className="text-ink-faint">to</span>
+              <input
+                type="number"
+                placeholder="Max $"
+                value={maxAmount}
+                onChange={(e) => setMaxAmount(e.target.value)}
+                className="w-24 sm:w-28 px-3 py-1.5 text-xs rounded-xl border border-hairline bg-surface text-ink placeholder-ink-faint focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary min-h-[36px]"
+              />
+            </div>
+
+            {activeFilterCount > 0 && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {
-                  setSearch("");
-                  setType("All");
-                  setCategoryId("All");
-                  setMinAmount("");
-                  setMaxAmount("");
-                  setDateRange("All Time");
-                }}
-                className="text-xs py-0.5 px-2 ml-auto"
+                onClick={resetAllFilters}
+                leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+                className="text-xs text-expense hover:text-expense"
               >
-                Reset Filters
+                Reset Filters ({activeFilterCount})
               </Button>
             )}
           </div>
@@ -332,8 +356,8 @@ export default function TransactionsPage() {
                       className="cursor-pointer select-none"
                       onClick={() => toggleSort("date")}
                     >
-                      <div className="flex items-center gap-1">
-                        Date <ArrowUpDown className="w-3 h-3" />
+                      <div className="flex items-center gap-1.5">
+                        Date <ArrowUpDown className="w-3.5 h-3.5 text-ink-muted" />
                       </div>
                     </TableHead>
                     <TableHead>Type</TableHead>
@@ -342,16 +366,16 @@ export default function TransactionsPage() {
                       className="cursor-pointer select-none"
                       onClick={() => toggleSort("item")}
                     >
-                      <div className="flex items-center gap-1">
-                        Item / Source <ArrowUpDown className="w-3 h-3" />
+                      <div className="flex items-center gap-1.5">
+                        Item / Source <ArrowUpDown className="w-3.5 h-3.5 text-ink-muted" />
                       </div>
                     </TableHead>
                     <TableHead
                       className="cursor-pointer select-none text-right"
                       onClick={() => toggleSort("amount")}
                     >
-                      <div className="flex items-center justify-end gap-1">
-                        Amount <ArrowUpDown className="w-3 h-3" />
+                      <div className="flex items-center justify-end gap-1.5">
+                        Amount <ArrowUpDown className="w-3.5 h-3.5 text-ink-muted" />
                       </div>
                     </TableHead>
                     <TableHead>Payment Method</TableHead>
@@ -362,7 +386,7 @@ export default function TransactionsPage() {
                 <TableBody>
                   {transactions.map((t) => (
                     <TableRow key={t._id}>
-                      <TableCell className="font-medium text-xs">
+                      <TableCell className="font-medium text-xs whitespace-nowrap">
                         {formatDate(t.date)}
                       </TableCell>
                       <TableCell>
@@ -379,12 +403,12 @@ export default function TransactionsPage() {
                           {t.type}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-semibold text-xs text-ink-secondary">
+                      <TableCell className="font-semibold text-xs text-ink-secondary whitespace-nowrap">
                         {t.categoryName}
                       </TableCell>
-                      <TableCell className="font-bold">{t.item}</TableCell>
+                      <TableCell className="font-bold text-ink max-w-[200px] truncate">{t.item}</TableCell>
                       <TableCell
-                        className={`text-right font-extrabold text-sm ${
+                        className={`text-right font-extrabold text-sm whitespace-nowrap ${
                           t.type === "Income"
                             ? "text-income"
                             : t.type === "Expense"
@@ -395,25 +419,27 @@ export default function TransactionsPage() {
                         {t.type === "Income" ? "+" : "-"}
                         {formatCurrency(t.amount)}
                       </TableCell>
-                      <TableCell className="text-xs text-ink-muted">
+                      <TableCell className="text-xs text-ink-muted whitespace-nowrap">
                         {t.paymentMethod}
                       </TableCell>
-                      <TableCell className="text-xs text-ink-muted max-w-xs truncate">
+                      <TableCell className="text-xs text-ink-muted max-w-[180px] truncate">
                         {t.notes || "—"}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => handleEdit(t)}
-                            className="p-1.5 rounded-lg text-primary hover:bg-sky-brand-bg"
+                            className="p-2 rounded-xl text-ink-muted hover:text-primary hover:bg-canvas transition-colors cursor-pointer"
                             title="Edit Transaction"
+                            aria-label="Edit Transaction"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(t._id, t.item)}
-                            className="p-1.5 rounded-lg text-expense hover:bg-expense-bg"
+                            className="p-2 rounded-xl text-ink-muted hover:text-expense hover:bg-expense-bg transition-colors cursor-pointer"
                             title="Delete Transaction"
+                            aria-label="Delete Transaction"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -428,8 +454,8 @@ export default function TransactionsPage() {
             {/* Mobile Card List View */}
             <div className="grid grid-cols-1 gap-3 md:hidden">
               {transactions.map((t) => (
-                <Card key={t._id} className="p-4 flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
+                <Card key={t._id} className="p-4 flex flex-col gap-3">
+                  <div className="flex items-center justify-between gap-2">
                     <Badge
                       variant={
                         t.type === "Income"
@@ -442,20 +468,20 @@ export default function TransactionsPage() {
                     >
                       {t.type}
                     </Badge>
-                    <span className="text-xs text-ink-muted">{formatDate(t.date)}</span>
+                    <span className="text-xs text-ink-muted font-medium">{formatDate(t.date)}</span>
                   </div>
 
-                  <div className="flex items-center justify-between mt-1">
-                    <div>
-                      <div className="text-base font-bold text-ink">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-base font-bold text-ink truncate">
                         {t.item}
                       </div>
-                      <div className="text-xs text-ink-muted font-medium">
+                      <div className="text-xs text-ink-muted font-medium mt-0.5">
                         {t.categoryName} • {t.paymentMethod}
                       </div>
                     </div>
                     <div
-                      className={`text-lg font-extrabold ${
+                      className={`text-lg font-black shrink-0 ${
                         t.type === "Income"
                           ? "text-income"
                           : t.type === "Expense"
@@ -463,24 +489,31 @@ export default function TransactionsPage() {
                           : "text-investment"
                       }`}
                     >
+                      {t.type === "Income" ? "+" : "-"}
                       {formatCurrency(t.amount)}
                     </div>
                   </div>
 
                   {t.notes && (
-                    <p className="text-xs text-ink-muted bg-canvas p-2 rounded-lg italic">
+                    <p className="text-xs text-ink-muted bg-canvas p-2.5 rounded-xl border border-hairline italic">
                       "{t.notes}"
                     </p>
                   )}
 
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-hairline mt-1">
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(t)}>
+                  <div className="flex items-center justify-end gap-2 pt-2.5 border-t border-hairline mt-1">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleEdit(t)}
+                      leftIcon={<Edit2 className="w-3.5 h-3.5" />}
+                    >
                       Edit
                     </Button>
                     <Button
                       variant="danger"
                       size="sm"
                       onClick={() => handleDelete(t._id, t.item)}
+                      leftIcon={<Trash2 className="w-3.5 h-3.5" />}
                     >
                       Delete
                     </Button>
@@ -505,7 +538,7 @@ export default function TransactionsPage() {
         ) : (
           <EmptyState
             title="No Transactions Found"
-            description="No entries matched your active filters or search string."
+            description="No entries matched your active filters or search criteria."
             actionLabel="Add Transaction"
             onAction={() => {
               setSelectedTransaction(null);
@@ -528,3 +561,4 @@ export default function TransactionsPage() {
     </AppShell>
   );
 }
+

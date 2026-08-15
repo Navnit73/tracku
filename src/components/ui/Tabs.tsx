@@ -38,7 +38,7 @@ export function TabsList({ children, className }: { children: ReactNode; classNa
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1 p-1 bg-canvas rounded-xl border border-hairline",
+        "inline-flex items-center gap-1 p-1 bg-canvas rounded-2xl border border-hairline overflow-x-auto max-w-full no-scrollbar",
         className
       )}
     >
@@ -66,10 +66,10 @@ export function TabsTrigger({
       type="button"
       onClick={() => context.setActiveTab(value)}
       className={cn(
-        "px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all select-none cursor-pointer",
+        "px-4 py-2 text-xs font-bold rounded-xl transition-all select-none cursor-pointer min-h-[36px] whitespace-nowrap active:scale-98",
         isActive
-          ? "bg-surface text-primary "
-          : "text-ink-muted hover:text-ink",
+          ? "bg-surface text-primary shadow-xs border border-hairline"
+          : "text-ink-muted hover:text-ink hover:bg-surface/50",
         className
       )}
     >
@@ -92,5 +92,6 @@ export function TabsContent({
 
   if (context.activeTab !== value) return null;
 
-  return <div className={cn("animate-in fade-in duration-150", className)}>{children}</div>;
+  return <div className={cn("animate-in fade-in duration-200", className)}>{children}</div>;
 }
+

@@ -184,28 +184,28 @@ export function TransactionModal({
       onClose={onClose}
       title={transactionToEdit ? "Edit Transaction" : "Record New Transaction"}
       description="Enter transaction details below. All fields marked with * are required."
-      maxWidth="4xl"
+      maxWidth="2xl"
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Transaction Type Selector */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+          <label className="text-xs font-bold uppercase tracking-wider text-ink-muted select-none">
             Transaction Type *
           </label>
-          <div className="grid grid-cols-3 gap-2 p-1 bg-canvas rounded-xl border border-hairline">
+          <div className="grid grid-cols-3 gap-1.5 p-1 bg-canvas rounded-2xl border border-hairline">
             {(["Expense", "Income", "Investment"] as const).map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => handleTypeChange(t)}
-                className={`py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                className={`py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer select-none active:scale-98 min-h-[40px] ${
                   type === t
                     ? t === "Expense"
-                      ? "bg-expense text-white "
+                      ? "bg-expense text-white shadow-xs"
                       : t === "Income"
-                      ? "bg-income text-white "
-                      : "bg-investment text-white "
-                    : "text-ink-muted hover:text-ink"
+                      ? "bg-income text-white shadow-xs"
+                      : "bg-investment text-white shadow-xs"
+                    : "text-ink-muted hover:text-ink hover:bg-surface/50"
                 }`}
               >
                 {t}
@@ -215,7 +215,7 @@ export function TransactionModal({
         </div>
 
         {/* Amount & Date */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
           <Input
             type="number"
             step="0.01"
@@ -236,7 +236,7 @@ export function TransactionModal({
         </div>
 
         {/* Category & Item Name */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
           <Select
             label="Category *"
             value={categoryId}
@@ -253,7 +253,7 @@ export function TransactionModal({
 
           <Input
             label="Item / Source Description *"
-            placeholder="e.g. Starbucks, Tech Salary, S&P 500 DCA"
+            placeholder="e.g. Starbucks, Salary, S&P 500 ETF"
             value={item}
             onChange={(e) => setItem(e.target.value)}
             error={errors.item}
@@ -262,7 +262,7 @@ export function TransactionModal({
         </div>
 
         {/* Payment Method & Tags */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
           <Select
             label="Payment Method *"
             value={paymentMethod}
@@ -289,15 +289,23 @@ export function TransactionModal({
           placeholder="Add optional notes, receipt details, or memo..."
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          rows={2}
         />
 
         {/* Modal Buttons */}
-        <div className="flex items-center justify-end gap-3 mt-4 pt-3 border-t border-hairline">
-          <Button type="button" variant="ghost" onClick={onClose}>
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5 sm:gap-3 mt-4 pt-3.5 border-t border-hairline">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            className="w-full sm:w-auto"
+          >
             Cancel
           </Button>
-          <Button type="submit" isLoading={isLoading}>
+          <Button
+            type="submit"
+            isLoading={isLoading}
+            className="w-full sm:w-auto"
+          >
             {transactionToEdit ? "Save Changes" : "Create Transaction"}
           </Button>
         </div>
@@ -305,3 +313,4 @@ export function TransactionModal({
     </Modal>
   );
 }
+

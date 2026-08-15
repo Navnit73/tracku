@@ -29,7 +29,7 @@ export function IncomeExpenseChart({
 }) {
   if (!data || data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-xs text-ink-muted">
+      <div className="h-60 sm:h-72 flex items-center justify-center text-xs font-semibold text-ink-muted">
         No trend data available for selected filter period.
       </div>
     );
@@ -47,46 +47,49 @@ export function IncomeExpenseChart({
   });
 
   return (
-    <div className="w-full h-72">
+    <div className="w-full h-64 sm:h-72 lg:h-80">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={formattedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--income)" stopOpacity={0.4} />
+              <stop offset="5%" stopColor="var(--income)" stopOpacity={0.35} />
               <stop offset="95%" stopColor="var(--income)" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--expense)" stopOpacity={0.4} />
+              <stop offset="5%" stopColor="var(--expense)" stopOpacity={0.35} />
               <stop offset="95%" stopColor="var(--expense)" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="investmentGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--investment)" stopOpacity={0.4} />
+              <stop offset="5%" stopColor="var(--investment)" stopOpacity={0.35} />
               <stop offset="95%" stopColor="var(--investment)" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--hairline)" opacity={0.5} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--hairline)" opacity={0.6} />
           <XAxis
             dataKey="displayDate"
             tick={{ fontSize: 11, fill: "var(--ink-muted)" }}
             axisLine={{ stroke: "var(--hairline)" }}
+            tickLine={false}
           />
           <YAxis
             tick={{ fontSize: 11, fill: "var(--ink-muted)" }}
             axisLine={{ stroke: "var(--hairline)" }}
+            tickLine={false}
             tickFormatter={(val) => formatCurrency(val, currency)}
           />
           <Tooltip
             contentStyle={{
               backgroundColor: "var(--surface)",
               borderColor: "var(--hairline)",
-              borderRadius: "8px",
+              borderRadius: "14px",
               fontSize: "12px",
               color: "var(--ink)",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+              padding: "10px 14px",
             }}
             formatter={(value: any) => [formatCurrency(Number(value) || 0, currency), ""]}
           />
-          <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }} />
+          <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "12px" }} />
           <Area
             type="monotone"
             dataKey="income"
@@ -94,7 +97,7 @@ export function IncomeExpenseChart({
             stroke="var(--income)"
             fillOpacity={1}
             fill="url(#incomeGrad)"
-            strokeWidth={2}
+            strokeWidth={2.5}
           />
           <Area
             type="monotone"
@@ -103,7 +106,7 @@ export function IncomeExpenseChart({
             stroke="var(--expense)"
             fillOpacity={1}
             fill="url(#expenseGrad)"
-            strokeWidth={2}
+            strokeWidth={2.5}
           />
           <Area
             type="monotone"
@@ -112,10 +115,11 @@ export function IncomeExpenseChart({
             stroke="var(--investment)"
             fillOpacity={1}
             fill="url(#investmentGrad)"
-            strokeWidth={2}
+            strokeWidth={2.5}
           />
         </AreaChart>
       </ResponsiveContainer>
     </div>
   );
 }
+

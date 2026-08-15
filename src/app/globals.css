@@ -11,8 +11,8 @@
 
   /* Homepage Palette Tokens */
   --homepage-mintcream: #EBF5F0;
-  --homepage-black: #182622;
-  --homepage-darkseagreen: #5B9B80;
+  --homepage-black: #121f1b;
+  --homepage-darkseagreen: #4a7c67;
   --homepage-whitesmoke: #F1ECEF;
   --homepage-snow: #FDF5F5;
   --homepage-ghostwhite: #F8FBFF;
@@ -20,75 +20,113 @@
   /* Application UI Mappings (Light Mode) */
   --canvas: var(--brand-whitesmoke);
   --surface: #ffffff;
-  --ink: var(--homepage-black);
+  --surface-raised: #ffffff;
+  --ink: #111c18;
   --ink-secondary: #2d3e38;
-  --ink-muted: var(--homepage-darkseagreen);
-  --ink-faint: #94b8ab;
+  --ink-muted: #526e63;
+  --ink-faint: #8daaa0;
   --hairline: #e2ede8;
+  --hairline-strong: #c8ded5;
 
-  --primary: var(--brand-mediumseagreen);
-  --primary-active: var(--brand-seagreen);
-  --secondary: var(--brand-mediumspringgreen);
+  --primary: #00874C;
+  --primary-active: #006e3d;
+  --secondary: #00A860;
 
-  --income: var(--brand-mediumseagreen);
-  --income-bg: var(--homepage-mintcream);
-  --expense: #e11d48;
-  --expense-bg: var(--homepage-snow);
-  --investment: #7c3aed;
+  --income: #00874C;
+  --income-bg: #E8F6EF;
+  --income-border: #b8e6d1;
+
+  --expense: #dc2626;
+  --expense-bg: #fef2f2;
+  --expense-border: #fecaca;
+
+  --investment: #6d28d9;
   --investment-bg: #f5f3ff;
-  --sky: #0075de;
-  --sky-bg: var(--homepage-ghostwhite);
+  --investment-border: #ddd6fe;
+
+  --sky: #0284c7;
+  --sky-bg: #f0f9ff;
+  --sky-border: #bae6fd;
+
   --warning: #d97706;
-  --warning-bg: #fef3c7;
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+
+  /* Safe areas */
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
 }
 
 .dark {
-  /* Application UI Mappings (Dark Mode) */
-  --canvas: var(--homepage-black);
-  --surface: #1e2e2a;
-  --ink: #f0f7f4;
-  --ink-secondary: #c5ded5;
-  --ink-muted: var(--homepage-darkseagreen);
-  --ink-faint: #436657;
-  --hairline: #273d36;
+  /* Application UI Mappings (Dark Mode - Professional Slate Green) */
+  --canvas: #0e1714;
+  --surface: #15221e;
+  --surface-raised: #1c2d28;
+  --ink: #f4f9f6;
+  --ink-secondary: #d1e4dc;
+  --ink-muted: #8caea0;
+  --ink-faint: #4e6f62;
+  --hairline: #223730;
+  --hairline-strong: #2f4b42;
 
-  --primary: var(--brand-mediumspringgreen);
-  --primary-active: var(--brand-mediumseagreen);
-  --secondary: var(--brand-mediumseagreen);
+  --primary: #00D27B;
+  --primary-active: #00A860;
+  --secondary: #00A860;
 
-  --income: var(--brand-mediumspringgreen);
-  --income-bg: #112920;
-  --expense: #f43f5e;
-  --expense-bg: #3b1c24;
+  --income: #00E687;
+  --income-bg: #0d271c;
+  --income-border: #184834;
+
+  --expense: #fb7185;
+  --expense-bg: #35131b;
+  --expense-border: #5c1e2b;
+
   --investment: #a78bfa;
-  --investment-bg: #2e1a47;
+  --investment-bg: #27173e;
+  --investment-border: #4c2d7b;
+
   --sky: #38bdf8;
   --sky-bg: #0c2a3a;
-  --warning: #f59e0b;
-  --warning-bg: #3d2e05;
+  --sky-border: #134e6f;
+
+  --warning: #fbbf24;
+  --warning-bg: #332403;
+  --warning-border: #5e4308;
 }
 
 @theme {
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-ink: var(--ink);
   --color-ink-secondary: var(--ink-secondary);
   --color-ink-muted: var(--ink-muted);
   --color-ink-faint: var(--ink-faint);
   --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
   --color-primary: var(--primary);
   --color-primary-active: var(--primary-active);
   --color-secondary: var(--secondary);
+
   --color-income: var(--income);
   --color-income-bg: var(--income-bg);
+  --color-income-border: var(--income-border);
+
   --color-expense: var(--expense);
   --color-expense-bg: var(--expense-bg);
+  --color-expense-border: var(--expense-border);
+
   --color-investment: var(--investment);
   --color-investment-bg: var(--investment-bg);
+  --color-investment-border: var(--investment-border);
+
   --color-sky-brand: var(--sky);
   --color-sky-brand-bg: var(--sky-bg);
+  --color-sky-brand-border: var(--sky-border);
+
   --color-warning-brand: var(--warning);
   --color-warning-brand-bg: var(--warning-bg);
+  --color-warning-brand-border: var(--warning-border);
 
   /* Direct Brand Utility Classes */
   --color-brand-whitesmoke: var(--brand-whitesmoke);
@@ -105,7 +143,44 @@
   --color-homepage-ghostwhite: var(--homepage-ghostwhite);
 }
 
+html {
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--canvas);
   color: var(--ink);
+  min-height: 100vh;
+  min-height: 100dvh;
+  touch-action: manipulation;
+  overflow-x: hidden;
+}
+
+/* Utilities for hiding scrollbars without breaking scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Print Stylesheet */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  aside,
+  nav,
+  header,
+  button,
+  .no-print {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
 }

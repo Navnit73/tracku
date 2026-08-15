@@ -351,7 +351,7 @@ export default function SignInPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Enter email"
-                        className="w-full pl-10 pr-4 py-3 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all"
+                        className="w-full pl-10 pr-4 py-3 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all min-h-[44px]"
                       />
                     </div>
 
@@ -366,12 +366,12 @@ export default function SignInPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Enter password"
-                        className="w-full pl-10 pr-11 py-3 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all"
+                        className="w-full pl-10 pr-11 py-3 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all min-h-[44px]"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-0.5 cursor-pointer"
+                        className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 cursor-pointer min-w-[32px] min-h-[32px] flex items-center justify-center"
                         tabIndex={-1}
                         aria-label={showPassword ? "Hide password" : "Show password"}
                       >
@@ -388,7 +388,7 @@ export default function SignInPage() {
                       <button
                         type="button"
                         onClick={() => switchMode("forgot-password")}
-                        className="text-[11px] sm:text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+                        className="text-[11px] sm:text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer py-1"
                       >
                         Forgot password?
                       </button>
@@ -398,7 +398,7 @@ export default function SignInPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all shadow-sm active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all shadow-sm active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 min-h-[44px]"
                     >
                       {loading ? (
                         <RotateCw className="w-4 h-4 animate-spin" />
@@ -420,7 +420,7 @@ export default function SignInPage() {
                   <button
                     type="button"
                     onClick={handleGoogleSignIn}
-                    className="w-full py-3 px-4 bg-[#3B82F6] hover:bg-[#2563EB] active:bg-[#1D4ED8] text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-3 transition-all shadow-sm active:scale-[0.99] cursor-pointer"
+                    className="w-full py-3 px-4 bg-[#3B82F6] hover:bg-[#2563EB] active:bg-[#1D4ED8] text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-3 transition-all shadow-sm active:scale-[0.99] cursor-pointer min-h-[44px]"
                   >
                     <div className="w-5 h-5 bg-white rounded flex items-center justify-center shrink-0">
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
@@ -452,7 +452,7 @@ export default function SignInPage() {
                       <button
                         type="button"
                         onClick={() => switchMode("register")}
-                        className="font-bold text-slate-800 dark:text-white hover:text-[#00a859] dark:hover:text-[#00a859] transition-colors cursor-pointer"
+                        className="font-bold text-slate-800 dark:text-white hover:text-[#00a859] dark:hover:text-[#00a859] transition-colors cursor-pointer py-1"
                       >
                         Create an account
                       </button>
@@ -476,7 +476,7 @@ export default function SignInPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Full name"
-                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all min-h-[44px]"
                       />
                     </div>
 
@@ -491,7 +491,7 @@ export default function SignInPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Enter email"
-                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all min-h-[44px]"
                       />
                     </div>
 
@@ -506,12 +506,12 @@ export default function SignInPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Create password (min 6 chars)"
-                        className="w-full pl-10 pr-11 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all"
+                        className="w-full pl-10 pr-11 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all min-h-[44px]"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-0.5 cursor-pointer"
+                        className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 cursor-pointer min-w-[32px] min-h-[32px] flex items-center justify-center"
                         tabIndex={-1}
                       >
                         {showPassword ? (
@@ -533,7 +533,7 @@ export default function SignInPage() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="Confirm password"
-                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all min-h-[44px]"
                       />
                     </div>
 
@@ -541,7 +541,7 @@ export default function SignInPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all shadow-sm active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 mt-1"
+                      className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all shadow-sm active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 mt-1 min-h-[44px]"
                     >
                       {loading ? (
                         <RotateCw className="w-4 h-4 animate-spin" />
@@ -563,7 +563,7 @@ export default function SignInPage() {
                   <button
                     type="button"
                     onClick={handleGoogleSignIn}
-                    className="w-full py-2.5 px-4 bg-[#3B82F6] hover:bg-[#2563EB] active:bg-[#1D4ED8] text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-3 transition-all shadow-sm active:scale-[0.99] cursor-pointer"
+                    className="w-full py-2.5 px-4 bg-[#3B82F6] hover:bg-[#2563EB] active:bg-[#1D4ED8] text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-3 transition-all shadow-sm active:scale-[0.99] cursor-pointer min-h-[44px]"
                   >
                     <div className="w-5 h-5 bg-white rounded flex items-center justify-center shrink-0">
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
@@ -595,7 +595,7 @@ export default function SignInPage() {
                       <button
                         type="button"
                         onClick={() => switchMode("login")}
-                        className="font-bold text-slate-800 dark:text-white hover:text-[#00a859] dark:hover:text-[#00a859] transition-colors cursor-pointer"
+                        className="font-bold text-slate-800 dark:text-white hover:text-[#00a859] dark:hover:text-[#00a859] transition-colors cursor-pointer py-1"
                       >
                         Log in
                       </button>
@@ -620,14 +620,14 @@ export default function SignInPage() {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="Enter your registered email"
-                          className="w-full pl-10 pr-4 py-3 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all"
+                          className="w-full pl-10 pr-4 py-3 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all min-h-[44px]"
                         />
                       </div>
 
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all shadow-sm active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+                        className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all shadow-sm active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 min-h-[44px]"
                       >
                         {loading ? (
                           <RotateCw className="w-4 h-4 animate-spin" />
@@ -640,7 +640,7 @@ export default function SignInPage() {
                         <button
                           type="button"
                           onClick={() => switchMode("login")}
-                          className="text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 inline-flex items-center gap-1.5 cursor-pointer"
+                          className="text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 inline-flex items-center gap-1.5 cursor-pointer py-1"
                         >
                           <ArrowLeft className="w-3.5 h-3.5" />
                           Back to login
@@ -662,7 +662,7 @@ export default function SignInPage() {
                           value={otpCode}
                           onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
                           placeholder="6-digit reset code"
-                          className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-sm text-slate-900 dark:text-white font-mono tracking-widest placeholder: placeholder:tracking-normal placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all"
+                          className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white font-mono tracking-widest placeholder:tracking-normal placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all min-h-[44px]"
                         />
                       </div>
 
@@ -677,12 +677,12 @@ export default function SignInPage() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="Enter new password (min 6 chars)"
-                          className="w-full pl-10 pr-11 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all"
+                          className="w-full pl-10 pr-11 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all min-h-[44px]"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-0.5 cursor-pointer"
+                          className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 cursor-pointer min-w-[32px] min-h-[32px] flex items-center justify-center"
                           tabIndex={-1}
                         >
                           {showPassword ? (
@@ -704,7 +704,7 @@ export default function SignInPage() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder="Confirm new password"
-                          className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all"
+                          className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700/80 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00a859]/20 focus:border-[#00a859] transition-all min-h-[44px]"
                         />
                       </div>
 
@@ -720,7 +720,7 @@ export default function SignInPage() {
                             type="button"
                             onClick={() => handleSendResetCode()}
                             disabled={loading}
-                            className="font-bold text-[#00a859] hover:underline cursor-pointer"
+                            className="font-bold text-[#00a859] hover:underline cursor-pointer py-1"
                           >
                             Resend code
                           </button>
@@ -731,7 +731,7 @@ export default function SignInPage() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all shadow-sm active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 mt-2"
+                        className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all shadow-sm active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 mt-2 min-h-[44px]"
                       >
                         {loading ? (
                           <RotateCw className="w-4 h-4 animate-spin" />
@@ -745,7 +745,7 @@ export default function SignInPage() {
                         <button
                           type="button"
                           onClick={() => switchMode("login")}
-                          className="text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 inline-flex items-center gap-1.5 cursor-pointer"
+                          className="text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 inline-flex items-center gap-1.5 cursor-pointer py-1"
                         >
                           <ArrowLeft className="w-3.5 h-3.5" />
                           Back to login

@@ -6,6 +6,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
   size?: "sm" | "md" | "lg" | "icon";
   isLoading?: boolean;
+  fullWidth?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
 }
@@ -17,6 +18,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       variant = "primary",
       size = "md",
       isLoading = false,
+      fullWidth = false,
       leftIcon,
       rightIcon,
       children,
@@ -30,41 +32,48 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       primary:
-        "bg-primary hover:bg-primary-active text-white rounded-full ",
+        "bg-primary hover:bg-primary-active text-white shadow-xs",
       secondary:
-        "bg-surface hover:bg-canvas text-ink border border-hairline rounded-full ",
+        "bg-surface hover:bg-canvas text-ink border border-hairline shadow-xs",
       outline:
-        "bg-transparent hover:bg-canvas text-ink border border-hairline rounded-md",
+        "bg-transparent hover:bg-canvas text-ink border border-hairline",
       ghost:
-        "bg-transparent hover:bg-canvas text-ink-secondary rounded-md",
+        "bg-transparent hover:bg-canvas text-ink-secondary hover:text-ink",
       danger:
-        "bg-expense hover:bg-expense/90 text-white rounded-md ",
+        "bg-expense hover:bg-expense/90 text-white shadow-xs",
     };
 
     const sizes = {
-      sm: "text-xs px-3 py-1.5 h-8 gap-1.5",
-      md: "text-sm px-4 py-2 h-9 gap-2",
-      lg: "text-base px-5 py-2.5 h-11 gap-2.5",
-      icon: "h-9 w-9 p-0 flex items-center justify-center rounded-md",
+      sm: "text-xs px-3 py-1.5 min-h-[36px] sm:min-h-[32px] gap-1.5 rounded-lg",
+      md: "text-sm px-4 py-2 min-h-[42px] sm:min-h-[38px] gap-2 rounded-xl",
+      lg: "text-base px-5 py-2.5 min-h-[48px] sm:min-h-[44px] gap-2.5 rounded-xl font-semibold",
+      icon: "min-h-[40px] min-w-[40px] sm:min-h-[36px] sm:min-w-[36px] p-0 flex items-center justify-center rounded-xl",
     };
 
     return (
       <button
         ref={ref}
         disabled={disabled || isLoading}
-        className={cn(baseStyles, variants[variant], sizes[size], className)}
+        className={cn(
+          baseStyles,
+          variants[variant],
+          sizes[size],
+          fullWidth && "w-full",
+          className
+        )}
         {...props}
       >
         {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader2 className="w-4 h-4 animate-spin shrink-0" />
         ) : (
-          leftIcon
+          leftIcon && <span className="shrink-0">{leftIcon}</span>
         )}
         {children}
-        {!isLoading && rightIcon}
+        {!isLoading && rightIcon && <span className="shrink-0">{rightIcon}</span>}
       </button>
     );
   }
 );
 
 Button.displayName = "Button";
+

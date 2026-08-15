@@ -13,7 +13,7 @@ import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getInvestmentAnalytics, getDashboardAnalytics } from "@/app/actions/analytics";
 import { formatCurrency } from "@/lib/utils";
-import { LineChart, Plus, ShieldCheck, Coins, Bitcoin } from "lucide-react";
+import { LineChart, Plus, ShieldCheck, Coins, TrendingUp } from "lucide-react";
 
 export default function InvestmentsPage() {
   const [datePreset, setDatePreset] = useState<DateRangePreset>("All Time");
@@ -57,17 +57,18 @@ export default function InvestmentsPage() {
     >
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-3.5 sm:p-4 rounded-2xl border border-hairline ">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight">
-              Asset Allocation & Wealth Accumulation
+            <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
+              <LineChart className="w-5 h-5 text-investment" />
+              Asset Allocation & Wealth Portfolio
             </h2>
             <p className="text-xs text-ink-muted mt-0.5">
-              Stocks, Mutual Funds, Crypto, Gold, Fixed Deposits & ETF Holdings
+              Stocks, mutual funds, crypto, gold, fixed deposits & ETF holdings
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap w-full sm:w-auto">
             <DatePicker
               selectedPreset={datePreset}
               startDate={customStart}
@@ -77,12 +78,13 @@ export default function InvestmentsPage() {
                 setCustomStart(s);
                 setCustomEnd(e);
               }}
+              className="w-full sm:w-auto"
             />
             <Button
               size="sm"
               onClick={() => setIsModalOpen(true)}
               leftIcon={<Plus className="w-4 h-4" />}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto shrink-0"
             >
               Add Investment
             </Button>
@@ -91,77 +93,93 @@ export default function InvestmentsPage() {
 
         {/* Portfolio Summary Cards */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <Card variant="hero" className="p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-purple-200">
-                  Total Portfolio Invested
-                </span>
-                <div className="p-2 rounded-lg bg-white/10 text-white backdrop-blur-xs">
-                  <LineChart className="w-4 h-4" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
+            {/* Total Portfolio Invested */}
+            <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[140px] border-investment/20">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    Total Portfolio
+                  </span>
+                  <div className="p-2 rounded-xl bg-investment-bg text-investment shadow-xs">
+                    <LineChart className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-investment tracking-tight truncate">
+                  {formatCurrency(analytics?.totalInvested || 0)}
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                {formatCurrency(analytics?.totalInvested || 0)}
-              </div>
-              <div className="mt-2 text-xs text-purple-200 border-t border-white/10 pt-2 flex justify-between">
-                <span>Investments Count:</span>
-                <strong className="text-white">{analytics?.investmentCount || 0}</strong>
+              <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2 flex items-center justify-between">
+                <span className="text-[11px]">{analytics?.investmentCount || 0} Assets Logged</span>
+                <Badge variant="investment" size="sm">Portfolio</Badge>
               </div>
             </Card>
 
-            <Card className="p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Largest Allocation
-                </span>
-                <div className="p-2 rounded-lg bg-investment-bg text-investment">
-                  <Coins className="w-4 h-4" />
+            {/* Largest Allocation */}
+            <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[140px]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    Largest Holding
+                  </span>
+                  <div className="p-2 rounded-xl bg-investment-bg text-investment shadow-xs">
+                    <Coins className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-ink tracking-tight truncate">
+                  {formatCurrency(analytics?.largestInvestment || 0)}
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-investment">
-                {formatCurrency(analytics?.largestInvestment || 0)}
-              </div>
-              <div className="mt-2 text-xs text-ink-muted truncate">
-                Asset: <strong>{analytics?.largestInvestmentItem || "N/A"}</strong>
+              <div className="mt-3 text-xs text-ink-muted truncate border-t border-hairline pt-2">
+                Asset: <strong className="text-ink font-semibold">{analytics?.largestInvestmentItem || "None recorded"}</strong>
               </div>
             </Card>
 
-            <Card className="p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Average Allocation
-                </span>
-                <Badge variant="investment" size="sm">
-                  DCA Avg
-                </Badge>
-              </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-ink">
-                {formatCurrency(analytics?.averageInvestment || 0)}
-              </div>
-              <div className="mt-2 text-xs text-ink-muted">Per deposit metric</div>
-            </Card>
-
-            <Card className="p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Asset Types
-                </span>
-                <div className="p-2 rounded-lg bg-income-bg text-income">
-                  <ShieldCheck className="w-4 h-4" />
+            {/* Average Allocation */}
+            <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[140px]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    Average Allocation
+                  </span>
+                  <div className="p-2 rounded-xl bg-sky-brand-bg text-primary shadow-xs">
+                    <TrendingUp className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-ink tracking-tight truncate">
+                  {formatCurrency(analytics?.averageInvestment || 0)}
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-ink">
-                {analytics?.investmentByCategory?.length || 0}
+              <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2">
+                DCA average per entry
               </div>
-              <div className="mt-2 text-xs text-ink-muted">Active asset classes</div>
+            </Card>
+
+            {/* Asset Classes */}
+            <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[140px]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    Asset Classes
+                  </span>
+                  <div className="p-2 rounded-xl bg-income-bg text-income shadow-xs">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-ink tracking-tight truncate">
+                  {analytics?.investmentByCategory?.length || 0}
+                </div>
+              </div>
+              <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2">
+                Diversified categories
+              </div>
             </Card>
           </div>
         )}
@@ -202,23 +220,23 @@ export default function InvestmentsPage() {
         <Card className="p-4 sm:p-5">
           <CardHeader>
             <CardTitle>Individual Asset Holdings</CardTitle>
-            <CardDescription>Investments grouped by asset ticker/name</CardDescription>
+            <CardDescription>Investments grouped by asset ticker or name</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent>
             {analytics?.investmentByItem?.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                 {analytics.investmentByItem.map((item: any, idx: number) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-hairline"
+                    className="flex items-center justify-between p-3.5 rounded-2xl bg-canvas border border-hairline"
                   >
-                    <div>
-                      <div className="text-sm font-bold text-ink">
+                    <div className="min-w-0 pr-3">
+                      <div className="text-sm font-bold text-ink truncate">
                         {item.item}
                       </div>
-                      <div className="text-xs text-ink-muted">Asset Holding</div>
+                      <div className="text-xs text-ink-muted mt-0.5">Asset Holding</div>
                     </div>
-                    <div className="text-right font-extrabold text-sm text-investment">
+                    <div className="text-right font-black text-sm text-investment shrink-0">
                       {formatCurrency(item.amount)}
                     </div>
                   </div>
@@ -243,3 +261,4 @@ export default function InvestmentsPage() {
     </AppShell>
   );
 }
+

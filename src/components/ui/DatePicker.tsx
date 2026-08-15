@@ -70,8 +70,9 @@ export function DatePicker({
         onClick={() => setIsOpen(!isOpen)}
         leftIcon={<Calendar className="w-4 h-4 text-primary" />}
         rightIcon={<ChevronDown className="w-3.5 h-3.5 opacity-60" />}
+        className="w-full sm:w-auto justify-between sm:justify-center"
       >
-        <span>{selectedPreset}</span>
+        <span className="truncate">{selectedPreset}</span>
       </Button>
 
       {isOpen && (
@@ -79,22 +80,23 @@ export function DatePicker({
           <div
             className="fixed inset-0 z-30"
             onClick={() => setIsOpen(false)}
+            aria-hidden="true"
           />
-          <div className="absolute right-0 mt-2 w-72 rounded-xl bg-surface border border-hairline shadow-xl z-40 p-3 flex flex-col gap-2 animate-in fade-in zoom-in-95 duration-150">
-            <div className="text-xs font-bold uppercase tracking-wider text-ink-muted px-2 py-1">
+          <div className="absolute right-0 sm:right-0 mt-2 w-[calc(100vw-2rem)] max-w-xs sm:w-80 rounded-2xl bg-surface border border-hairline shadow-2xl z-40 p-3.5 flex flex-col gap-2.5 animate-in fade-in zoom-in-95 duration-150">
+            <div className="text-xs font-bold uppercase tracking-wider text-ink-muted px-1.5">
               Select Time Horizon
             </div>
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-2 gap-1.5">
               {PRESETS.map((preset) => (
                 <button
                   key={preset}
                   type="button"
                   onClick={() => handleSelectPreset(preset)}
                   className={cn(
-                    "text-left px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer",
+                    "text-left px-3 py-2 text-xs font-semibold rounded-xl transition-all select-none cursor-pointer active:scale-98 min-h-[36px]",
                     selectedPreset === preset
-                      ? "bg-primary text-white"
-                      : "text-ink hover:bg-canvas"
+                      ? "bg-primary text-white shadow-xs"
+                      : "text-ink bg-canvas/60 hover:bg-canvas hover:text-primary"
                   )}
                 >
                   {preset}
@@ -103,20 +105,20 @@ export function DatePicker({
             </div>
 
             {selectedPreset === "Custom Range" && (
-              <div className="mt-2 pt-2 border-t border-hairline flex flex-col gap-2">
+              <div className="mt-2 pt-3 border-t border-hairline flex flex-col gap-2.5 animate-in fade-in duration-150">
                 <Input
                   type="date"
                   label="Start Date"
                   value={customStart}
                   onChange={(e) => setCustomStart(e.target.value)}
-                  className="py-1 text-xs"
+                  className="py-1.5 text-xs min-h-[38px]"
                 />
                 <Input
                   type="date"
                   label="End Date"
                   value={customEnd}
                   onChange={(e) => setCustomEnd(e.target.value)}
-                  className="py-1 text-xs"
+                  className="py-1.5 text-xs min-h-[38px]"
                 />
                 <Button size="sm" onClick={handleApplyCustom} className="mt-1 w-full">
                   Apply Custom Range
@@ -129,3 +131,4 @@ export function DatePicker({
     </div>
   );
 }
+

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { AppShell } from "@/components/layout/AppShell";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { DatePicker, DateRangePreset } from "@/components/ui/DatePicker";
 import { Badge } from "@/components/ui/Badge";
@@ -81,18 +81,18 @@ export default function ReportsPage() {
     <AppShell title="Financial Reports">
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-3.5 sm:p-4 rounded-2xl border border-hairline ">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
               <FileSpreadsheet className="w-5 h-5 text-primary" />
               Executive Financial Statement
             </h2>
             <p className="text-xs text-ink-muted mt-0.5">
-              Consolidated audit statement for period horizon: <strong>{datePreset}</strong>
+              Consolidated audit statement for period horizon: <strong className="text-primary font-semibold">{datePreset}</strong>
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap w-full sm:w-auto">
             <DatePicker
               selectedPreset={datePreset}
               startDate={customStart}
@@ -102,6 +102,7 @@ export default function ReportsPage() {
                 setCustomStart(s);
                 setCustomEnd(e);
               }}
+              className="w-full sm:w-auto"
             />
             <Button
               variant="outline"
@@ -110,31 +111,31 @@ export default function ReportsPage() {
               leftIcon={<Printer className="w-4 h-4" />}
               className="flex-1 sm:flex-none"
             >
-              Print Report
+              Print
             </Button>
             <Button
               size="sm"
               onClick={() => handleExportCSV("All")}
               leftIcon={<Download className="w-4 h-4" />}
-              className="flex-1 sm:flex-none"
+              className="flex-1 sm:flex-none shrink-0"
             >
-              Export Report CSV
+              Export CSV
             </Button>
           </div>
         </div>
 
         {/* Report Overview Card */}
-        <Card className="p-4 sm:p-6">
-          <div className="border-b border-hairline pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start gap-2">
+        <Card className="p-4 sm:p-6 lg:p-8">
+          <div className="border-b border-hairline pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <div className="text-xs uppercase font-bold text-primary tracking-wider">
                 Personal Finance Audit Summary
               </div>
-              <h1 className="text-xl sm:text-2xl font-black text-ink mt-1">
+              <h1 className="text-xl sm:text-2xl font-black text-ink mt-0.5 tracking-tight">
                 Cash Flow & Wealth Report
               </h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               {healthScore && (
                 <Badge
                   variant={healthScore.score >= 60 ? "income" : "expense"}
@@ -151,39 +152,39 @@ export default function ReportsPage() {
 
           {/* Summary cards with MoM deltas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
-            <div className="p-3.5 sm:p-4 rounded-xl bg-canvas border border-hairline">
-              <div className="text-xs font-semibold text-ink-muted">Total Cash Inflow</div>
-              <div className="text-lg sm:text-xl font-extrabold text-income mt-1">
+            <div className="p-4 rounded-2xl bg-canvas border border-hairline">
+              <div className="text-xs font-bold text-ink-muted uppercase tracking-wider">Total Inflow</div>
+              <div className="text-xl sm:text-2xl font-black text-income mt-1 truncate">
                 {formatCurrency(analytics?.summary?.totalIncome || 0)}
               </div>
             </div>
 
-            <div className="p-3.5 sm:p-4 rounded-xl bg-canvas border border-hairline">
-              <div className="text-xs font-semibold text-ink-muted">Total Cash Outflow</div>
-              <div className="text-lg sm:text-xl font-extrabold text-expense mt-1">
+            <div className="p-4 rounded-2xl bg-canvas border border-hairline">
+              <div className="text-xs font-bold text-ink-muted uppercase tracking-wider">Total Outflow</div>
+              <div className="text-xl sm:text-2xl font-black text-expense mt-1 truncate">
                 {formatCurrency(analytics?.summary?.totalExpenses || 0)}
               </div>
             </div>
 
-            <div className="p-3.5 sm:p-4 rounded-xl bg-canvas border border-hairline">
-              <div className="text-xs font-semibold text-ink-muted">Total Wealth Invested</div>
-              <div className="text-lg sm:text-xl font-extrabold text-investment mt-1">
+            <div className="p-4 rounded-2xl bg-canvas border border-hairline">
+              <div className="text-xs font-bold text-ink-muted uppercase tracking-wider">Total Invested</div>
+              <div className="text-xl sm:text-2xl font-black text-investment mt-1 truncate">
                 {formatCurrency(analytics?.summary?.totalInvestments || 0)}
               </div>
             </div>
 
-            <div className="p-3.5 sm:p-4 rounded-xl bg-secondary text-white">
-              <div className="text-xs font-semibold text-blue-200">Net Surplus / Balance</div>
-              <div className="text-lg sm:text-xl font-extrabold mt-1">
+            <div className="p-4 rounded-2xl bg-primary text-white shadow-xs">
+              <div className="text-xs font-bold text-emerald-100 uppercase tracking-wider">Net Balance</div>
+              <div className="text-xl sm:text-2xl font-black mt-1 truncate">
                 {formatCurrency(analytics?.summary?.balance || 0)}
               </div>
             </div>
 
-            <div className="p-3.5 sm:p-4 rounded-xl bg-canvas border border-hairline">
-              <div className="text-xs font-semibold text-ink-muted flex items-center gap-1">
-                <TrendingUp className="w-3 h-3" /> Savings Rate
+            <div className="p-4 rounded-2xl bg-canvas border border-hairline">
+              <div className="text-xs font-bold text-ink-muted uppercase tracking-wider flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5 text-income" /> Savings Rate
               </div>
-              <div className={`text-lg sm:text-xl font-extrabold mt-1 ${savingsRate >= 20 ? "text-income" : savingsRate >= 0 ? "text-warning" : "text-expense"}`}>
+              <div className={`text-xl sm:text-2xl font-black mt-1 ${savingsRate >= 20 ? "text-income" : savingsRate >= 0 ? "text-warning" : "text-expense"}`}>
                 {Math.round(savingsRate)}%
               </div>
             </div>
@@ -191,7 +192,7 @@ export default function ReportsPage() {
 
           {/* Top Insights Section */}
           {insights.length > 0 && (
-            <div className="mb-6 pt-4 border-t border-hairline">
+            <div className="mb-6 pt-5 border-t border-hairline">
               <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-primary" />
                 Key Insights for This Period
@@ -206,56 +207,56 @@ export default function ReportsPage() {
 
           {/* Category Breakdown Table */}
           {categories.length > 0 && (
-            <div className="mb-6 pt-4 border-t border-hairline">
+            <div className="mb-6 pt-5 border-t border-hairline">
               <h3 className="text-sm font-bold text-ink mb-3">
                 Category Breakdown — This Period vs Previous
               </h3>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-2xl border border-hairline">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-hairline">
-                      <th className="text-left py-2 px-3 text-[10px] uppercase font-bold text-ink-faint tracking-wider">
+                    <tr className="border-b border-hairline bg-canvas/80">
+                      <th className="text-left py-2.5 px-3.5 text-[10px] uppercase font-bold text-ink-muted tracking-wider">
                         Category
                       </th>
-                      <th className="text-right py-2 px-3 text-[10px] uppercase font-bold text-ink-faint tracking-wider">
+                      <th className="text-right py-2.5 px-3.5 text-[10px] uppercase font-bold text-ink-muted tracking-wider">
                         Current
                       </th>
-                      <th className="text-right py-2 px-3 text-[10px] uppercase font-bold text-ink-faint tracking-wider">
+                      <th className="text-right py-2.5 px-3.5 text-[10px] uppercase font-bold text-ink-muted tracking-wider">
                         Previous
                       </th>
-                      <th className="text-right py-2 px-3 text-[10px] uppercase font-bold text-ink-faint tracking-wider">
+                      <th className="text-right py-2.5 px-3.5 text-[10px] uppercase font-bold text-ink-muted tracking-wider">
                         Change
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-hairline">
                     {categories.map((cat) => (
                       <tr
                         key={cat.category}
-                        className="border-b border-hairline/50 hover:bg-canvas transition-colors"
+                        className="hover:bg-canvas/50 transition-colors"
                       >
-                        <td className="py-2.5 px-3 font-semibold text-ink">
+                        <td className="py-3 px-3.5 font-bold text-ink">
                           {cat.category}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-bold text-ink">
+                        <td className="py-3 px-3.5 text-right font-black text-ink">
                           {formatCurrency(cat.currentAmount)}
                         </td>
-                        <td className="py-2.5 px-3 text-right text-ink-muted">
+                        <td className="py-3 px-3.5 text-right text-ink-muted font-medium">
                           {formatCurrency(cat.previousAmount)}
                         </td>
-                        <td className="py-2.5 px-3 text-right">
+                        <td className="py-3 px-3.5 text-right">
                           {cat.delta !== 0 ? (
                             <span
-                              className={`inline-flex items-center gap-0.5 text-xs font-bold ${
+                              className={`inline-flex items-center gap-0.5 text-xs font-extrabold ${
                                 cat.delta > 0
                                   ? "text-expense"
                                   : "text-income"
                               }`}
                             >
                               {cat.delta > 0 ? (
-                                <ArrowUpRight className="w-3 h-3" />
+                                <ArrowUpRight className="w-3.5 h-3.5" />
                               ) : (
-                                <ArrowDownRight className="w-3 h-3" />
+                                <ArrowDownRight className="w-3.5 h-3.5" />
                               )}
                               {Math.abs(cat.delta)}%
                             </span>

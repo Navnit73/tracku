@@ -23,13 +23,14 @@ export interface CategoryModalProps {
 }
 
 const COLOR_PALETTE = [
+  "#00874C",
   "#0075de",
   "#e11d48",
   "#059669",
   "#7c3aed",
-  "#eab308",
+  "#d97706",
   "#ec4899",
-  "#f97316",
+  "#ea580c",
   "#06b6d4",
   "#8b5cf6",
   "#14b8a6",
@@ -64,7 +65,7 @@ export function CategoryModal({
   const [name, setName] = useState("");
   const [type, setType] = useState<"Expense" | "Income" | "Investment" | "All">("Expense");
   const [icon, setIcon] = useState("Tag");
-  const [color, setColor] = useState("#0075de");
+  const [color, setColor] = useState("#00874C");
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -75,12 +76,12 @@ export function CategoryModal({
         setName(categoryToEdit.name);
         setType(categoryToEdit.type);
         setIcon(categoryToEdit.icon || "Tag");
-        setColor(categoryToEdit.color || "#0075de");
+        setColor(categoryToEdit.color || "#00874C");
       } else {
         setName("");
         setType("Expense");
         setIcon("Tag");
-        setColor("#0075de");
+        setColor("#00874C");
       }
       setError("");
     }
@@ -154,7 +155,7 @@ export function CategoryModal({
           <option value="All">All Types</option>
         </Select>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
           <Select label="Icon *" value={icon} onChange={(e) => setIcon(e.target.value)}>
             {ICONS.map((ic) => (
               <option key={ic} value={ic}>
@@ -164,17 +165,17 @@ export function CategoryModal({
           </Select>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+            <label className="text-xs font-bold uppercase tracking-wider text-ink-muted select-none">
               Color Token
             </label>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <input
                 type="color"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
-                className="w-9 h-9 p-1 rounded-lg border border-hairline cursor-pointer"
+                className="w-10 h-10 p-1 rounded-xl border border-hairline bg-surface cursor-pointer shadow-xs"
               />
-              <span className="text-xs font-mono text-ink-muted">
+              <span className="text-xs font-mono font-semibold text-ink">
                 {color}
               </span>
             </div>
@@ -183,30 +184,42 @@ export function CategoryModal({
 
         {/* Color Palette Presets */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-            Preset Colors
+          <label className="text-xs font-bold uppercase tracking-wider text-ink-muted select-none">
+            Preset Swatches
           </label>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2.5">
             {COLOR_PALETTE.map((c) => (
               <button
                 key={c}
                 type="button"
                 onClick={() => setColor(c)}
-                className={`w-6 h-6 rounded-full transition-transform cursor-pointer ${
-                  color === c ? "ring-2 ring-offset-2 ring-primary scale-110" : ""
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl transition-all cursor-pointer shadow-xs active:scale-90 ${
+                  color.toLowerCase() === c.toLowerCase()
+                    ? "ring-2 ring-offset-2 ring-primary scale-110"
+                    : "hover:scale-105"
                 }`}
                 style={{ backgroundColor: c }}
+                aria-label={`Select color ${c}`}
               />
             ))}
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3 mt-4 pt-3 border-t border-hairline">
-          <Button type="button" variant="ghost" onClick={onClose}>
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5 sm:gap-3 mt-4 pt-3.5 border-t border-hairline">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            className="w-full sm:w-auto"
+          >
             Cancel
           </Button>
-          <Button type="submit" isLoading={isLoading}>
+          <Button
+            type="submit"
+            isLoading={isLoading}
+            className="w-full sm:w-auto"
+          >
             {categoryToEdit ? "Save Category" : "Add Category"}
           </Button>
         </div>
@@ -214,3 +227,4 @@ export function CategoryModal({
     </Modal>
   );
 }
+

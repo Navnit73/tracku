@@ -35,9 +35,15 @@ export const authOptions: NextAuthOptions = {
         }
 
         if (!user.password) {
-          throw new Error(
-            "This account was created with Google. Please log in using Google."
-          );
+          if (user.googleId) {
+            throw new Error(
+              "This account was created with Google. Please log in using Google, or use 'Forgot password?' to set a password."
+            );
+          } else {
+            throw new Error(
+              "No password has been set for this account yet. Please use 'Forgot password?' or Register to set a password."
+            );
+          }
         }
 
         const isPasswordMatch = await bcrypt.compare(

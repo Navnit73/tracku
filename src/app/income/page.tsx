@@ -12,7 +12,7 @@ import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getIncomeAnalytics } from "@/app/actions/analytics";
 import { formatCurrency } from "@/lib/utils";
-import { TrendingUp, Banknote, Plus, ArrowUpRight } from "lucide-react";
+import { TrendingUp, Banknote, Plus, ArrowUpRight, DollarSign, Layers } from "lucide-react";
 
 export default function IncomePage() {
   const [datePreset, setDatePreset] = useState<DateRangePreset>("This Month");
@@ -46,9 +46,10 @@ export default function IncomePage() {
     >
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Control Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-3.5 sm:p-4 rounded-2xl border border-hairline ">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-income" />
               Income Streams & Earnings
             </h2>
             <p className="text-xs text-ink-muted mt-0.5">
@@ -56,7 +57,7 @@ export default function IncomePage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap w-full sm:w-auto">
             <DatePicker
               selectedPreset={datePreset}
               startDate={customStart}
@@ -66,12 +67,13 @@ export default function IncomePage() {
                 setCustomStart(s);
                 setCustomEnd(e);
               }}
+              className="w-full sm:w-auto"
             />
             <Button
               size="sm"
               onClick={() => setIsModalOpen(true)}
               leftIcon={<Plus className="w-4 h-4" />}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto shrink-0"
             >
               Add Income
             </Button>
@@ -80,76 +82,93 @@ export default function IncomePage() {
 
         {/* Metrics Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <Card className="p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Total Inflow
-                </span>
-                <div className="p-2 rounded-lg bg-income-bg text-income">
-                  <TrendingUp className="w-4 h-4" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
+            {/* Total Income */}
+            <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[140px] border-income/20">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    Total Inflow
+                  </span>
+                  <div className="p-2 rounded-xl bg-income-bg text-income shadow-xs">
+                    <TrendingUp className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-income tracking-tight truncate">
+                  {formatCurrency(analytics?.totalIncome || 0)}
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-income">
-                {formatCurrency(analytics?.totalIncome || 0)}
-              </div>
-              <div className="mt-2 text-xs text-ink-muted">
-                {analytics?.transactionCount || 0} Income deposits logged
+              <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2 flex items-center justify-between">
+                <span className="text-[11px]">{analytics?.transactionCount || 0} Deposits Logged</span>
+                <Badge variant="income" size="sm">Inflow</Badge>
               </div>
             </Card>
 
-            <Card className="p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Top Income Source
-                </span>
-                <div className="p-2 rounded-lg bg-sky-brand-bg text-primary">
-                  <Banknote className="w-4 h-4" />
+            {/* Top Income Source */}
+            <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[140px]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    Top Income Source
+                  </span>
+                  <div className="p-2 rounded-xl bg-sky-brand-bg text-primary shadow-xs">
+                    <Banknote className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-ink tracking-tight truncate">
+                  {formatCurrency(analytics?.highestIncome || 0)}
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-ink">
-                {formatCurrency(analytics?.highestIncome || 0)}
-              </div>
-              <div className="mt-2 text-xs text-ink-muted truncate">
-                Source: <strong>{analytics?.highestIncomeSource || "N/A"}</strong>
+              <div className="mt-3 text-xs text-ink-muted truncate border-t border-hairline pt-2">
+                Source: <strong className="text-ink font-semibold">{analytics?.highestIncomeSource || "None logged"}</strong>
               </div>
             </Card>
 
-            <Card className="p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Average Deposit
-                </span>
-                <Badge variant="income" size="sm">
-                  Average
-                </Badge>
-              </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-ink">
-                {formatCurrency(analytics?.averageIncome || 0)}
-              </div>
-              <div className="mt-2 text-xs text-ink-muted">Per deposit metric</div>
-            </Card>
-
-            <Card className="p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Income Streams
-                </span>
-                <div className="p-2 rounded-lg bg-investment-bg text-investment">
-                  <ArrowUpRight className="w-4 h-4" />
+            {/* Average Deposit */}
+            <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[140px]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    Average Deposit
+                  </span>
+                  <div className="p-2 rounded-xl bg-income-bg text-income shadow-xs">
+                    <DollarSign className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-ink tracking-tight truncate">
+                  {formatCurrency(analytics?.averageIncome || 0)}
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-ink">
-                {analytics?.incomeByItem?.length || 0}
+              <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2">
+                Per deposit metric
               </div>
-              <div className="mt-2 text-xs text-ink-muted">Unique income sources</div>
+            </Card>
+
+            {/* Unique Streams */}
+            <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[140px]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    Active Streams
+                  </span>
+                  <div className="p-2 rounded-xl bg-investment-bg text-investment shadow-xs">
+                    <Layers className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-ink tracking-tight truncate">
+                  {analytics?.incomeByItem?.length || 0}
+                </div>
+              </div>
+              <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2">
+                Distinct revenue channels
+              </div>
             </Card>
           </div>
         )}
@@ -172,7 +191,10 @@ export default function IncomePage() {
 
           <Card className="p-4 sm:p-5">
             <CardHeader>
-              <CardTitle>Top Income Sources</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Banknote className="w-4 h-4 text-income" />
+                Top Income Sources
+              </CardTitle>
               <CardDescription>Individual clients and salary payments</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -180,17 +202,17 @@ export default function IncomePage() {
                 analytics.incomeByItem.map((src: any, idx: number) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-hairline"
+                    className="flex items-center justify-between p-3.5 rounded-2xl bg-canvas border border-hairline"
                   >
-                    <div className="flex items-center gap-2.5 sm:gap-3">
-                      <div className="p-2 rounded-lg bg-income-bg text-income">
+                    <div className="flex items-center gap-3 min-w-0 pr-3">
+                      <div className="p-2 rounded-xl bg-income-bg text-income shrink-0 shadow-xs">
                         <Banknote className="w-4 h-4" />
                       </div>
-                      <div className="font-bold text-sm text-ink">
+                      <div className="font-bold text-sm text-ink truncate">
                         {src.item}
                       </div>
                     </div>
-                    <div className="font-extrabold text-sm text-income">
+                    <div className="font-black text-sm text-income shrink-0">
                       +{formatCurrency(src.amount)}
                     </div>
                   </div>
@@ -215,3 +237,4 @@ export default function IncomePage() {
     </AppShell>
   );
 }
+

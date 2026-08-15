@@ -98,29 +98,30 @@ export default function DashboardPage() {
     <AppShell title="Dashboard" onOpenNewTransaction={() => setIsModalOpen(true)}>
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Top Control Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-3.5 sm:p-4 rounded-2xl border border-hairline ">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline shadow-xs">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight">
               Financial Summary
             </h2>
             <p className="text-xs text-ink-muted mt-0.5">
-              Metrics horizon: <strong className="text-primary">{datePreset}</strong>
+              Metrics horizon: <strong className="text-primary font-semibold">{datePreset}</strong>
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap w-full sm:w-auto">
             <DatePicker
               selectedPreset={datePreset}
               startDate={customStart}
               endDate={customEnd}
               onChange={handleDateChange}
+              className="w-full sm:w-auto"
             />
 
             <Button
               size="sm"
               onClick={() => setIsModalOpen(true)}
               leftIcon={<Plus className="w-4 h-4" />}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto shrink-0"
             >
               New Transaction
             </Button>
@@ -153,103 +154,113 @@ export default function DashboardPage() {
 
         {/* Summary Metric Cards */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            {/* Total Balance */}
-            <Card variant="hero" className="relative overflow-hidden p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-blue-100 uppercase tracking-wider">
-                  Total Net Balance
-                </span>
-                <div className="p-2 rounded-lg bg-white/10 text-white backdrop-blur-xs">
-                  <Wallet className="w-4 h-4" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
+            {/* 1. Total Net Balance (Hero Accent) */}
+            <Card variant="hero" className="relative overflow-hidden p-4 sm:p-5 flex flex-col justify-between min-h-[145px]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-emerald-100 uppercase tracking-wider">
+                    Total Net Balance
+                  </span>
+                  <div className="p-2 rounded-xl bg-white/15 text-white backdrop-blur-xs shadow-xs">
+                    <Wallet className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl xl:text-2xl 2xl:text-3xl font-black tracking-tight text-white truncate">
+                  {formatCurrency(analytics?.summary?.balance || 0, analytics?.currency)}
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                {formatCurrency(analytics?.summary?.balance || 0, analytics?.currency)}
-              </div>
-              <div className="mt-2 text-xs text-blue-100 flex items-center justify-between border-t border-white/10 pt-2">
-                <span>Net = Income - Exp - Inv</span>
-                <span className="font-semibold text-emerald-300">Active</span>
+              <div className="mt-3 text-xs text-emerald-100 flex items-center justify-between border-t border-white/15 pt-2">
+                <span className="text-[11px] opacity-90 truncate">Net Surplus Balance</span>
+                <span className="font-bold text-[10px] bg-white/20 px-2 py-0.5 rounded-full text-white shrink-0">
+                  Active
+                </span>
               </div>
             </Card>
 
-            {/* Savings */}
-            <Card className="p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Net Savings
-                </span>
-                <div className="p-2 rounded-lg bg-income-bg text-income">
-                  <PiggyBank className="w-4 h-4" />
+            {/* 2. Net Savings */}
+            <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[145px]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    Net Savings
+                  </span>
+                  <div className="p-2 rounded-xl bg-income-bg text-income shadow-xs">
+                    <PiggyBank className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl xl:text-2xl 2xl:text-3xl font-black text-income tracking-tight truncate">
+                  {formatCurrency(analytics?.summary?.savings || 0, analytics?.currency)}
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
-                {formatCurrency(analytics?.summary?.savings || 0, analytics?.currency)}
-              </div>
-              <div className="mt-2 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2">
-                <span>Savings = Income - Exp</span>
+              <div className="mt-3 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2 gap-1">
+                <span className="text-[11px] truncate">Monthly Inflow:</span>
                 <Badge variant="income" size="sm">
-                  +{formatCurrency(analytics?.summary?.monthlyIncome || 0, analytics?.currency)}/mo
+                  +{formatCurrency(analytics?.summary?.monthlyIncome || 0, analytics?.currency)}
                 </Badge>
               </div>
             </Card>
 
-            {/* Total Income & Expenses */}
-            <Card className="p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Income & Expenses
-                </span>
-                <div className="p-2 rounded-lg bg-sky-brand-bg text-primary">
-                  <TrendingUp className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline justify-between gap-1">
-                <div>
-                  <div className="text-xs text-ink-muted">Income</div>
-                  <div className="text-base sm:text-lg font-bold text-income">
-                    {formatCurrency(analytics?.summary?.totalIncome || 0, analytics?.currency)}
+            {/* 3. Cash Flow Split (Income vs Expenses) */}
+            <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[145px]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    Income vs Expenses
+                  </span>
+                  <div className="p-2 rounded-xl bg-sky-brand-bg text-sky-brand shadow-xs">
+                    <TrendingUp className="w-4 h-4" />
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-xs text-ink-muted">Expenses</div>
-                  <div className="text-base sm:text-lg font-bold text-expense">
-                    {formatCurrency(analytics?.summary?.totalExpenses || 0, analytics?.currency)}
+                <div className="flex items-baseline justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="text-[11px] text-ink-muted font-medium">Inflow</div>
+                    <div className="text-base sm:text-lg font-extrabold text-income truncate">
+                      +{formatCurrency(analytics?.summary?.totalIncome || 0, analytics?.currency)}
+                    </div>
+                  </div>
+                  <div className="text-right min-w-0">
+                    <div className="text-[11px] text-ink-muted font-medium">Outflow</div>
+                    <div className="text-base sm:text-lg font-extrabold text-expense truncate">
+                      -{formatCurrency(analytics?.summary?.totalExpenses || 0, analytics?.currency)}
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="mt-2 text-xs text-ink-muted border-t border-hairline pt-2 flex justify-between">
-                <span>Mo. Expenses:</span>
-                <strong className="text-expense">
+              <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2 flex items-center justify-between">
+                <span className="text-[11px] truncate">Mo. Spend:</span>
+                <strong className="text-expense text-[11px]">
                   {formatCurrency(analytics?.summary?.monthlyExpenses || 0, analytics?.currency)}
                 </strong>
               </div>
             </Card>
 
-            {/* Investments */}
-            <Card className="p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                  Total Investments
-                </span>
-                <div className="p-2 rounded-lg bg-investment-bg text-investment">
-                  <LineChart className="w-4 h-4" />
+            {/* 4. Total Wealth Invested */}
+            <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[145px]">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    Total Investments
+                  </span>
+                  <div className="p-2 rounded-xl bg-investment-bg text-investment shadow-xs">
+                    <LineChart className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="text-2xl sm:text-3xl xl:text-2xl 2xl:text-3xl font-black text-investment tracking-tight truncate">
+                  {formatCurrency(analytics?.summary?.totalInvestments || 0, analytics?.currency)}
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-investment tracking-tight">
-                {formatCurrency(analytics?.summary?.totalInvestments || 0, analytics?.currency)}
-              </div>
-              <div className="mt-2 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2">
-                <span>Mo. Invested:</span>
-                <strong className="text-investment">
-                  {formatCurrency(analytics?.summary?.monthlyInvestments || 0, analytics?.currency)}
+              <div className="mt-3 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2 gap-1">
+                <span className="text-[11px] truncate">Mo. Invested:</span>
+                <strong className="text-investment text-[11px]">
+                  +{formatCurrency(analytics?.summary?.monthlyInvestments || 0, analytics?.currency)}
                 </strong>
               </div>
             </Card>
