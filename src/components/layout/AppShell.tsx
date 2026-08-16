@@ -30,10 +30,10 @@ export function AppShell({
     }
   }, [status, router]);
 
-  if (status === "loading") {
+  if (status === "loading" && !session) {
     return (
       <div className="min-h-screen bg-canvas flex flex-col items-center justify-center gap-3 text-ink">
-        <div className="p-3  animate-pulse">
+        <div className="p-3 animate-pulse">
           <Image
             src="/asset-management.png"
             alt="FinanceTrack"
@@ -68,7 +68,7 @@ export function AppShell({
       {/* Main Content Workspace with dynamic left padding */}
       <div
         className={cn(
-          "flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out",
+          "flex-1 flex flex-col min-w-0 transition-[padding] duration-300 ease-in-out",
           isCollapsed ? "lg:pl-20" : "lg:pl-64"
         )}
       >

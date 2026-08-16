@@ -22,9 +22,11 @@ const CurrencyContext = createContext<CurrencyContextType>({
 });
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  const { data: session, update: updateSession } = useSession();
+  const { data: session } = useSession();
   const [currency, setCurrencyState] = useState<string>("USD");
   const [isSaving, setIsSaving] = useState(false);
+
+  const userId = session?.user?.id;
 
   // Initialize and sync currency
   useEffect(() => {
@@ -38,7 +40,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     }
 
     // 2. Query user currency from DB when user is authenticated
-    if (session?.user) {
+    if (userId) {
       getUserCurrency()
         .then((res) => {
           if (res.success && res.currency) {
@@ -48,37 +50,28 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         })
         .catch(() => {});
     }
-  }, [session]);
+  }, [userId, session?.user?.currency]);
 
   const setCurrency = useCallback(
     async (newCurrency: string): Promise<boolean> => {
+      // 1. Instant optimistic local update
       setCurrencyState(newCurrency);
       if (typeof window !== "undefined") {
         localStorage.setItem("preferred_currency", newCurrency);
       }
       setIsSaving(true);
 
+      // 2. Persist to MongoDB in background
       try {
         const res = await apiUpdateUserCurrency(newCurrency);
-        if (res.success) {
-          if (updateSession) {
-            try {
-              await updateSession({ currency: newCurrency });
-            } catch {
-              // Ignore session update error if any
-            }
-          }
-          setIsSaving(false);
-          return true;
-        }
+        setIsSaving(false);
+        return !!res.success;
       } catch {
-        // Ignore
+        setIsSaving(false);
+        return false;
       }
-
-      setIsSaving(false);
-      return false;
     },
-    [updateSession]
+    []
   );
 
   const formatCurrency = useCallback(

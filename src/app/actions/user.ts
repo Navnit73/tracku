@@ -37,14 +37,6 @@ export async function updateUserCurrency(currency: string) {
 
     await User.findByIdAndUpdate(sessionUser.id, { currency });
 
-    revalidatePath("/");
-    revalidatePath("/transactions");
-    revalidatePath("/expenses");
-    revalidatePath("/income");
-    revalidatePath("/investments");
-    revalidatePath("/reports");
-    revalidatePath("/settings");
-
     return { success: true, currency };
   } catch (error: any) {
     console.error("[REDACTED Currency Update Error]", error instanceof Error ? error.message : "Currency update error");

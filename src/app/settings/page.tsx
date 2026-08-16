@@ -167,46 +167,51 @@ export default function SettingsPage() {
     <AppShell title="Settings & Preferences">
       <div className="flex flex-col gap-4 sm:gap-6 max-w-4xl mx-auto w-full">
         {/* Top Header Card */}
-        <div className="bg-surface p-4 sm:p-5 rounded-2xl border border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
+        <div className="bg-surface p-4 sm:p-5 rounded-2xl border border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="min-w-0">
             <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
-              <SettingsIcon className="w-5 h-5 text-primary" />
-              Settings & Preferences
+              <SettingsIcon className="w-5 h-5 text-primary shrink-0" />
+              <span>Settings & Preferences</span>
             </h2>
             <p className="text-xs text-ink-muted mt-0.5 leading-relaxed">
               Manage your personal profile, subscription tier, display theme, and currency formats
             </p>
           </div>
-          <Badge variant={isPremium ? "income" : "neutral"} size="md">
-            {isPremium ? "Pro Member" : "Free Plan"}
-          </Badge>
+          <div className="self-start sm:self-center shrink-0">
+            <Badge variant={isPremium ? "income" : "neutral"} size="md">
+              {isPremium ? "Pro Member" : "Free Plan"}
+            </Badge>
+          </div>
         </div>
 
         {/* Section 1: Subscription & Billing */}
         <Card className="p-4 sm:p-6">
           <CardHeader>
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                  <CreditCard className="w-4 h-4 text-primary" />
-                  Subscription & Billing
+                  <CreditCard className="w-4 h-4 text-primary shrink-0" />
+                  <span>Subscription & Billing</span>
                 </CardTitle>
                 <CardDescription>
                   Manage your subscription tier, billing period, and transaction capacity
                 </CardDescription>
               </div>
-              <Link href="/pricing" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
-                View Plans <ExternalLink className="w-3.5 h-3.5" />
+              <Link
+                href="/pricing"
+                className="text-xs font-bold text-primary hover:underline flex items-center gap-1 shrink-0 self-start sm:self-center"
+              >
+                <span>View Plans</span> <ExternalLink className="w-3.5 h-3.5 shrink-0" />
               </Link>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Scheduled cancellation alert */}
             {isScheduledCancel && (
-              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-950 dark:text-amber-200 flex items-start gap-3">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-950 dark:text-amber-200 flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-amber-500" />
-                <div className="text-xs">
-                  <strong className="text-sm font-bold block">Cancellation Scheduled</strong>
+                <div className="text-xs leading-relaxed">
+                  <strong className="text-sm font-bold block mb-0.5">Cancellation Scheduled</strong>
                   Your subscription will remain fully active until{" "}
                   <span className="font-bold underline">
                     {sub?.currentPeriodEnd
@@ -223,10 +228,10 @@ export default function SettingsPage() {
             )}
 
             {/* Plan Info Box */}
-            <div className="p-4 rounded-2xl bg-canvas border border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-base font-extrabold text-ink">
+            <div className="p-4 sm:p-5 rounded-2xl bg-canvas border border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1.5 min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-base font-extrabold text-ink truncate">
                     {isPremium
                       ? sub?.planName || "FinanceTrack Pro"
                       : "Free Tier Plan"}
@@ -249,11 +254,11 @@ export default function SettingsPage() {
                   </Badge>
                 </div>
 
-                <div className="text-xs text-ink-muted">
+                <div className="text-xs text-ink-muted break-words">
                   {isPremium ? (
                     sub?.isVip ? (
                       <span className="text-income font-semibold flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5" /> Full Access Granted • Lifetime VIP Privileges (Unlimited)
+                        <Sparkles className="w-3.5 h-3.5 shrink-0" /> Full Access Granted • Lifetime VIP Privileges (Unlimited)
                       </span>
                     ) : (
                       <span>
@@ -287,14 +292,14 @@ export default function SettingsPage() {
                 )}
               </div>
 
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 w-full sm:w-auto">
                 {!isPremium ? (
                   <Button
                     variant="primary"
                     size="sm"
                     onClick={() => setIsPricingModalOpen(true)}
-                    leftIcon={<Zap className="w-4 h-4" />}
-                    className="w-full sm:w-auto font-bold"
+                    leftIcon={<Zap className="w-4 h-4 shrink-0" />}
+                    className="w-full sm:w-auto font-bold justify-center"
                   >
                     Upgrade to Pro
                   </Button>
@@ -305,7 +310,7 @@ export default function SettingsPage() {
                       size="sm"
                       onClick={handleCancelSubscription}
                       isLoading={isCancellingSub}
-                      className="w-full sm:w-auto text-ink-muted hover:text-expense hover:border-expense/40"
+                      className="w-full sm:w-auto text-ink-muted hover:text-expense hover:border-expense/40 justify-center"
                     >
                       Cancel Subscription
                     </Button>
@@ -317,11 +322,11 @@ export default function SettingsPage() {
             {/* Subscription Metadata details if active */}
             {isPremium && sub && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-ink-muted pt-2 border-t border-hairline">
-                <div className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-hairline">
-                  <span className="font-medium flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-primary" /> Current Period Ends
+                <div className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-hairline gap-2">
+                  <span className="font-medium flex items-center gap-1.5 shrink-0">
+                    <Calendar className="w-3.5 h-3.5 text-primary shrink-0" /> Current Period Ends
                   </span>
-                  <strong className="text-ink">
+                  <strong className="text-ink text-right">
                     {sub.currentPeriodEnd
                       ? new Date(sub.currentPeriodEnd).toLocaleDateString("en-US", {
                           month: "short",
@@ -332,11 +337,14 @@ export default function SettingsPage() {
                   </strong>
                 </div>
 
-                <div className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-hairline">
-                  <span className="font-medium flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-income" /> Razorpay Sub ID
+                <div className="flex items-center justify-between p-3 rounded-xl bg-canvas border border-hairline gap-2">
+                  <span className="font-medium flex items-center gap-1.5 shrink-0">
+                    <ShieldCheck className="w-3.5 h-3.5 text-income shrink-0" /> Razorpay Sub ID
                   </span>
-                  <code className="text-ink font-mono text-[11px]">
+                  <code
+                    className="text-ink font-mono text-[11px] truncate max-w-[130px] sm:max-w-[180px] text-right"
+                    title={sub.razorpaySubscriptionId || "—"}
+                  >
                     {sub.razorpaySubscriptionId || "—"}
                   </code>
                 </div>
@@ -349,27 +357,27 @@ export default function SettingsPage() {
         <Card className="p-4 sm:p-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <User className="w-4 h-4 text-primary" />
-              Profile & Account
+              <User className="w-4 h-4 text-primary shrink-0" />
+              <span>Profile & Account</span>
             </CardTitle>
             <CardDescription>Your authenticated Google user account details</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-canvas border border-hairline">
-              <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-canvas border border-hairline">
+              <div className="flex items-center gap-3.5 sm:gap-4 min-w-0 flex-1">
                 {session?.user?.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={session.user.image}
-                    alt={session.user.name || "Google User"}
-                    className="w-12 h-12 rounded-full border-2 border-primary/40 shrink-0"
+                    alt={session.user.name || "User"}
+                    className="w-12 h-12 rounded-full border-2 border-primary/40 shrink-0 object-cover"
                   />
                 ) : (
                   <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg shrink-0">
                     {session?.user?.name?.[0] || "U"}
                   </div>
                 )}
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="text-sm sm:text-base font-bold text-ink truncate">
                     {session?.user?.name || "Authenticated User"}
                   </div>
@@ -377,8 +385,8 @@ export default function SettingsPage() {
                     {session?.user?.email || "No email associated"}
                   </div>
                   <div className="flex items-center gap-1.5 mt-1.5">
-                    <span className="w-2 h-2 rounded-full bg-income" />
-                    <span className="text-[11px] font-semibold text-income">Connected via Google OAuth</span>
+                    <span className="w-2 h-2 rounded-full bg-income shrink-0" />
+                    <span className="text-[11px] font-semibold text-income truncate">Connected via Google OAuth</span>
                   </div>
                 </div>
               </div>
@@ -387,8 +395,8 @@ export default function SettingsPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => signOut()}
-                leftIcon={<LogOut className="w-4 h-4" />}
-                className="w-full sm:w-auto shrink-0"
+                leftIcon={<LogOut className="w-4 h-4 shrink-0" />}
+                className="w-full sm:w-auto shrink-0 justify-center"
               >
                 Sign Out
               </Button>
@@ -400,8 +408,8 @@ export default function SettingsPage() {
         <Card className="p-4 sm:p-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <Sparkles className="w-4 h-4 text-sky-brand" />
-              Appearance & Theme
+              <Sparkles className="w-4 h-4 text-sky-brand shrink-0" />
+              <span>Appearance & Theme</span>
             </CardTitle>
             <CardDescription>Customize the visual interface and dark mode settings</CardDescription>
           </CardHeader>
@@ -411,23 +419,23 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => handleThemeChange("light")}
-                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between active:scale-98 ${
+                className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between active:scale-98 ${
                   activeTheme === "light"
                     ? "bg-surface border-primary ring-2 ring-primary/20"
                     : "bg-canvas border-hairline hover:border-hairline-strong text-ink-muted"
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`p-2.5 rounded-xl ${activeTheme === "light" ? "bg-primary text-white" : "bg-surface text-ink-muted"}`}>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`p-2.5 rounded-xl shrink-0 ${activeTheme === "light" ? "bg-primary text-white" : "bg-surface text-ink-muted border border-hairline"}`}>
                     <Sun className="w-5 h-5 text-amber-500" />
                   </div>
-                  <div>
-                    <div className="text-sm font-bold text-ink">Light Mode</div>
-                    <div className="text-xs text-ink-muted mt-0.5">Clean off-white palette</div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold text-ink truncate">Light Mode</div>
+                    <div className="text-xs text-ink-muted mt-0.5 truncate">Clean off-white palette</div>
                   </div>
                 </div>
                 {activeTheme === "light" && (
-                  <div className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center shrink-0 ml-2">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                 )}
@@ -437,23 +445,23 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => handleThemeChange("dark")}
-                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between active:scale-98 ${
+                className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between active:scale-98 ${
                   activeTheme === "dark"
                     ? "bg-surface border-primary ring-2 ring-primary/20"
                     : "bg-canvas border-hairline hover:border-hairline-strong text-ink-muted"
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`p-2.5 rounded-xl ${activeTheme === "dark" ? "bg-primary text-white" : "bg-surface text-ink-muted"}`}>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`p-2.5 rounded-xl shrink-0 ${activeTheme === "dark" ? "bg-primary text-white" : "bg-surface text-ink-muted border border-hairline"}`}>
                     <Moon className="w-5 h-5 text-primary" />
                   </div>
-                  <div>
-                    <div className="text-sm font-bold text-ink">Dark Mode</div>
-                    <div className="text-xs text-ink-muted mt-0.5">Sleek slate green theme</div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold text-ink truncate">Dark Mode</div>
+                    <div className="text-xs text-ink-muted mt-0.5 truncate">Sleek slate green theme</div>
                   </div>
                 </div>
                 {activeTheme === "dark" && (
-                  <div className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center shrink-0 ml-2">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                 )}
@@ -466,14 +474,14 @@ export default function SettingsPage() {
         <Card className="p-4 sm:p-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <Globe className="w-4 h-4 text-income" />
-              Currency & Region Preferences
+              <Globe className="w-4 h-4 text-income shrink-0" />
+              <span>Currency & Region Preferences</span>
             </CardTitle>
             <CardDescription>Select your primary display currency for ledger records, reports, and charts</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-end gap-3">
-              <div className="flex-1">
+              <div className="flex-1 w-full">
                 <Select
                   label="Primary Display Currency"
                   value={currency}
@@ -488,13 +496,13 @@ export default function SettingsPage() {
                   <option value="JPY">JPY (¥) — Japanese Yen</option>
                 </Select>
               </div>
-              <div className="flex items-center gap-2 pb-1">
+              <div className="flex items-center gap-2 pb-1 min-h-[24px]">
                 {isSavingCurrency && (
                   <span className="text-xs text-ink-muted animate-pulse font-medium">Saving...</span>
                 )}
                 {currencySaved && (
                   <span className="text-xs text-income font-bold flex items-center gap-1">
-                    <Check className="w-4 h-4" /> Saved Successfully
+                    <Check className="w-4 h-4 shrink-0" /> Saved Successfully
                   </span>
                 )}
               </div>
@@ -509,22 +517,22 @@ export default function SettingsPage() {
         <Card className="p-4 sm:p-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <ShieldCheck className="w-4 h-4 text-primary" />
-              Data Security & Privacy Architecture
+              <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
+              <span>Data Security & Privacy Architecture</span>
             </CardTitle>
             <CardDescription>How your financial records are isolated and protected</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-xs text-ink-muted leading-relaxed">
             <div className="flex items-start gap-3 p-3.5 rounded-xl bg-canvas border border-hairline">
               <Lock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <div>
+              <div className="min-w-0">
                 <strong className="text-ink font-semibold">Strict Account Isolation: </strong>
                 All financial documents (transactions, custom categories, analytics) are strictly keyed to your unique authentication identifier in MongoDB Atlas.
               </div>
             </div>
             <div className="flex items-start gap-3 p-3.5 rounded-xl bg-canvas border border-hairline">
               <ShieldCheck className="w-4 h-4 text-income shrink-0 mt-0.5" />
-              <div>
+              <div className="min-w-0">
                 <strong className="text-ink font-semibold">Zero External Sharing: </strong>
                 No third-party data tracking or external data brokers have access to your personal finance records.
               </div>
@@ -536,8 +544,8 @@ export default function SettingsPage() {
         <Card className="p-4 sm:p-6 border-expense-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-expense text-base sm:text-lg">
-              <AlertTriangle className="w-5 h-5 text-expense" />
-              Danger Zone
+              <AlertTriangle className="w-5 h-5 text-expense shrink-0" />
+              <span>Danger Zone</span>
             </CardTitle>
             <CardDescription>
               Irreversible actions for resetting transaction history or deleting your entire account
@@ -546,7 +554,7 @@ export default function SettingsPage() {
           <CardContent className="space-y-4">
             {/* Action A: Clear Ledger */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-expense-bg border border-expense-border">
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="text-sm font-bold text-ink">Reset Transaction Ledger</div>
                 <div className="text-xs text-ink-muted mt-0.5 leading-relaxed">
                   Permanently deletes all logged income, expense, and investment entries. Your account profile and custom category definitions remain intact.
@@ -574,8 +582,8 @@ export default function SettingsPage() {
                   }
                 }}
                 isLoading={isClearingTx}
-                leftIcon={<RefreshCcw className="w-4 h-4 text-expense" />}
-                className="w-full sm:w-auto shrink-0 border-expense/40 text-expense hover:bg-expense-bg"
+                leftIcon={<RefreshCcw className="w-4 h-4 text-expense shrink-0" />}
+                className="w-full sm:w-auto shrink-0 border-expense/40 text-expense hover:bg-expense-bg justify-center"
               >
                 Reset Ledger
               </Button>
@@ -583,7 +591,7 @@ export default function SettingsPage() {
 
             {/* Action B: Account Deletion (GDPR) */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-expense-bg border border-expense-border">
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="text-sm font-bold text-expense">Permanent Account Erasure (GDPR)</div>
                 <div className="text-xs text-ink-muted mt-0.5 leading-relaxed">
                   Completely purges your user profile, all financial records, and custom categories from the database. Signs out immediately.
@@ -594,8 +602,8 @@ export default function SettingsPage() {
                 size="sm"
                 onClick={handleDeleteAccount}
                 isLoading={isDeleting}
-                leftIcon={<Trash2 className="w-4 h-4" />}
-                className="w-full sm:w-auto shrink-0"
+                leftIcon={<Trash2 className="w-4 h-4 shrink-0" />}
+                className="w-full sm:w-auto shrink-0 justify-center"
               >
                 Delete Everything
               </Button>
