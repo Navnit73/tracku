@@ -4,7 +4,7 @@ import { Subscription, ISubscription } from "@/models/Subscription";
 import { Transaction } from "@/models/Transaction";
 import { PLAN_CONFIGS } from "@/lib/razorpay";
 
-export const FREE_TIER_LIMIT = 10;
+export const FREE_TIER_LIMIT = 40;
 
 /**
  * Whitelist of email addresses that receive permanent full access (Lifetime Pro VIP)

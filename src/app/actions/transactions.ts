@@ -8,7 +8,11 @@ import { requireAuthUser } from "@/lib/auth";
 import { transactionSchema, transactionFilterSchema, TransactionInput, TransactionFilterInput } from "@/lib/validations";
 import { getDateRangeBounds } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
-import { assertCanCreateTransaction, getUserTransactionUsage } from "@/lib/subscription";
+import {
+  assertCanCreateTransaction,
+  getUserTransactionUsage,
+  FREE_TIER_LIMIT,
+} from "@/lib/subscription";
 
 export async function getTransactions(filters: TransactionFilterInput) {
   try {
@@ -199,8 +203,8 @@ export async function getBillingOverview() {
       isPremium: false,
       canCreate: true,
       transactionCount: 0,
-      freeLimit: 10,
-      remainingFreeTransactions: 10,
+      freeLimit: FREE_TIER_LIMIT,
+      remainingFreeTransactions: FREE_TIER_LIMIT,
       subscription: null,
       error: error.message,
     };

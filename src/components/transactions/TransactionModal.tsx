@@ -177,7 +177,7 @@ export function TransactionModal({
       onClose();
     } else if ((res as any).code === "TRANSACTION_LIMIT_REACHED") {
       setIsPricingOpen(true);
-      showToast.error("Free Limit Reached", res.error || "You've used all 10 free transactions. Upgrade to Pro to continue.");
+      showToast.error("Free Limit Reached", res.error || "You've used all 40 free transactions. Upgrade to Pro to continue.");
     } else {
       showToast.error("Saving Failed", res.error || "Please check form inputs.");
     }

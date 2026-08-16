@@ -113,8 +113,8 @@ export function PricingModal({
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400">
             <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
             <div className="text-xs">
-              <span className="font-bold block text-sm">Free Tier Transaction Limit Reached (10/10)</span>
-              You have used all 10 free transactions. Upgrade to Pro to continue adding unlimited income, expense, and investment entries.
+              <span className="font-bold block text-sm">Free Tier Transaction Limit Reached (40/40)</span>
+              You have used all 40 free transactions. Upgrade to Pro to continue adding unlimited income, expense, and investment entries.
             </div>
           </div>
         )}

@@ -111,7 +111,7 @@ export default function PricingPage() {
   const FAQS = [
     {
       q: "How does the Freemium model work?",
-      a: "Every new user receives 10 free transaction records. You can explore all dashboard charts, custom categories, and analytical insights. Once you reach 10 transactions, subscribe to any Pro plan to continue adding unlimited income, expense, and investment entries.",
+      a: "Every new user receives 40 free transaction records. You can explore all dashboard charts, custom categories, and analytical insights. Once you reach 40 transactions, subscribe to any Pro plan to continue adding unlimited income, expense, and investment entries.",
     },
     {
       q: "What payment methods are supported?",
@@ -123,7 +123,7 @@ export default function PricingPage() {
     },
     {
       q: "What happens to my data if my subscription ends?",
-      a: "All your existing transactions, custom categories, and historical charts remain safe and accessible. You simply won't be able to add new transactions beyond the 10 free tier limit until you re-subscribe.",
+      a: "All your existing transactions, custom categories, and historical charts remain safe and accessible. You simply won't be able to add new transactions beyond the 40 free tier limit until you re-subscribe.",
     },
   ];
 
@@ -140,7 +140,7 @@ export default function PricingPage() {
             Take Full Control of Your Financial Journey
           </h1>
           <p className="text-sm sm:text-base text-ink-muted max-w-2xl mx-auto leading-relaxed">
-            Free users can record up to 10 transactions. Upgrade to Pro for unlimited transactions, deep AI insights, and multi-currency tracking.
+            Free users can record up to 40 transactions. Upgrade to Pro for unlimited transactions, deep AI insights, and multi-currency tracking.
           </p>
         </div>
 

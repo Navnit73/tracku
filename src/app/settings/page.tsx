@@ -112,7 +112,7 @@ export default function SettingsPage() {
 
     const confirmed = await confirmDialog({
       title: "Cancel Subscription?",
-      text: `You'll keep full Premium Pro access until ${periodEndDate}. After that date, your account will return to the free plan (10 transaction limit).`,
+      text: `You'll keep full Premium Pro access until ${periodEndDate}. After that date, your account will return to the free plan (40 transaction limit).`,
       confirmText: "Yes, Cancel at Cycle End",
     });
 
@@ -217,7 +217,7 @@ export default function SettingsPage() {
                         })
                       : "the end of your billing cycle"}
                   </span>
-                  . After this date, your account will return to the free plan with a 10 transaction limit.
+                  . After this date, your account will return to the free plan with a 40 transaction limit.
                 </div>
               </div>
             )}
@@ -262,7 +262,7 @@ export default function SettingsPage() {
                     )
                   ) : (
                     <span>
-                      {billingInfo?.transactionCount || 0} of {billingInfo?.freeLimit || 10} free transactions recorded
+                      {billingInfo?.transactionCount || 0} of {billingInfo?.freeLimit || 40} free transactions recorded
                     </span>
                   )}
                 </div>
@@ -277,7 +277,7 @@ export default function SettingsPage() {
                           100,
                           Math.round(
                             ((billingInfo?.transactionCount || 0) /
-                              (billingInfo?.freeLimit || 10)) *
+                              (billingInfo?.freeLimit || 40)) *
                               100
                           )
                         )}%`,

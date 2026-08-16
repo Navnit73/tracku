@@ -32,7 +32,7 @@ export function FreeTierBanner({ className, onUpgradeSuccess }: FreeTierBannerPr
     return null;
   }
 
-  const limit = freeLimit || 10;
+  const limit = freeLimit || 40;
   const percentage = Math.min(100, Math.round((count / limit) * 100));
   const isLimitReached = count >= limit;
   const isCloseToLimit = count >= limit - 3 && !isLimitReached;
@@ -78,7 +78,7 @@ export function FreeTierBanner({ className, onUpgradeSuccess }: FreeTierBannerPr
 
             <div className="text-sm font-bold text-ink mt-0.5 truncate">
               {isLimitReached
-                ? "You have reached your 10 free transactions limit"
+                ? `You have reached your ${limit} free transactions limit`
                 : `${count} of ${limit} free transactions used`}
             </div>
 
