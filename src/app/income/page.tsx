@@ -6,8 +6,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/Button";
 import { DatePicker, DateRangePreset } from "@/components/ui/DatePicker";
 import { Badge } from "@/components/ui/Badge";
-import { CategoryPieChart } from "@/components/charts/CategoryPieChart";
 import { TransactionModal } from "@/components/transactions/TransactionModal";
+import { LazyCategoryPieChart } from "@/components/charts/LazyCharts";
 import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getIncomeAnalytics } from "@/app/actions/analytics";
@@ -188,7 +188,7 @@ export default function IncomePage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <CategoryPieChart
+                <LazyCategoryPieChart
                   data={analytics?.incomeByCategory || []}
                   currency={activeCurrency}
                 />

@@ -40,12 +40,12 @@ const TransactionSchema = new Schema<ITransaction>(
   }
 );
 
-// Targeted compound indexes for high-frequency user-scoped queries:
-TransactionSchema.index({ userId: 1, date: -1 });
+// Targeted compound indexes for high-frequency user-scoped queries & sorting
 TransactionSchema.index({ userId: 1, type: 1, date: -1 });
 TransactionSchema.index({ userId: 1, date: -1, type: 1 });
 TransactionSchema.index({ userId: 1, categoryId: 1, date: -1 });
 TransactionSchema.index({ userId: 1, item: 1 });
+TransactionSchema.index({ userId: 1, categoryName: 1 });
 
 export const Transaction: Model<ITransaction> =
   mongoose.models.Transaction || mongoose.model<ITransaction>("Transaction", TransactionSchema);

@@ -6,10 +6,12 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/Button";
 import { DatePicker, DateRangePreset } from "@/components/ui/DatePicker";
 import { Badge } from "@/components/ui/Badge";
-import { IncomeExpenseChart } from "@/components/charts/IncomeExpenseChart";
-import { CategoryPieChart } from "@/components/charts/CategoryPieChart";
-import { TopItemsChart } from "@/components/charts/TopItemsChart";
-import { InvestmentGrowthChart } from "@/components/charts/InvestmentGrowthChart";
+import {
+  LazyIncomeExpenseChart,
+  LazyCategoryPieChart,
+  LazyTopItemsChart,
+  LazyInvestmentGrowthChart,
+} from "@/components/charts/LazyCharts";
 import { TransactionModal } from "@/components/transactions/TransactionModal";
 import { FreeTierBanner } from "@/components/billing/FreeTierBanner";
 import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
@@ -294,7 +296,7 @@ export default function DashboardPage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <IncomeExpenseChart
+                <LazyIncomeExpenseChart
                   data={analytics?.charts?.incomeVsExpense || []}
                   currency={activeCurrency}
                 />
@@ -312,7 +314,7 @@ export default function DashboardPage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <CategoryPieChart
+                <LazyCategoryPieChart
                   data={analytics?.charts?.categorySpending || []}
                   currency={activeCurrency}
                 />
@@ -338,7 +340,7 @@ export default function DashboardPage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <InvestmentGrowthChart
+                <LazyInvestmentGrowthChart
                   data={analytics?.charts?.investmentGrowth || []}
                   currency={activeCurrency}
                 />
@@ -356,7 +358,7 @@ export default function DashboardPage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <TopItemsChart
+                <LazyTopItemsChart
                   data={analytics?.charts?.topSpendingItems || []}
                   currency={activeCurrency}
                 />

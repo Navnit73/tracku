@@ -6,8 +6,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/Button";
 import { DatePicker, DateRangePreset } from "@/components/ui/DatePicker";
 import { Badge } from "@/components/ui/Badge";
-import { InvestmentGrowthChart } from "@/components/charts/InvestmentGrowthChart";
-import { CategoryPieChart } from "@/components/charts/CategoryPieChart";
+import {
+  LazyInvestmentGrowthChart,
+  LazyCategoryPieChart,
+} from "@/components/charts/LazyCharts";
 import { TransactionModal } from "@/components/transactions/TransactionModal";
 import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -199,7 +201,7 @@ export default function InvestmentsPage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <InvestmentGrowthChart data={growthData} currency={activeCurrency} />
+                <LazyInvestmentGrowthChart data={growthData} currency={activeCurrency} />
               )}
             </CardContent>
           </Card>
@@ -213,7 +215,7 @@ export default function InvestmentsPage() {
               {loading ? (
                 <ChartSkeleton />
               ) : (
-                <CategoryPieChart
+                <LazyCategoryPieChart
                   data={analytics?.investmentByCategory || []}
                   currency={activeCurrency}
                 />

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Sparkles, Zap, ShieldCheck, ArrowRight, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PricingModal } from "@/components/billing/PricingModal";
+import { useBilling } from "@/components/providers/BillingProvider";
 import { cn } from "@/lib/utils";
 
 export interface FreeTierBannerProps {
@@ -12,46 +13,26 @@ export interface FreeTierBannerProps {
 }
 
 export function FreeTierBanner({ className, onUpgradeSuccess }: FreeTierBannerProps) {
-  const [billingInfo, setBillingInfo] = useState<{
-    isPremium: boolean;
-    transactionCount: number;
-    freeLimit: number;
-    remainingFreeTransactions: number;
-    subscription: any;
-  } | null>(null);
+  const {
+    isPremium,
+    transactionCount: count,
+    freeLimit,
+    isLoading: loading,
+    refreshBilling,
+  } = useBilling();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  const fetchStatus = async () => {
-    try {
-      const res = await fetch("/api/billing/status");
-      const data = await res.json();
-      if (data.success) {
-        setBillingInfo(data);
-      }
-    } catch {
-      // Ignore network errors on background poll
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchStatus();
-  }, []);
-
-  if (loading || !billingInfo) {
+  if (loading) {
     return null;
   }
 
-  // If user has active Pro subscription, show active pill or hide
-  if (billingInfo.isPremium) {
+  // If user has active Pro subscription, hide banner
+  if (isPremium) {
     return null;
   }
 
-  const count = billingInfo.transactionCount;
-  const limit = billingInfo.freeLimit || 10;
+  const limit = freeLimit || 10;
   const percentage = Math.min(100, Math.round((count / limit) * 100));
   const isLimitReached = count >= limit;
   const isCloseToLimit = count >= limit - 3 && !isLimitReached;
@@ -136,7 +117,7 @@ export function FreeTierBanner({ className, onUpgradeSuccess }: FreeTierBannerPr
         onClose={() => setIsModalOpen(false)}
         reason={isLimitReached ? "LIMIT_REACHED" : "UPGRADE_CTA"}
         onSuccess={() => {
-          fetchStatus();
+          refreshBilling();
           if (onUpgradeSuccess) onUpgradeSuccess();
         }}
       />

@@ -19,6 +19,7 @@ import { getCategories } from "@/app/actions/categories";
 import { downloadTransactionsCSV } from "@/lib/csvExport";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/CurrencyProvider";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 import { showToast, confirmDialog } from "@/lib/toast";
 import {
   Search,
@@ -45,6 +46,11 @@ export default function TransactionsPage() {
   const [maxAmount, setMaxAmount] = useState("");
   const [sortBy, setSortBy] = useState<"date" | "amount" | "item">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  // Debounced filters to avoid querying DB on every keystroke
+  const debouncedSearch = useDebounce(search, 300);
+  const debouncedMinAmount = useDebounce(minAmount, 350);
+  const debouncedMaxAmount = useDebounce(maxAmount, 350);
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -73,14 +79,14 @@ export default function TransactionsPage() {
   const fetchLedger = useCallback(async () => {
     setLoading(true);
     const res = await getTransactions({
-      search,
+      search: debouncedSearch,
       type: type as any,
       categoryId,
       dateRange,
       startDate: customStart,
       endDate: customEnd,
-      minAmount: minAmount ? parseFloat(minAmount) : undefined,
-      maxAmount: maxAmount ? parseFloat(maxAmount) : undefined,
+      minAmount: debouncedMinAmount ? parseFloat(debouncedMinAmount) : undefined,
+      maxAmount: debouncedMaxAmount ? parseFloat(debouncedMaxAmount) : undefined,
       sortBy,
       sortOrder,
       page,
@@ -95,14 +101,14 @@ export default function TransactionsPage() {
     }
     setLoading(false);
   }, [
-    search,
+    debouncedSearch,
     type,
     categoryId,
     dateRange,
     customStart,
     customEnd,
-    minAmount,
-    maxAmount,
+    debouncedMinAmount,
+    debouncedMaxAmount,
     sortBy,
     sortOrder,
     page,

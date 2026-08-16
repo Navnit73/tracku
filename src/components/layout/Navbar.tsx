@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Menu, Sun, Moon, LogIn, LogOut, User as UserIcon, PanelLeft, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { useBilling } from "@/components/providers/BillingProvider";
 import { cn } from "@/lib/utils";
 
 export function Navbar({
@@ -20,8 +21,8 @@ export function Navbar({
   onToggleCollapse?: () => void;
 }) {
   const { data: session } = useSession();
+  const { isPremium } = useBilling();
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isPremium, setIsPremium] = useState<boolean | null>(null);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -32,19 +33,7 @@ export function Navbar({
       document.documentElement.classList.remove("dark");
       setIsDarkMode(false);
     }
-
-    // Check premium status
-    if (session?.user) {
-      fetch("/api/billing/status")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            setIsPremium(data.isPremium);
-          }
-        })
-        .catch(() => {});
-    }
-  }, [session]);
+  }, []);
 
   const toggleDarkMode = () => {
     if (isDarkMode) {

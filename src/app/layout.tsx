@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import AuthProvider from "@/components/providers/AuthProvider";
 import { SidebarProvider } from "@/components/providers/SidebarProvider";
 import { CurrencyProvider } from "@/components/providers/CurrencyProvider";
+import { BillingProvider } from "@/components/providers/BillingProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -47,9 +48,11 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-sans bg-canvas text-ink">
         <AuthProvider>
-          <CurrencyProvider>
-            <SidebarProvider>{children}</SidebarProvider>
-          </CurrencyProvider>
+          <BillingProvider>
+            <CurrencyProvider>
+              <SidebarProvider>{children}</SidebarProvider>
+            </CurrencyProvider>
+          </BillingProvider>
         </AuthProvider>
       </body>
     </html>

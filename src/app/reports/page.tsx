@@ -8,13 +8,13 @@ import { DatePicker, DateRangePreset } from "@/components/ui/DatePicker";
 import { Badge } from "@/components/ui/Badge";
 import { CardSkeleton } from "@/components/ui/Skeleton";
 import { InsightCard } from "@/components/insights/InsightCard";
-import { getDashboardAnalytics } from "@/app/actions/analytics";
 import { getTransactions } from "@/app/actions/transactions";
 import { getComprehensiveFinancialInsights } from "@/app/actions/insights";
-import type { InsightItem, MonthComparisonCategory, HealthScore } from "@/app/actions/insights";
+import type { InsightItem, MonthComparisonCategory, HealthScore, MonthComparison } from "@/app/actions/insights";
 import { downloadTransactionsCSV } from "@/lib/csvExport";
 import { formatCurrency } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/CurrencyProvider";
+import { showToast } from "@/lib/toast";
 import {
   FileSpreadsheet,
   Download,
@@ -24,6 +24,7 @@ import {
   ArrowDownRight,
   ShieldCheck,
   TrendingUp,
+  RotateCw,
 } from "lucide-react";
 
 export default function ReportsPage() {
@@ -32,33 +33,39 @@ export default function ReportsPage() {
   const [customStart, setCustomStart] = useState<string | undefined>();
   const [customEnd, setCustomEnd] = useState<string | undefined>();
 
-  const [analytics, setAnalytics] = useState<any>(null);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [comparison, setComparison] = useState<MonthComparison | null>(null);
+  const [serverCurrency, setServerCurrency] = useState<string | null>(null);
   const [insights, setInsights] = useState<InsightItem[]>([]);
   const [categories, setCategories] = useState<MonthComparisonCategory[]>([]);
   const [savingsRate, setSavingsRate] = useState<number>(0);
   const [healthScore, setHealthScore] = useState<HealthScore | null>(null);
   const [loading, setLoading] = useState(true);
+  const [exportingType, setExportingType] = useState<string | null>(null);
 
-  const activeCurrency = analytics?.currency || currency;
+  const activeCurrency = serverCurrency || currency;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     const filters = { dateRange: datePreset, startDate: customStart, endDate: customEnd };
 
-    const [analyticsRes, transRes, comprehensiveInsightsRes] = await Promise.all([
-      getDashboardAnalytics(filters),
-      getTransactions({ ...filters, limit: 500 }),
-      getComprehensiveFinancialInsights(filters),
-    ]);
+    // Single unified intelligence query replaces 3 overlapping roundtrips
+    const comprehensiveInsightsRes = await getComprehensiveFinancialInsights(filters);
 
-    if (analyticsRes.success) setAnalytics(analyticsRes);
-    if (transRes.success) setTransactions(transRes.transactions);
     if (comprehensiveInsightsRes.success) {
+      if (comprehensiveInsightsRes.currency) setServerCurrency(comprehensiveInsightsRes.currency);
+      setComparison(comprehensiveInsightsRes.comparison);
       setInsights((comprehensiveInsightsRes.insights || []).slice(0, 3));
-      if (comprehensiveInsightsRes.comparison) setCategories(comprehensiveInsightsRes.comparison.categories || []);
-      if (comprehensiveInsightsRes.savings) setSavingsRate(comprehensiveInsightsRes.savings.savingsRate);
-      if (comprehensiveInsightsRes.healthScore) setHealthScore(comprehensiveInsightsRes.healthScore);
+      if (comprehensiveInsightsRes.comparison) {
+        setCategories(comprehensiveInsightsRes.comparison.categories || []);
+      }
+      if (comprehensiveInsightsRes.savings) {
+        setSavingsRate(comprehensiveInsightsRes.savings.savingsRate);
+      }
+      if (comprehensiveInsightsRes.healthScore) {
+        setHealthScore(comprehensiveInsightsRes.healthScore);
+      }
+    } else {
+      showToast.error("Failed to load report", comprehensiveInsightsRes.error);
     }
 
     setLoading(false);
@@ -68,12 +75,33 @@ export default function ReportsPage() {
     fetchData();
   }, [fetchData]);
 
-  const handleExportCSV = (typeFilter: string) => {
-    const filtered =
-      typeFilter === "All"
-        ? transactions
-        : transactions.filter((t) => t.type === typeFilter);
-    downloadTransactionsCSV(filtered, `report_${typeFilter.toLowerCase()}`);
+  // On-demand CSV export: only fetches transactions when requested
+  const handleExportCSV = async (typeFilter: string) => {
+    setExportingType(typeFilter);
+    showToast.info("Preparing Export", `Generating ${typeFilter === "All" ? "full" : typeFilter} transaction report...`);
+
+    try {
+      const res = await getTransactions({
+        dateRange: datePreset,
+        startDate: customStart,
+        endDate: customEnd,
+        type: typeFilter === "All" ? undefined : (typeFilter as any),
+        limit: 2000,
+      });
+
+      if (res.success && res.transactions && res.transactions.length > 0) {
+        downloadTransactionsCSV(res.transactions, `report_${typeFilter.toLowerCase()}`);
+        showToast.success("Export Downloaded", `Saved ${res.transactions.length} transaction records.`);
+      } else if (res.success && (!res.transactions || res.transactions.length === 0)) {
+        showToast.info("No Records", "No matching transactions found for this period to export.");
+      } else {
+        showToast.error("Export Failed", res.error || "Failed to generate CSV export.");
+      }
+    } catch (err: any) {
+      showToast.error("Export Error", err?.message || "Failed to generate CSV file.");
+    } finally {
+      setExportingType(null);
+    }
   };
 
   const handlePrint = () => {
@@ -119,6 +147,7 @@ export default function ReportsPage() {
             <Button
               size="sm"
               onClick={() => handleExportCSV("All")}
+              isLoading={exportingType === "All"}
               leftIcon={<Download className="w-4 h-4" />}
               className="flex-1 sm:flex-none shrink-0"
             >
@@ -158,28 +187,33 @@ export default function ReportsPage() {
             <div className="p-4 rounded-2xl bg-canvas border border-hairline">
               <div className="text-xs font-bold text-ink-muted uppercase tracking-wider">Total Inflow</div>
               <div className="text-xl sm:text-2xl font-black text-income mt-1 truncate">
-                {formatCurrency(analytics?.summary?.totalIncome || 0, activeCurrency)}
+                {formatCurrency(comparison?.currentIncome || 0, activeCurrency)}
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-canvas border border-hairline">
               <div className="text-xs font-bold text-ink-muted uppercase tracking-wider">Total Outflow</div>
               <div className="text-xl sm:text-2xl font-black text-expense mt-1 truncate">
-                {formatCurrency(analytics?.summary?.totalExpenses || 0, activeCurrency)}
+                {formatCurrency(comparison?.currentExpenses || 0, activeCurrency)}
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-canvas border border-hairline">
               <div className="text-xs font-bold text-ink-muted uppercase tracking-wider">Total Invested</div>
               <div className="text-xl sm:text-2xl font-black text-investment mt-1 truncate">
-                {formatCurrency(analytics?.summary?.totalInvestments || 0, activeCurrency)}
+                {formatCurrency(comparison?.currentInvestments || 0, activeCurrency)}
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-primary text-white ">
               <div className="text-xs font-bold text-emerald-100 uppercase tracking-wider">Net Balance</div>
               <div className="text-xl sm:text-2xl font-black mt-1 truncate">
-                {formatCurrency(analytics?.summary?.balance || 0, activeCurrency)}
+                {formatCurrency(
+                  (comparison?.currentIncome || 0) -
+                    (comparison?.currentExpenses || 0) -
+                    (comparison?.currentInvestments || 0),
+                  activeCurrency
+                )}
               </div>
             </div>
 
@@ -284,6 +318,7 @@ export default function ReportsPage() {
               <Button
                 variant="secondary"
                 onClick={() => handleExportCSV("Expense")}
+                isLoading={exportingType === "Expense"}
                 leftIcon={<Download className="w-4 h-4 text-expense" />}
                 className="justify-between"
               >
@@ -296,6 +331,7 @@ export default function ReportsPage() {
               <Button
                 variant="secondary"
                 onClick={() => handleExportCSV("Income")}
+                isLoading={exportingType === "Income"}
                 leftIcon={<Download className="w-4 h-4 text-income" />}
                 className="justify-between"
               >
@@ -308,6 +344,7 @@ export default function ReportsPage() {
               <Button
                 variant="secondary"
                 onClick={() => handleExportCSV("Investment")}
+                isLoading={exportingType === "Investment"}
                 leftIcon={<Download className="w-4 h-4 text-investment" />}
                 className="justify-between"
               >
