@@ -95,24 +95,12 @@ export async function getTransactions(filters: TransactionFilterInput) {
       .limit(limit)
       .lean();
 
-    let transactions: any[];
-    let totalCount: number;
+    const [transactions, totalCount] = await Promise.all([
+      txPromise,
+      Transaction.countDocuments(query),
+    ]);
 
-    if (page === 1) {
-      transactions = await txPromise;
-      if (transactions.length < limit) {
-        totalCount = transactions.length;
-      } else {
-        totalCount = await Transaction.countDocuments(query);
-      }
-    } else {
-      [transactions, totalCount] = await Promise.all([
-        txPromise,
-        Transaction.countDocuments(query),
-      ]);
-    }
-
-    const totalPages = Math.ceil(totalCount / limit);
+    const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 
     return {
       success: true,

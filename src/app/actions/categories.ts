@@ -44,12 +44,18 @@ export async function getCategories(typeFilter?: string) {
       query.type = typeFilter;
     }
 
-    let categories = await Category.find(query).sort({ name: 1 }).lean();
+    let categories = await Category.find(query)
+      .select("_id userId name type icon color createdAt updatedAt")
+      .sort({ name: 1 })
+      .lean();
 
     // Lazy initialization: only check and populate defaults if no categories returned
     if (categories.length === 0 && (!typeFilter || typeFilter === "All")) {
       await ensureDefaultCategories(user.id);
-      categories = await Category.find(query).sort({ name: 1 }).lean();
+      categories = await Category.find(query)
+        .select("_id userId name type icon color createdAt updatedAt")
+        .sort({ name: 1 })
+        .lean();
     }
 
     return {

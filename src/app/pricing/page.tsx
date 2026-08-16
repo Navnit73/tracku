@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { AppShell } from "@/components/layout/AppShell";
 import { PricingCard } from "@/components/billing/PricingCard";
 import { PLAN_CONFIGS } from "@/lib/razorpay";
 import { openRazorpayCheckout } from "@/components/billing/RazorpayScript";
+import { useBilling } from "@/components/providers/BillingProvider";
 import { showToast } from "@/lib/toast";
 import {
   Sparkles,
@@ -20,27 +21,10 @@ import {
 
 export default function PricingPage() {
   const { data: session } = useSession();
-  const [currentPlan, setCurrentPlan] = useState<string | null>(null);
+  const { subscription, isPremium, refreshBilling } = useBilling();
+  const currentPlan = isPremium && subscription ? subscription.plan : null;
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-
-  const fetchStatus = async () => {
-    try {
-      const res = await fetch("/api/billing/status");
-      const data = await res.json();
-      if (data.success && data.isPremium && data.subscription) {
-        setCurrentPlan(data.subscription.plan);
-      } else {
-        setCurrentPlan(null);
-      }
-    } catch {
-      // Ignore
-    }
-  };
-
-  useEffect(() => {
-    fetchStatus();
-  }, []);
 
   const handleSubscribe = async (planType: "MONTHLY" | "SIX_MONTH" | "YEARLY") => {
     setLoadingPlan(planType);
@@ -86,7 +70,7 @@ export default function PricingPage() {
               "Welcome to FinanceTrack Pro!",
               "Your subscription is active. Unlimited transaction recording is now unlocked."
             );
-            fetchStatus();
+            refreshBilling();
           } else {
             showToast.error(
               "Verification Failed",

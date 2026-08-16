@@ -18,7 +18,6 @@ import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getDashboardAnalytics } from "@/app/actions/analytics";
 import { seedSampleTransactions } from "@/app/actions/transactions";
-import { getSpendingInsights } from "@/app/actions/insights";
 import type { InsightItem } from "@/app/actions/insights";
 import { InsightCard } from "@/components/insights/InsightCard";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -39,6 +38,78 @@ import {
   Brain,
 } from "lucide-react";
 
+function deriveQuickInsights(analytics: any, curr: string): InsightItem[] {
+  if (!analytics || !analytics.summary) return [];
+  const items: InsightItem[] = [];
+  const { totalIncome = 0, totalExpenses = 0, totalInvestments = 0, balance = 0 } = analytics.summary;
+
+  // 1. Top Spending Category
+  const topCat = analytics.charts?.categorySpending?.[0];
+  if (topCat && topCat.amount > 0) {
+    const catPct = totalExpenses > 0 ? Math.round((topCat.amount / totalExpenses) * 100) : 100;
+    items.push({
+      id: "quick-top-cat",
+      type: catPct > 40 ? "warning" : "info",
+      icon: "PieChart",
+      headline: `${topCat.name}: ${formatCurrency(topCat.amount, curr)}`,
+      description: `Your top spending category this period is ${topCat.name}, representing ${catPct}% of total outlays.`,
+      metric: formatCurrency(topCat.amount, curr),
+    });
+  }
+
+  // 2. Savings Rate & Cash Flow
+  if (totalIncome > 0) {
+    const savingsRate = Math.round(((totalIncome - totalExpenses) / totalIncome) * 100);
+    items.push({
+      id: "quick-savings-rate",
+      type: savingsRate >= 20 ? "positive" : savingsRate >= 0 ? "neutral" : "warning",
+      icon: "PiggyBank",
+      headline: `Savings Rate: ${savingsRate}%`,
+      description:
+        savingsRate >= 20
+          ? `Excellent cash flow! You are retaining ${savingsRate}% of your total earnings this period.`
+          : savingsRate >= 0
+          ? `You are saving ${savingsRate}% of income. Target 20%+ for optimal financial resilience.`
+          : `Expenses exceed income by ${formatCurrency(totalExpenses - totalIncome, curr)}. Look for areas to trim.`,
+      metric: `${savingsRate}%`,
+    });
+  } else if (totalExpenses > 0) {
+    items.push({
+      id: "quick-burn",
+      type: "info",
+      icon: "Zap",
+      headline: `Total Outflow: ${formatCurrency(totalExpenses, curr)}`,
+      description: `Logged ${formatCurrency(totalExpenses, curr)} across ${analytics.charts?.categorySpending?.length || 0} categories.`,
+      metric: formatCurrency(totalExpenses, curr),
+    });
+  }
+
+  // 3. Investment or Frequent Purchases
+  if (totalInvestments > 0) {
+    const investRatio = totalIncome > 0 ? Math.round((totalInvestments / totalIncome) * 100) : 0;
+    items.push({
+      id: "quick-invest",
+      type: "positive",
+      icon: "TrendingUp",
+      headline: `Invested: ${formatCurrency(totalInvestments, curr)}`,
+      description: `Allocated ${formatCurrency(totalInvestments, curr)}${investRatio > 0 ? ` (${investRatio}% of inflow)` : ""} into wealth building assets.`,
+      metric: formatCurrency(totalInvestments, curr),
+    });
+  } else if (analytics.frequentlySpentItems?.length > 0) {
+    const freq = analytics.frequentlySpentItems[0];
+    items.push({
+      id: "quick-freq",
+      type: "neutral",
+      icon: "Sparkles",
+      headline: `Frequent: ${freq.item}`,
+      description: `Purchased ${freq.count} times for a total of ${formatCurrency(freq.totalAmount, curr)}.`,
+      metric: `${freq.count}x`,
+    });
+  }
+
+  return items.slice(0, 3);
+}
+
 export default function DashboardPage() {
   const { currency } = useCurrency();
   const [datePreset, setDatePreset] = useState<DateRangePreset>("This Month");
@@ -56,28 +127,20 @@ export default function DashboardPage() {
 
   const fetchAnalytics = useCallback(async () => {
     setLoading(true);
-    const [res, insightsRes] = await Promise.all([
-      getDashboardAnalytics({
-        dateRange: datePreset,
-        startDate: customStart,
-        endDate: customEnd,
-      }),
-      getSpendingInsights({
-        dateRange: datePreset,
-        startDate: customStart,
-        endDate: customEnd,
-      }),
-    ]);
+    const res = await getDashboardAnalytics({
+      dateRange: datePreset,
+      startDate: customStart,
+      endDate: customEnd,
+    });
+
     if (res.success) {
       setAnalytics(res);
+      setQuickInsights(deriveQuickInsights(res, res.currency || currency));
     } else {
       showToast.error("Failed to load dashboard data", res.error);
     }
-    if (insightsRes.success) {
-      setQuickInsights((insightsRes.insights || []).slice(0, 3));
-    }
     setLoading(false);
-  }, [datePreset, customStart, customEnd]);
+  }, [datePreset, customStart, customEnd, currency]);
 
   useEffect(() => {
     fetchAnalytics();

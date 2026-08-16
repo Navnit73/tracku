@@ -569,6 +569,7 @@ export default function TransactionsPage() {
         }}
         onSuccess={fetchLedger}
         transactionToEdit={selectedTransaction}
+        initialCategories={categories}
       />
     </AppShell>
   );

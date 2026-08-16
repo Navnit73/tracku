@@ -125,13 +125,27 @@ export async function getUserTransactionUsage(userId: string): Promise<UserSubsc
   const [user, transactionCount, subRecord] = await Promise.all([
     User.findById(userId).select("email").lean<{ email?: string } | null>(),
     Transaction.countDocuments({ userId }),
-    Subscription.findOne({ userId })
+    Subscription.findOne({
+      userId,
+      status: { $in: ["ACTIVE", "CANCEL_AT_PERIOD_END", "PENDING", "PAST_DUE", "HALTED"] },
+    })
       .sort({ createdAt: -1 })
       .lean<ISubscription | null>(),
   ]);
 
   const isVip = isWhitelistedEmail(user?.email);
-  const isSubscribed = await hasActiveSubscription(userId);
+  const now = new Date();
+
+  let isSubscribed = false;
+  if (
+    subRecord &&
+    (subRecord.status === "ACTIVE" || subRecord.status === "CANCEL_AT_PERIOD_END")
+  ) {
+    if (!subRecord.currentPeriodEnd || new Date(subRecord.currentPeriodEnd).getTime() >= now.getTime()) {
+      isSubscribed = true;
+    }
+  }
+
   const isPremium = isVip || isSubscribed;
 
   const canCreate = isPremium || transactionCount < FREE_TIER_LIMIT;

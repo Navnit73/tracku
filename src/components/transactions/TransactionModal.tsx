@@ -30,6 +30,7 @@ export interface TransactionModalProps {
     tags?: string[];
   } | null;
   defaultType?: "Expense" | "Income" | "Investment";
+  initialCategories?: { _id: string; name: string; type: string }[];
 }
 
 const PAYMENT_METHODS = [
@@ -52,10 +53,13 @@ export function TransactionModal({
   onSuccess,
   transactionToEdit,
   defaultType = "Expense",
+  initialCategories,
 }: TransactionModalProps) {
   const { currency, currencySymbol } = useCurrency();
   const [type, setType] = useState<"Expense" | "Income" | "Investment">(defaultType);
-  const [categories, setCategories] = useState<{ _id: string; name: string; type: string }[]>([]);
+  const [categories, setCategories] = useState<{ _id: string; name: string; type: string }[]>(
+    initialCategories || []
+  );
   const [categoryId, setCategoryId] = useState("");
   const [item, setItem] = useState("");
   const [amount, setAmount] = useState<string>("");
@@ -69,16 +73,25 @@ export function TransactionModal({
   const [isPricingOpen, setIsPricingOpen] = useState(false);
 
   const fetchCategories = useCallback(async (selectedType: string) => {
+    if (initialCategories && initialCategories.length > 0) {
+      setCategories(initialCategories);
+      const matching = initialCategories.filter((c) => c.type === selectedType || c.type === "All");
+      if (matching.length > 0 && !transactionToEdit) {
+        setCategoryId(matching[0]._id);
+      }
+      return;
+    }
+
     const res = await getCategories("All");
     if (res.success && res.categories) {
       setCategories(res.categories);
       // Auto select first category matching type
-      const matching = res.categories.filter((c: any) => c.type === selectedType || c.type === "All");
+      const matching = res.categories.filter((c) => c.type === selectedType || c.type === "All");
       if (matching.length > 0 && !transactionToEdit) {
         setCategoryId(matching[0]._id);
       }
     }
-  }, [transactionToEdit]);
+  }, [transactionToEdit, initialCategories]);
 
   useEffect(() => {
     if (isOpen) {

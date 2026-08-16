@@ -47,6 +47,9 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
 
   const fetchBilling = useCallback(async () => {
     if (status !== "authenticated" || !session?.user) {
+      if (status === "unauthenticated") {
+        setBillingState((prev) => ({ ...prev, isLoading: false }));
+      }
       return;
     }
 
@@ -72,41 +75,8 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
   }, [status, session?.user]);
 
   useEffect(() => {
-    let isMounted = true;
-
-    if (status === "unauthenticated") {
-      setBillingState((prev) => ({ ...prev, isLoading: false }));
-      return;
-    }
-
-    if (status === "authenticated" && session?.user) {
-      fetch("/api/billing/status")
-        .then((res) => res.json())
-        .then((data) => {
-          if (!isMounted) return;
-          if (data.success) {
-            setBillingState({
-              isPremium: data.isPremium ?? false,
-              canCreate: data.canCreate ?? true,
-              transactionCount: data.transactionCount ?? 0,
-              freeLimit: data.freeLimit ?? 40,
-              remainingFreeTransactions: data.remainingFreeTransactions ?? 40,
-              subscription: data.subscription ?? null,
-              isLoading: false,
-            });
-          } else {
-            setBillingState((prev) => ({ ...prev, isLoading: false }));
-          }
-        })
-        .catch(() => {
-          if (isMounted) setBillingState((prev) => ({ ...prev, isLoading: false }));
-        });
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [status, session?.user]);
+    fetchBilling();
+  }, [fetchBilling]);
 
   return (
     <BillingContext.Provider

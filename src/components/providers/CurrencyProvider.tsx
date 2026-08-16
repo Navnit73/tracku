@@ -23,23 +23,29 @@ const CurrencyContext = createContext<CurrencyContextType>({
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
-  const [currency, setCurrencyState] = useState<string>("USD");
+  const [currency, setCurrencyState] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem("preferred_currency");
+      if (cached) return cached;
+    }
+    return "USD";
+  });
   const [isSaving, setIsSaving] = useState(false);
 
   const userId = session?.user?.id;
+  const sessionCurrency = session?.user?.currency;
 
-  // Initialize and sync currency
+  // Sync currency from session or fallback DB query if not cached
   useEffect(() => {
-    // 1. Check local storage for instant sync across tabs / page visits
     const cached = typeof window !== "undefined" ? localStorage.getItem("preferred_currency") : null;
-    if (cached) {
-      setCurrencyState(cached);
-    } else if (session?.user?.currency) {
-      setCurrencyState(session.user.currency);
-      localStorage.setItem("preferred_currency", session.user.currency);
+    if (cached) return;
+
+    if (sessionCurrency) {
+      setCurrencyState(sessionCurrency);
+      localStorage.setItem("preferred_currency", sessionCurrency);
+      return;
     }
 
-    // 2. Query user currency from DB when user is authenticated
     if (userId) {
       getUserCurrency()
         .then((res) => {
@@ -50,7 +56,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         })
         .catch(() => {});
     }
-  }, [userId, session?.user?.currency]);
+  }, [userId, sessionCurrency]);
 
   const setCurrency = useCallback(
     async (newCurrency: string): Promise<boolean> => {

@@ -12,6 +12,7 @@ import { deleteUserAccountAndData } from "@/app/actions/user";
 import { clearAllUserData } from "@/app/actions/transactions";
 import { showToast, confirmDialog } from "@/lib/toast";
 import { useCurrency } from "@/components/providers/CurrencyProvider";
+import { useBilling } from "@/components/providers/BillingProvider";
 import {
   Settings as SettingsIcon,
   Globe,
@@ -37,30 +38,15 @@ import Link from "next/link";
 export default function SettingsPage() {
   const { data: session } = useSession();
   const { currency, setCurrency: setGlobalCurrency, isSaving: isSavingCurrency } = useCurrency();
+  const { isPremium, transactionCount, freeLimit, subscription: sub, refreshBilling } = useBilling();
   const [currencySaved, setCurrencySaved] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClearingTx, setIsClearingTx] = useState(false);
   const [activeTheme, setActiveTheme] = useState<"light" | "dark">("light");
 
   // Subscription state
-  const [billingInfo, setBillingInfo] = useState<any>(null);
-  const [loadingBilling, setLoadingBilling] = useState(true);
   const [isCancellingSub, setIsCancellingSub] = useState(false);
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
-
-  const fetchBillingStatus = useCallback(async () => {
-    try {
-      const res = await fetch("/api/billing/status");
-      const data = await res.json();
-      if (data.success) {
-        setBillingInfo(data);
-      }
-    } catch {
-      // Ignore
-    } finally {
-      setLoadingBilling(false);
-    }
-  }, []);
 
   // Load saved theme on mount
   useEffect(() => {
@@ -84,11 +70,6 @@ export default function SettingsPage() {
     showToast.success("Theme Updated", `Switched to ${newTheme} mode.`);
   };
 
-  // Load billing status on mount
-  useEffect(() => {
-    fetchBillingStatus();
-  }, [fetchBillingStatus]);
-
   const handleCurrencyChange = useCallback(async (newCurrency: string) => {
     setCurrencySaved(false);
     const success = await setGlobalCurrency(newCurrency);
@@ -102,8 +83,8 @@ export default function SettingsPage() {
   }, [setGlobalCurrency]);
 
   const handleCancelSubscription = async () => {
-    const periodEndDate = billingInfo?.subscription?.currentPeriodEnd
-      ? new Date(billingInfo.subscription.currentPeriodEnd).toLocaleDateString("en-US", {
+    const periodEndDate = sub?.currentPeriodEnd
+      ? new Date(sub.currentPeriodEnd).toLocaleDateString("en-US", {
           month: "long",
           day: "numeric",
           year: "numeric",
@@ -127,7 +108,7 @@ export default function SettingsPage() {
 
         if (data.success) {
           showToast.success("Cancellation Scheduled", data.message);
-          fetchBillingStatus();
+          refreshBilling();
         } else {
           showToast.error("Cancellation Error", data.error || "Failed to cancel subscription.");
         }
@@ -159,8 +140,6 @@ export default function SettingsPage() {
     }
   };
 
-  const sub = billingInfo?.subscription;
-  const isPremium = billingInfo?.isPremium;
   const isScheduledCancel = sub?.cancelAtPeriodEnd || sub?.status === "CANCEL_AT_PERIOD_END";
 
   return (
@@ -267,7 +246,7 @@ export default function SettingsPage() {
                     )
                   ) : (
                     <span>
-                      {billingInfo?.transactionCount || 0} of {billingInfo?.freeLimit || 40} free transactions recorded
+                      {transactionCount || 0} of {freeLimit || 40} free transactions recorded
                     </span>
                   )}
                 </div>
@@ -281,8 +260,8 @@ export default function SettingsPage() {
                         width: `${Math.min(
                           100,
                           Math.round(
-                            ((billingInfo?.transactionCount || 0) /
-                              (billingInfo?.freeLimit || 40)) *
+                            ((transactionCount || 0) /
+                              (freeLimit || 40)) *
                               100
                           )
                         )}%`,
@@ -575,7 +554,7 @@ export default function SettingsPage() {
                     setIsClearingTx(false);
                     if (res.success) {
                       showToast.success("Ledger Reset", res.message);
-                      fetchBillingStatus();
+                      refreshBilling();
                     } else {
                       showToast.error("Error", res.error);
                     }
@@ -615,7 +594,7 @@ export default function SettingsPage() {
       <PricingModal
         isOpen={isPricingModalOpen}
         onClose={() => setIsPricingModalOpen(false)}
-        onSuccess={fetchBillingStatus}
+        onSuccess={refreshBilling}
       />
     </AppShell>
   );

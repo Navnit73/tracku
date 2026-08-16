@@ -11,7 +11,6 @@ import { LazyCategoryPieChart } from "@/components/charts/LazyCharts";
 import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getExpenseAnalytics } from "@/app/actions/analytics";
-import { getTransactions } from "@/app/actions/transactions";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/CurrencyProvider";
 import { TrendingDown, ShoppingBag, Plus, Sparkles, CreditCard, Receipt } from "lucide-react";
@@ -23,7 +22,6 @@ export default function ExpensesPage() {
   const [customEnd, setCustomEnd] = useState<string | undefined>();
 
   const [analytics, setAnalytics] = useState<any>(null);
-  const [expensesList, setExpensesList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,23 +30,13 @@ export default function ExpensesPage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const [analyticsRes, listRes] = await Promise.all([
-      getExpenseAnalytics({
-        dateRange: datePreset,
-        startDate: customStart,
-        endDate: customEnd,
-      }),
-      getTransactions({
-        type: "Expense",
-        dateRange: datePreset,
-        startDate: customStart,
-        endDate: customEnd,
-        limit: 20,
-      }),
-    ]);
+    const analyticsRes = await getExpenseAnalytics({
+      dateRange: datePreset,
+      startDate: customStart,
+      endDate: customEnd,
+    });
 
     if (analyticsRes.success) setAnalytics(analyticsRes);
-    if (listRes.success) setExpensesList(listRes.transactions);
     setLoading(false);
   }, [datePreset, customStart, customEnd]);
 
