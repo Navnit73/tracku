@@ -147,7 +147,8 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
     });
 
     const balance = totalIncome - totalExpenses - totalInvestments;
-    const savings = totalIncome - totalExpenses;
+    const netCashFlow = totalIncome - totalExpenses;
+    const netSavings = totalIncome - totalExpenses - totalInvestments;
 
     let monthlyIncome = 0;
     let monthlyExpenses = 0;
@@ -229,7 +230,8 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
       currency,
       summary: {
         balance,
-        savings,
+        netCashFlow,
+        netSavings,
         totalIncome,
         totalExpenses,
         totalInvestments,

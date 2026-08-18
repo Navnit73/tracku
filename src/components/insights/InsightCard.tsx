@@ -89,7 +89,14 @@ export function InsightCard({ insight, index = 0 }: { insight: InsightItem; inde
               <span
                 className={cn(
                   "text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0",
-                  insight.delta > 0 ? "bg-expense-bg text-expense border border-expense/20" : "bg-income-bg text-income border border-income/20"
+                  // For warning insights (spending), up = bad (red); for positive/info insights (income), up = good (green)
+                  insight.type === "warning"
+                    ? insight.delta > 0
+                      ? "bg-expense-bg text-expense border border-expense/20"
+                      : "bg-income-bg text-income border border-income/20"
+                    : insight.delta > 0
+                    ? "bg-income-bg text-income border border-income/20"
+                    : "bg-expense-bg text-expense border border-expense/20"
                 )}
               >
                 {insight.delta > 0 ? "↑" : "↓"} {Math.abs(insight.delta)}%

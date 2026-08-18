@@ -57,9 +57,10 @@ function deriveQuickInsights(analytics: any, curr: string): InsightItem[] {
     });
   }
 
-  // 2. Savings Rate & Cash Flow
+  // 2. Savings Rate & Cash Flow (uses net savings = Income - Expenses - Investments)
   if (totalIncome > 0) {
-    const savingsRate = Math.round(((totalIncome - totalExpenses) / totalIncome) * 100);
+    const netSavings = totalIncome - totalExpenses - totalInvestments;
+    const savingsRate = Math.round((netSavings / totalIncome) * 100);
     items.push({
       id: "quick-savings-rate",
       type: savingsRate >= 20 ? "positive" : savingsRate >= 0 ? "neutral" : "warning",
@@ -235,11 +236,20 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
-            {/* 1. Total Net Balance (Hero Accent) */}
-            <Card variant="hero" className="relative overflow-hidden p-4 sm:p-5 flex flex-col justify-between min-h-[145px]">
+            {/* 1. Total Net Balance (Hero Accent) — conditional red/green */}
+            <Card
+              variant={(analytics?.summary?.balance ?? 0) < 0 ? "default" : "hero"}
+              className={`relative overflow-hidden p-4 sm:p-5 flex flex-col justify-between min-h-[145px] ${
+                (analytics?.summary?.balance ?? 0) < 0
+                  ? "bg-gradient-to-br from-red-600 to-red-800 dark:from-red-700 dark:to-red-900 text-white border-red-500/30 shadow-lg"
+                  : ""
+              }`}
+            >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-emerald-100 uppercase tracking-wider">
+                  <span className={`text-xs font-bold uppercase tracking-wider ${
+                    (analytics?.summary?.balance ?? 0) < 0 ? "text-red-100" : "text-emerald-100"
+                  }`}>
                     Total Net Balance
                   </span>
                   <div className="p-2 rounded-xl bg-white/15 text-white backdrop-blur-xs ">
@@ -250,31 +260,43 @@ export default function DashboardPage() {
                   {formatCurrency(analytics?.summary?.balance || 0, activeCurrency)}
                 </div>
               </div>
-              <div className="mt-3 text-xs text-emerald-100 flex items-center justify-between border-t border-white/15 pt-2">
-                <span className="text-[11px] opacity-90 truncate">Net Surplus Balance</span>
-                <span className="font-bold text-[10px] bg-white/20 px-2 py-0.5 rounded-full text-white shrink-0">
-                  Active
+              <div className={`mt-3 text-xs flex items-center justify-between border-t border-white/15 pt-2 ${
+                (analytics?.summary?.balance ?? 0) < 0 ? "text-red-100" : "text-emerald-100"
+              }`}>
+                <span className="text-[11px] opacity-90 truncate">
+                  {(analytics?.summary?.balance ?? 0) < 0 ? "Deficit — expenses exceed income" : "Net Surplus Balance"}
+                </span>
+                <span className={`font-bold text-[10px] px-2 py-0.5 rounded-full text-white shrink-0 ${
+                  (analytics?.summary?.balance ?? 0) < 0 ? "bg-red-400/30" : "bg-white/20"
+                }`}>
+                  {(analytics?.summary?.balance ?? 0) < 0 ? "Deficit" : "Active"}
                 </span>
               </div>
             </Card>
 
-            {/* 2. Net Savings */}
+            {/* 2. Net Savings (Income - Expenses - Investments) — conditional color */}
             <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[145px]">
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Net Savings
                   </span>
-                  <div className="p-2 rounded-xl bg-income-bg text-income ">
+                  <div className={`p-2 rounded-xl ${
+                    (analytics?.summary?.netSavings ?? 0) < 0
+                      ? "bg-expense-bg text-expense"
+                      : "bg-income-bg text-income"
+                  }`}>
                     <PiggyBank className="w-4 h-4" />
                   </div>
                 </div>
-                <div className="text-2xl sm:text-3xl xl:text-2xl 2xl:text-3xl font-black text-income tracking-tight truncate">
-                  {formatCurrency(analytics?.summary?.savings || 0, activeCurrency)}
+                <div className={`text-2xl sm:text-3xl xl:text-2xl 2xl:text-3xl font-black tracking-tight truncate ${
+                  (analytics?.summary?.netSavings ?? 0) < 0 ? "text-expense" : "text-income"
+                }`}>
+                  {formatCurrency(analytics?.summary?.netSavings ?? 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2 gap-1">
-                <span className="text-[11px] truncate">Monthly Inflow:</span>
+                <span className="text-[11px] truncate">This Mo. Inflow:</span>
                 <Badge variant="income" size="sm">
                   +{formatCurrency(analytics?.summary?.monthlyIncome || 0, activeCurrency)}
                 </Badge>
@@ -308,7 +330,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2 flex items-center justify-between">
-                <span className="text-[11px] truncate">Mo. Spend:</span>
+                <span className="text-[11px] truncate">This Mo. Spend:</span>
                 <strong className="text-expense text-[11px]">
                   {formatCurrency(analytics?.summary?.monthlyExpenses || 0, activeCurrency)}
                 </strong>
@@ -331,7 +353,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2 gap-1">
-                <span className="text-[11px] truncate">Mo. Invested:</span>
+                <span className="text-[11px] truncate">This Mo. Invested:</span>
                 <strong className="text-investment text-[11px]">
                   +{formatCurrency(analytics?.summary?.monthlyInvestments || 0, activeCurrency)}
                 </strong>
@@ -343,7 +365,7 @@ export default function DashboardPage() {
         {/* Charts Grid Row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Income vs Expenses Trend Chart */}
-          <Card className="lg:col-span-2 p-4 sm:p-5">
+          <Card className="lg:col-span-2 p-4 sm:p-3">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div>
                 <CardTitle>Income vs Expenses Trend</CardTitle>
@@ -502,6 +524,8 @@ export default function DashboardPage() {
                         >
                           {t.type === "Income" ? (
                             <ArrowUpRight className="w-4 h-4" />
+                          ) : t.type === "Investment" ? (
+                            <TrendingUp className="w-4 h-4" />
                           ) : (
                             <ArrowDownRight className="w-4 h-4" />
                           )}
@@ -524,7 +548,7 @@ export default function DashboardPage() {
                             : "text-investment"
                         }`}
                       >
-                        {t.type === "Income" ? "+" : "-"}
+                        {t.type === "Expense" ? "-" : "+"}
                         {formatCurrency(t.amount, activeCurrency)}
                       </div>
                     </div>
