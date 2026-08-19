@@ -70,9 +70,18 @@ export const TopItemsChart = React.memo(function TopItemsChart({
             formatter={(value: any) => [formatCurrency(Number(value) || 0, currency), "Total Spend"]}
           />
           <Bar dataKey="totalAmount" radius={[0, 6, 6, 0]}>
-            {data.map((_, index) => (
-              <Cell key={`bar-${index}`} fill={index === 0 ? "var(--expense)" : "var(--primary)"} />
-            ))}
+            {data.map((_, index) => {
+              // Descending opacity of expense color so rank #1 is brightest red and #2-#5 are subtle expense tones
+              const opacities = [1, 0.85, 0.7, 0.55, 0.4];
+              const opacity = opacities[index] || 0.4;
+              return (
+                <Cell
+                  key={`bar-${index}`}
+                  fill="var(--expense)"
+                  fillOpacity={opacity}
+                />
+              );
+            })}
           </Bar>
         </BarChart>
       </ResponsiveContainer>

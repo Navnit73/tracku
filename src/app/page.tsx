@@ -57,9 +57,9 @@ function deriveQuickInsights(analytics: any, curr: string): InsightItem[] {
     });
   }
 
-  // 2. Savings Rate & Cash Flow (uses net savings = Income - Expenses - Investments)
+  // 2. Savings Rate & Cash Flow (Retained Wealth = Income - Expenses)
   if (totalIncome > 0) {
-    const netSavings = totalIncome - totalExpenses - totalInvestments;
+    const netSavings = totalIncome - totalExpenses;
     const savingsRate = Math.round((netSavings / totalIncome) * 100);
     items.push({
       id: "quick-savings-rate",
@@ -68,9 +68,9 @@ function deriveQuickInsights(analytics: any, curr: string): InsightItem[] {
       headline: `Savings Rate: ${savingsRate}%`,
       description:
         savingsRate >= 20
-          ? `Excellent cash flow! You are retaining ${savingsRate}% of your total earnings this period.`
+          ? `Excellent financial health! You are retaining ${savingsRate}% of your earnings (${formatCurrency(netSavings, curr)}) this period.`
           : savingsRate >= 0
-          ? `You are saving ${savingsRate}% of income. Target 20%+ for optimal financial resilience.`
+          ? `You are saving ${savingsRate}% of income. Target 20%+ for optimal wealth building.`
           : `Expenses exceed income by ${formatCurrency(totalExpenses - totalIncome, curr)}. Look for areas to trim.`,
       metric: `${savingsRate}%`,
     });
@@ -236,7 +236,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
-            {/* 1. Total Net Balance (Hero Accent) — conditional red/green */}
+            {/* 1. Liquid Cash Balance (Cash remaining in bank/wallet) */}
             <Card
               variant={(analytics?.summary?.balance ?? 0) < 0 ? "default" : "hero"}
               className={`relative overflow-hidden p-4 sm:p-5 flex flex-col justify-between min-h-[145px] ${
@@ -250,7 +250,7 @@ export default function DashboardPage() {
                   <span className={`text-xs font-bold uppercase tracking-wider ${
                     (analytics?.summary?.balance ?? 0) < 0 ? "text-red-100" : "text-emerald-100"
                   }`}>
-                    Total Net Balance
+                    Liquid Cash Balance
                   </span>
                   <div className="p-2 rounded-xl bg-white/15 text-white backdrop-blur-xs ">
                     <Wallet className="w-4 h-4" />
@@ -264,22 +264,22 @@ export default function DashboardPage() {
                 (analytics?.summary?.balance ?? 0) < 0 ? "text-red-100" : "text-emerald-100"
               }`}>
                 <span className="text-[11px] opacity-90 truncate">
-                  {(analytics?.summary?.balance ?? 0) < 0 ? "Deficit — expenses exceed income" : "Net Surplus Balance"}
+                  {(analytics?.summary?.balance ?? 0) < 0 ? "Cash deficit after outlays" : "Inflow − Expenses − Invested"}
                 </span>
                 <span className={`font-bold text-[10px] px-2 py-0.5 rounded-full text-white shrink-0 ${
                   (analytics?.summary?.balance ?? 0) < 0 ? "bg-red-400/30" : "bg-white/20"
                 }`}>
-                  {(analytics?.summary?.balance ?? 0) < 0 ? "Deficit" : "Active"}
+                  {(analytics?.summary?.balance ?? 0) < 0 ? "Deficit" : "Liquid Cash"}
                 </span>
               </div>
             </Card>
 
-            {/* 2. Net Savings (Income - Expenses - Investments) — conditional color */}
+            {/* 2. Total Net Savings (Wealth Retained = Income - Expenses) */}
             <Card className="p-4 sm:p-5 flex flex-col justify-between min-h-[145px]">
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
-                    Net Savings
+                    Total Net Savings
                   </span>
                   <div className={`p-2 rounded-xl ${
                     (analytics?.summary?.netSavings ?? 0) < 0
@@ -296,9 +296,9 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2 gap-1">
-                <span className="text-[11px] truncate">This Mo. Inflow:</span>
-                <Badge variant="income" size="sm">
-                  +{formatCurrency(analytics?.summary?.monthlyIncome || 0, activeCurrency)}
+                <span className="text-[11px] truncate">Savings Rate:</span>
+                <Badge variant={(analytics?.summary?.savingsRate ?? 0) >= 20 ? "income" : (analytics?.summary?.savingsRate ?? 0) >= 0 ? "sky" : "expense"} size="sm">
+                  {analytics?.summary?.savingsRate ?? 0}%
                 </Badge>
               </div>
             </Card>

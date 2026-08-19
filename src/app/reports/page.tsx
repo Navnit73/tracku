@@ -170,10 +170,10 @@ export default function ReportsPage() {
             <div className="flex items-center gap-2 flex-wrap">
               {healthScore && (
                 <Badge
-                  variant={healthScore.score >= 60 ? "income" : "expense"}
+                  variant={healthScore.score >= 70 ? "income" : healthScore.score >= 40 ? "warning" : "expense"}
                   size="md"
                 >
-                  Health: {healthScore.score}/100
+                  Health: {healthScore.score}/100 ({healthScore.grade})
                 </Badge>
               )}
               <Badge variant="sky" size="md">
@@ -187,31 +187,29 @@ export default function ReportsPage() {
             <div className="p-4 rounded-2xl bg-canvas border border-hairline">
               <div className="text-xs font-bold text-ink-muted uppercase tracking-wider">Total Inflow</div>
               <div className="text-xl sm:text-2xl font-black text-income mt-1 truncate">
-                {formatCurrency(comparison?.currentIncome || 0, activeCurrency)}
+                +{formatCurrency(comparison?.currentIncome || 0, activeCurrency)}
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-canvas border border-hairline">
               <div className="text-xs font-bold text-ink-muted uppercase tracking-wider">Total Outflow</div>
               <div className="text-xl sm:text-2xl font-black text-expense mt-1 truncate">
-                {formatCurrency(comparison?.currentExpenses || 0, activeCurrency)}
+                -{formatCurrency(comparison?.currentExpenses || 0, activeCurrency)}
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-canvas border border-hairline">
               <div className="text-xs font-bold text-ink-muted uppercase tracking-wider">Total Invested</div>
               <div className="text-xl sm:text-2xl font-black text-investment mt-1 truncate">
-                {formatCurrency(comparison?.currentInvestments || 0, activeCurrency)}
+                +{formatCurrency(comparison?.currentInvestments || 0, activeCurrency)}
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-primary text-white ">
-              <div className="text-xs font-bold text-emerald-100 uppercase tracking-wider">Net Balance</div>
+              <div className="text-xs font-bold text-emerald-100 uppercase tracking-wider">Net Retained Savings</div>
               <div className="text-xl sm:text-2xl font-black mt-1 truncate">
                 {formatCurrency(
-                  (comparison?.currentIncome || 0) -
-                    (comparison?.currentExpenses || 0) -
-                    (comparison?.currentInvestments || 0),
+                  (comparison?.currentIncome || 0) - (comparison?.currentExpenses || 0),
                   activeCurrency
                 )}
               </div>
@@ -221,7 +219,7 @@ export default function ReportsPage() {
               <div className="text-xs font-bold text-ink-muted uppercase tracking-wider flex items-center gap-1">
                 <TrendingUp className="w-3.5 h-3.5 text-income" /> Savings Rate
               </div>
-              <div className={`text-xl sm:text-2xl font-black mt-1 ${savingsRate >= 20 ? "text-income" : savingsRate >= 0 ? "text-warning" : "text-expense"}`}>
+              <div className={`text-xl sm:text-2xl font-black mt-1 ${savingsRate >= 20 ? "text-income" : savingsRate >= 0 ? "text-sky-brand" : "text-expense"}`}>
                 {Math.round(savingsRate)}%
               </div>
             </div>

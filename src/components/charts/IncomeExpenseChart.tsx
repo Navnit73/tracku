@@ -46,20 +46,25 @@ export const IncomeExpenseChart = React.memo(function IncomeExpenseChart({
     };
   });
 
+  const uniqueId = React.useId().replace(/:/g, "");
+  const incomeGradId = `incomeGrad-${uniqueId}`;
+  const expenseGradId = `expenseGrad-${uniqueId}`;
+  const investmentGradId = `investmentGrad-${uniqueId}`;
+
   return (
     <div className="w-full h-64 sm:h-72 lg:h-80">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={formattedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
-            <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id={incomeGradId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="var(--income)" stopOpacity={0.35} />
               <stop offset="95%" stopColor="var(--income)" stopOpacity={0} />
             </linearGradient>
-            <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id={expenseGradId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="var(--expense)" stopOpacity={0.35} />
               <stop offset="95%" stopColor="var(--expense)" stopOpacity={0} />
             </linearGradient>
-            <linearGradient id="investmentGrad" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id={investmentGradId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="var(--investment)" stopOpacity={0.35} />
               <stop offset="95%" stopColor="var(--investment)" stopOpacity={0} />
             </linearGradient>
@@ -96,7 +101,7 @@ export const IncomeExpenseChart = React.memo(function IncomeExpenseChart({
             name="Income"
             stroke="var(--income)"
             fillOpacity={1}
-            fill="url(#incomeGrad)"
+            fill={`url(#${incomeGradId})`}
             strokeWidth={2.5}
           />
           <Area
@@ -105,7 +110,7 @@ export const IncomeExpenseChart = React.memo(function IncomeExpenseChart({
             name="Expenses"
             stroke="var(--expense)"
             fillOpacity={1}
-            fill="url(#expenseGrad)"
+            fill={`url(#${expenseGradId})`}
             strokeWidth={2.5}
           />
           <Area
@@ -114,7 +119,7 @@ export const IncomeExpenseChart = React.memo(function IncomeExpenseChart({
             name="Investments"
             stroke="var(--investment)"
             fillOpacity={1}
-            fill="url(#investmentGrad)"
+            fill={`url(#${investmentGradId})`}
             strokeWidth={2.5}
           />
         </AreaChart>

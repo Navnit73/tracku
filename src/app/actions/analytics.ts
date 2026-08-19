@@ -31,7 +31,7 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
     const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
     // Parallel execution of all required queries using optimized MongoDB aggregations
-    const [dbUser, facetResult, monthlyResult, recentTxns] = await Promise.all([
+    const [dbUser, facetResult, monthlyResult, recentTxns, priorInvestResult] = await Promise.all([
       User.findById(user.id).select("currency").lean(),
       Transaction.aggregate([
         { $match: queryMatch },
@@ -131,6 +131,12 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
         .sort({ date: -1 })
         .limit(6)
         .lean(),
+      startDate
+        ? Transaction.aggregate([
+            { $match: { userId: user.id, type: "Investment", date: { $lt: startDate } } },
+            { $group: { _id: null, total: { $sum: "$amount" } } },
+          ])
+        : Promise.resolve([]),
     ]);
 
     const currency = (dbUser as any)?.currency || "USD";
@@ -146,9 +152,12 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
       else if (t._id === "Investment") totalInvestments = t.total || 0;
     });
 
+    // Liquid Cash Balance remaining in wallet/bank
     const balance = totalIncome - totalExpenses - totalInvestments;
+    // Net Savings (Total Retained Wealth = Income - Expenses = Liquid Cash + Investments)
+    const netSavings = totalIncome - totalExpenses;
     const netCashFlow = totalIncome - totalExpenses;
-    const netSavings = totalIncome - totalExpenses - totalInvestments;
+    const savingsRate = totalIncome > 0 ? Math.round(((totalIncome - totalExpenses) / totalIncome) * 100) : 0;
 
     let monthlyIncome = 0;
     let monthlyExpenses = 0;
@@ -203,8 +212,9 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
       amount: c.amount,
     }));
 
-    // Investment Growth Series
-    let cumulative = 0;
+    // Investment Growth Series initialized with prior portfolio baseline
+    const priorBaseline = priorInvestResult?.[0]?.total || 0;
+    let cumulative = priorBaseline;
     const investmentGrowthChart = (facet.dailyInvestments || []).map((inv: any) => {
       cumulative += inv.amount || 0;
       return {
@@ -232,6 +242,7 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
         balance,
         netCashFlow,
         netSavings,
+        savingsRate,
         totalIncome,
         totalExpenses,
         totalInvestments,
@@ -451,7 +462,7 @@ export async function getInvestmentAnalytics(filters?: AnalyticsFilter) {
       if (endDate) queryMatch.date.$lte = endDate;
     }
 
-    const [dbUser, facetResult, highestTx] = await Promise.all([
+    const [dbUser, facetResult, highestTx, priorInvestResult] = await Promise.all([
       User.findById(user.id).select("currency").lean(),
       Transaction.aggregate([
         { $match: queryMatch },
@@ -499,6 +510,12 @@ export async function getInvestmentAnalytics(filters?: AnalyticsFilter) {
         },
       ]),
       Transaction.findOne(queryMatch).sort({ amount: -1 }).select("item amount").lean(),
+      startDate
+        ? Transaction.aggregate([
+            { $match: { userId: user.id, type: "Investment", date: { $lt: startDate } } },
+            { $group: { _id: null, total: { $sum: "$amount" } } },
+          ])
+        : Promise.resolve([]),
     ]);
 
     const currency = (dbUser as any)?.currency || "USD";
@@ -515,7 +532,8 @@ export async function getInvestmentAnalytics(filters?: AnalyticsFilter) {
       amount: item.amount,
     }));
 
-    let cumulative = 0;
+    const priorBaseline = priorInvestResult?.[0]?.total || 0;
+    let cumulative = priorBaseline;
     const investmentGrowth = (facet.dailyInvestments || []).map((inv: any) => {
       cumulative += inv.amount || 0;
       return {

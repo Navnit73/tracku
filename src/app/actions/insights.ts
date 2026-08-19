@@ -121,7 +121,7 @@ function getPreviousPeriodBounds(start: Date | null, end: Date | null) {
   if (!start || !end) {
     const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate(), 23, 59, 59, 999);
     return {
       currentStart: thisMonthStart,
       currentEnd: now,
@@ -133,8 +133,11 @@ function getPreviousPeriodBounds(start: Date | null, end: Date | null) {
   // Proper calendar month shifting if starting on 1st of month
   if (start.getDate() === 1) {
     const prevStart = new Date(start.getFullYear(), start.getMonth() - 1, 1, 0, 0, 0, 0);
-    // End of previous month
-    const prevEnd = new Date(start.getFullYear(), start.getMonth(), 0, 23, 59, 59, 999);
+    const lastDayOfPrevMonth = new Date(start.getFullYear(), start.getMonth(), 0).getDate();
+    // If viewing current running month mid-month, compare identical days (MTD vs prior MTD)
+    const isCurrentMonthRunning = start.getMonth() === now.getMonth() && start.getFullYear() === now.getFullYear();
+    const dayToMatch = isCurrentMonthRunning ? Math.min(end.getDate(), lastDayOfPrevMonth) : lastDayOfPrevMonth;
+    const prevEnd = new Date(start.getFullYear(), start.getMonth() - 1, dayToMatch, 23, 59, 59, 999);
     return {
       currentStart: start,
       currentEnd: end,
@@ -303,15 +306,12 @@ export async function getComprehensiveFinancialInsights(
 
     // B2: Daily burn & velocity
     const now = new Date();
-    const daysElapsed = Math.max(
-      1,
-      Math.ceil(
-        (Math.min(now.getTime(), (periods.currentEnd || now).getTime()) -
-          (periods.currentStart || new Date(now.getFullYear(), now.getMonth(), 1)).getTime()) /
-          (1000 * 60 * 60 * 24)
-      )
-    );
-    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const targetDate = periods.currentStart || now;
+    const daysInMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0).getDate();
+    const periodStartMs = (periods.currentStart || new Date(now.getFullYear(), now.getMonth(), 1)).getTime();
+    const periodEndMs = Math.min(now.getTime(), (periods.currentEnd || now).getTime());
+    const rawElapsedDays = Math.max(1, Math.ceil((periodEndMs - periodStartMs) / (1000 * 60 * 60 * 24)));
+    const daysElapsed = Math.min(daysInMonth, rawElapsedDays);
     const dailyBurn = curExpenses / daysElapsed;
     const projectedTotal = dailyBurn * daysInMonth;
 
@@ -441,6 +441,9 @@ export async function getComprehensiveFinancialInsights(
     for (const [, group] of Object.entries(itemGroups)) {
       if (group.amounts.length < 3) continue;
 
+      // Chronologically sort dates to compute accurate interval deltas
+      group.dates.sort((a, b) => a.getTime() - b.getTime());
+
       const avg = group.amounts.reduce((s, a) => s + a, 0) / group.amounts.length;
       const variance =
         Math.sqrt(
@@ -448,31 +451,36 @@ export async function getComprehensiveFinancialInsights(
         ) / (avg || 1);
 
       if (variance <= 0.25) {
-        // Calculate average day interval between consecutive transactions
+        // Calculate average day interval between consecutive distinct transactions
         let totalIntervalDays = 0;
+        let intervalsCount = 0;
         for (let i = 1; i < group.dates.length; i++) {
-          totalIntervalDays += (group.dates[i].getTime() - group.dates[i - 1].getTime()) / (1000 * 60 * 60 * 24);
+          const diffDays = (group.dates[i].getTime() - group.dates[i - 1].getTime()) / (1000 * 60 * 60 * 24);
+          if (diffDays > 0) {
+            totalIntervalDays += diffDays;
+            intervalsCount++;
+          }
         }
-        const avgIntervalDays = group.dates.length > 1 ? totalIntervalDays / (group.dates.length - 1) : 30;
+        const avgIntervalDays = intervalsCount > 0 ? totalIntervalDays / intervalsCount : 30;
 
-        // Determine monthly frequency cleanly
-        let monthlyFreq = 1;
-        if (avgIntervalDays > 0) {
+        // Determine monthly frequency cleanly (minimum 4 days interval to qualify as recurring regular bill)
+        if (avgIntervalDays >= 4) {
+          let monthlyFreq = 1;
           if (avgIntervalDays >= 25 && avgIntervalDays <= 35) monthlyFreq = 1; // Monthly
           else if (avgIntervalDays >= 12 && avgIntervalDays <= 16) monthlyFreq = 2; // Bi-weekly
           else if (avgIntervalDays >= 6 && avgIntervalDays <= 8) monthlyFreq = 4.33; // Weekly
-          else monthlyFreq = Math.min(30, Math.max(0.5, 30 / avgIntervalDays));
-        }
+          else monthlyFreq = Math.min(10, Math.max(0.5, 30 / avgIntervalDays));
 
-        recurring.push({
-          item: group.item,
-          categoryName: group.category,
-          occurrences: group.amounts.length,
-          averageAmount: Math.round(avg * 100) / 100,
-          estimatedMonthly: Math.round(avg * monthlyFreq * 100) / 100,
-          lastDate: group.dates[group.dates.length - 1].toISOString(),
-          amountVariance: Math.round(variance * 100) / 100,
-        });
+          recurring.push({
+            item: group.item,
+            categoryName: group.category,
+            occurrences: group.amounts.length,
+            averageAmount: Math.round(avg * 100) / 100,
+            estimatedMonthly: Math.round(avg * monthlyFreq * 100) / 100,
+            lastDate: group.dates[group.dates.length - 1].toISOString(),
+            amountVariance: Math.round(variance * 100) / 100,
+          });
+        }
       }
     }
 
@@ -557,11 +565,12 @@ export async function getComprehensiveFinancialInsights(
       amount: item.amount || 0,
     }));
 
+    // True Net Worth = Total Retained Wealth (Total Income - Total Expenses = Liquid Cash + Total Investments)
     const netWorth: NetWorthSnapshot = {
       totalInvestments: totalAllInvestments,
       totalIncome: totalAllIncome,
       totalExpenses: totalAllExpenses,
-      netBalance: totalAllIncome - totalAllExpenses - totalAllInvestments,
+      netBalance: totalAllIncome - totalAllExpenses,
       investmentsByCategory,
     };
 
@@ -596,8 +605,12 @@ export async function getComprehensiveFinancialInsights(
       diversityScore = catValues.length === 0 ? 50 : 30;
     } else {
       const totalCat = catValues.reduce((s, v) => s + v, 0);
-      const hhi = catValues.reduce((sum, v) => sum + Math.pow(v / totalCat, 2), 0);
-      diversityScore = Math.round((1 - hhi) * 100);
+      if (totalCat === 0) {
+        diversityScore = 50;
+      } else {
+        const hhi = catValues.reduce((sum, v) => sum + Math.pow(v / totalCat, 2), 0);
+        diversityScore = Math.round((1 - hhi) * 100);
+      }
     }
 
     const savingsImprovement = rawSavingsRate - previousSavingsRate;

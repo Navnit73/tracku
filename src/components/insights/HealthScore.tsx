@@ -14,6 +14,15 @@ export function HealthScoreRing({ healthScore }: { healthScore: HealthScoreType 
   const progress = (score / 100) * circumference;
   const offset = circumference - progress;
 
+  const ringColor =
+    score >= 80
+      ? "var(--income)"
+      : score >= 60
+      ? "var(--sky-brand)"
+      : score >= 40
+      ? "var(--warning)"
+      : "var(--expense)";
+
   return (
     <div className="flex flex-col items-center gap-5">
       {/* Score Ring */}
@@ -34,7 +43,7 @@ export function HealthScoreRing({ healthScore }: { healthScore: HealthScoreType 
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke={color}
+            stroke={ringColor}
             strokeWidth={strokeWidth}
             fill="none"
             strokeDasharray={circumference}
@@ -48,7 +57,7 @@ export function HealthScoreRing({ healthScore }: { healthScore: HealthScoreType 
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span
             className="text-4xl font-black tracking-tight"
-            style={{ color }}
+            style={{ color: ringColor }}
           >
             {score}
           </span>

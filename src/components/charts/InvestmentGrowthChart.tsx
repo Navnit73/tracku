@@ -44,12 +44,15 @@ export const InvestmentGrowthChart = React.memo(function InvestmentGrowthChart({
     };
   });
 
+  const uniqueId = React.useId().replace(/:/g, "");
+  const purpleGradId = `purpleGrad-${uniqueId}`;
+
   return (
     <div className="w-full h-64 sm:h-72 lg:h-80">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={formattedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
-            <linearGradient id="purpleGrad" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id={purpleGradId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="var(--investment)" stopOpacity={0.35} />
               <stop offset="95%" stopColor="var(--investment)" stopOpacity={0} />
             </linearGradient>
@@ -88,7 +91,7 @@ export const InvestmentGrowthChart = React.memo(function InvestmentGrowthChart({
             name="cumulative"
             stroke="var(--investment)"
             fillOpacity={1}
-            fill="url(#purpleGrad)"
+            fill={`url(#${purpleGradId})`}
             strokeWidth={2.5}
           />
         </AreaChart>

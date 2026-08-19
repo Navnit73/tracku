@@ -370,15 +370,15 @@ export default function InsightsPage() {
               ) : netWorth ? (
                 <div className="space-y-4">
                   {/* Top-level net worth */}
-                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#7c3aed] to-[#5b21b6] text-white ">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#7c3aed] to-[#4c1d95] text-white shadow-md">
                     <div className="text-[10px] uppercase font-bold text-purple-200 tracking-wider">
-                      Net Surplus Balance
+                      Estimated Net Worth (Retained Wealth)
                     </div>
                     <div className="text-2xl sm:text-3xl font-black tracking-tight mt-0.5">
                       {formatCurrency(netWorth.netBalance, activeCurrency)}
                     </div>
                     <div className="text-[11px] text-purple-200 mt-1">
-                      Income − Expenses − Investments
+                      Liquid Cash ({formatCurrency(Math.max(0, netWorth.netBalance - netWorth.totalInvestments), activeCurrency)}) + Investments ({formatCurrency(netWorth.totalInvestments, activeCurrency)})
                     </div>
                   </div>
 

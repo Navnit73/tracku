@@ -428,7 +428,7 @@ export default function TransactionsPage() {
                             : "text-investment"
                         }`}
                       >
-                        {t.type === "Income" ? "+" : "-"}
+                        {t.type === "Income" ? "+" : t.type === "Expense" ? "-" : "+"}
                         {formatCurrency(t.amount, currency)}
                       </TableCell>
                       <TableCell className="text-xs text-ink-muted whitespace-nowrap">
@@ -501,7 +501,7 @@ export default function TransactionsPage() {
                           : "text-investment"
                       }`}
                     >
-                      {t.type === "Income" ? "+" : "-"}
+                      {t.type === "Income" ? "+" : t.type === "Expense" ? "-" : "+"}
                       {formatCurrency(t.amount, currency)}
                     </div>
                   </div>
