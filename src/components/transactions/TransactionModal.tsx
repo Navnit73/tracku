@@ -47,6 +47,12 @@ const PAYMENT_METHODS = [
   "Other",
 ];
 
+let categoryCache: { _id: string; name: string; type: string }[] | null = null;
+
+export function invalidateCategoryCache() {
+  categoryCache = null;
+}
+
 export function TransactionModal({
   isOpen,
   onClose,
@@ -58,7 +64,7 @@ export function TransactionModal({
   const { currency, currencySymbol } = useCurrency();
   const [type, setType] = useState<"Expense" | "Income" | "Investment">(defaultType);
   const [categories, setCategories] = useState<{ _id: string; name: string; type: string }[]>(
-    initialCategories || []
+    initialCategories || categoryCache || []
   );
   const [categoryId, setCategoryId] = useState("");
   const [item, setItem] = useState("");
@@ -74,6 +80,7 @@ export function TransactionModal({
 
   const fetchCategories = useCallback(async (selectedType: string) => {
     if (initialCategories && initialCategories.length > 0) {
+      categoryCache = initialCategories;
       setCategories(initialCategories);
       const matching = initialCategories.filter((c) => c.type === selectedType || c.type === "All");
       if (matching.length > 0 && !transactionToEdit) {
@@ -82,8 +89,18 @@ export function TransactionModal({
       return;
     }
 
+    if (categoryCache && categoryCache.length > 0) {
+      setCategories(categoryCache);
+      const matching = categoryCache.filter((c) => c.type === selectedType || c.type === "All");
+      if (matching.length > 0 && !transactionToEdit) {
+        setCategoryId(matching[0]._id);
+      }
+      return;
+    }
+
     const res = await getCategories("All");
     if (res.success && res.categories) {
+      categoryCache = res.categories;
       setCategories(res.categories);
       // Auto select first category matching type
       const matching = res.categories.filter((c) => c.type === selectedType || c.type === "All");

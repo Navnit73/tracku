@@ -3,7 +3,6 @@
 import { connectToDatabase } from "@/lib/db";
 import { Transaction } from "@/models/Transaction";
 import { Category } from "@/models/Category";
-import { User } from "@/models/User";
 import { requireAuthUser } from "@/lib/auth";
 import { transactionSchema, transactionFilterSchema, TransactionInput, TransactionFilterInput } from "@/lib/validations";
 import { getDateRangeBounds } from "@/lib/utils";
@@ -19,11 +18,8 @@ export async function getTransactions(filters: TransactionFilterInput) {
     const user = await requireAuthUser();
     await connectToDatabase();
 
-    const [dbUser, parsedFilters] = await Promise.all([
-      User.findById(user.id).select("currency").lean(),
-      Promise.resolve(transactionFilterSchema.parse(filters)),
-    ]);
-    const currency = (dbUser as any)?.currency || "USD";
+    const currency = user.currency || "USD";
+    const parsedFilters = transactionFilterSchema.parse(filters);
 
     const {
       search,
@@ -146,7 +142,7 @@ export async function createTransaction(input: TransactionInput) {
     await connectToDatabase();
 
     // 1. Authoritative Backend Freemium Limit Check
-    await assertCanCreateTransaction(user.id);
+    await assertCanCreateTransaction(user.id, user.email);
 
     const txDate = validated.date.includes("T") ? new Date(validated.date) : new Date(validated.date + "T12:00:00");
 
@@ -185,7 +181,7 @@ export async function createTransaction(input: TransactionInput) {
 export async function getBillingOverview() {
   try {
     const user = await requireAuthUser();
-    return await getUserTransactionUsage(user.id);
+    return await getUserTransactionUsage(user.id, user.email);
   } catch (error: any) {
     return {
       isPremium: false,

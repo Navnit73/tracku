@@ -5,7 +5,7 @@ import { getUserTransactionUsage } from "@/lib/subscription";
 export async function GET() {
   try {
     const user = await requireAuthUser();
-    const usage = await getUserTransactionUsage(user.id);
+    const usage = await getUserTransactionUsage(user.id, user.email);
 
     return NextResponse.json({
       success: true,

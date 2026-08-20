@@ -2,7 +2,6 @@
 
 import { connectToDatabase } from "@/lib/db";
 import { Transaction } from "@/models/Transaction";
-import { User } from "@/models/User";
 import { requireAuthUser } from "@/lib/auth";
 import { getDateRangeBounds } from "@/lib/utils";
 
@@ -18,6 +17,7 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
     await connectToDatabase();
 
     const range = filters?.dateRange || "This Month";
+    const isDefaultThisMonth = range === "This Month" && !filters?.startDate && !filters?.endDate;
     const { startDate, endDate } = getDateRangeBounds(range, filters?.startDate, filters?.endDate);
 
     const queryMatch: any = { userId: user.id };
@@ -30,116 +30,133 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
     const now = new Date();
     const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    // Parallel execution of all required queries using optimized MongoDB aggregations
-    const [dbUser, facetResult, monthlyResult, recentTxns, priorInvestResult] = await Promise.all([
-      User.findById(user.id).select("currency").lean(),
-      Transaction.aggregate([
-        { $match: queryMatch },
-        {
-          $facet: {
-            totalsByType: [
-              {
-                $group: {
-                  _id: "$type",
-                  total: { $sum: "$amount" },
-                },
+    // Parallel execution of required queries using optimized MongoDB aggregations
+    const facetPromise = Transaction.aggregate([
+      { $match: queryMatch },
+      {
+        $facet: {
+          totalsByType: [
+            {
+              $group: {
+                _id: "$type",
+                total: { $sum: "$amount" },
               },
-            ],
-            expenseCategories: [
-              { $match: { type: "Expense" } },
-              {
-                $group: {
-                  _id: "$categoryName",
-                  amount: { $sum: "$amount" },
-                },
+            },
+          ],
+          expenseCategories: [
+            { $match: { type: "Expense" } },
+            {
+              $group: {
+                _id: "$categoryName",
+                amount: { $sum: "$amount" },
               },
-              { $sort: { amount: -1 } },
-            ],
-            incomeCategories: [
-              { $match: { type: "Income" } },
-              {
-                $group: {
-                  _id: "$categoryName",
-                  amount: { $sum: "$amount" },
-                },
+            },
+            { $sort: { amount: -1 } },
+          ],
+          incomeCategories: [
+            { $match: { type: "Income" } },
+            {
+              $group: {
+                _id: "$categoryName",
+                amount: { $sum: "$amount" },
               },
-            ],
-            investmentCategories: [
-              { $match: { type: "Investment" } },
-              {
-                $group: {
-                  _id: "$categoryName",
-                  amount: { $sum: "$amount" },
-                },
+            },
+          ],
+          investmentCategories: [
+            { $match: { type: "Investment" } },
+            {
+              $group: {
+                _id: "$categoryName",
+                amount: { $sum: "$amount" },
               },
-            ],
-            expenseItems: [
-              { $match: { type: "Expense" } },
-              {
-                $group: {
-                  _id: "$item",
-                  totalAmount: { $sum: "$amount" },
-                  count: { $sum: 1 },
-                  lastDate: { $max: "$date" },
-                  categoryName: { $first: "$categoryName" },
-                },
+            },
+          ],
+          expenseItems: [
+            { $match: { type: "Expense" } },
+            {
+              $group: {
+                _id: "$item",
+                totalAmount: { $sum: "$amount" },
+                count: { $sum: 1 },
+                lastDate: { $max: "$date" },
+                categoryName: { $first: "$categoryName" },
               },
-              { $sort: { totalAmount: -1 } },
-              { $limit: 20 },
-            ],
-            dailyTrends: [
-              {
-                $group: {
-                  _id: {
-                    date: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
-                    type: "$type",
-                  },
-                  total: { $sum: "$amount" },
+            },
+            { $sort: { totalAmount: -1 } },
+            { $limit: 20 },
+          ],
+          dailyTrends: [
+            {
+              $group: {
+                _id: {
+                  date: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+                  type: "$type",
                 },
+                total: { $sum: "$amount" },
               },
-              { $sort: { "_id.date": 1 } },
-            ],
-            dailyInvestments: [
-              { $match: { type: "Investment" } },
-              {
-                $group: {
-                  _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
-                  amount: { $sum: "$amount" },
-                },
+            },
+            { $sort: { "_id.date": 1 } },
+          ],
+          dailyInvestments: [
+            { $match: { type: "Investment" } },
+            {
+              $group: {
+                _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+                amount: { $sum: "$amount" },
               },
-              { $sort: { _id: 1 } },
-            ],
-          },
+            },
+            { $sort: { _id: 1 } },
+          ],
+          recentTransactions: [
+            { $sort: { date: -1 } },
+            { $limit: 6 },
+            {
+              $project: {
+                type: 1,
+                categoryName: 1,
+                item: 1,
+                amount: 1,
+                date: 1,
+                paymentMethod: 1,
+              },
+            },
+          ],
         },
-      ]),
-      Transaction.aggregate([
-        {
-          $match: {
-            userId: user.id,
-            date: { $gte: startOfCurrentMonth },
-          },
-        },
-        {
-          $group: {
-            _id: "$type",
-            total: { $sum: "$amount" },
-          },
-        },
-      ]),
-      Transaction.find(queryMatch)
-        .select("type categoryName item amount date paymentMethod")
-        .sort({ date: -1 })
-        .limit(6)
-        .lean(),
-      startDate
-        ? Transaction.aggregate([
-            { $match: { userId: user.id, type: "Investment", date: { $lt: startDate } } },
-            { $group: { _id: null, total: { $sum: "$amount" } } },
-          ])
-        : Promise.resolve([]),
+      },
     ]);
 
-    const currency = (dbUser as any)?.currency || "USD";
+    // Only run separate monthly aggregation if the current filter is not already "This Month"
+    const monthlyPromise = isDefaultThisMonth
+      ? Promise.resolve(null)
+      : Transaction.aggregate([
+          {
+            $match: {
+              userId: user.id,
+              date: { $gte: startOfCurrentMonth },
+            },
+          },
+          {
+            $group: {
+              _id: "$type",
+              total: { $sum: "$amount" },
+            },
+          },
+        ]);
+
+    const priorInvestPromise = startDate
+      ? Transaction.aggregate([
+          { $match: { userId: user.id, type: "Investment", date: { $lt: startDate } } },
+          { $group: { _id: null, total: { $sum: "$amount" } } },
+        ])
+      : Promise.resolve([]);
+
+    const [facetResult, monthlyResult, priorInvestResult] = await Promise.all([
+      facetPromise,
+      monthlyPromise,
+      priorInvestPromise,
+    ]);
+
+    const currency = user.currency || "USD";
     const facet = facetResult[0] || {};
 
     let totalIncome = 0;
@@ -163,7 +180,9 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
     let monthlyExpenses = 0;
     let monthlyInvestments = 0;
 
-    (monthlyResult || []).forEach((m: any) => {
+    // Use monthlyResult if calculated, otherwise fallback directly to facet totals (for "This Month")
+    const monthlySource = monthlyResult !== null ? monthlyResult : (facet.totalsByType || []);
+    (monthlySource || []).forEach((m: any) => {
       if (m._id === "Income") monthlyIncome = m.total || 0;
       else if (m._id === "Expense") monthlyExpenses = m.total || 0;
       else if (m._id === "Investment") monthlyInvestments = m.total || 0;
@@ -224,8 +243,8 @@ export async function getDashboardAnalytics(filters?: AnalyticsFilter) {
       };
     });
 
-    // Recent 6 transactions formatted
-    const recentTransactions = (recentTxns || []).map((t: any) => ({
+    // Recent 6 transactions formatted from embedded facet pipeline
+    const recentTransactions = (facet.recentTransactions || []).map((t: any) => ({
       _id: t._id.toString(),
       type: t.type,
       categoryName: t.categoryName,
@@ -283,8 +302,7 @@ export async function getExpenseAnalytics(filters?: AnalyticsFilter) {
       if (endDate) queryMatch.date.$lte = endDate;
     }
 
-    const [dbUser, facetResult, highestTx] = await Promise.all([
-      User.findById(user.id).select("currency").lean(),
+    const [facetResult, highestTx] = await Promise.all([
       Transaction.aggregate([
         { $match: queryMatch },
         {
@@ -327,7 +345,7 @@ export async function getExpenseAnalytics(filters?: AnalyticsFilter) {
       Transaction.findOne(queryMatch).sort({ amount: -1 }).select("item amount").lean(),
     ]);
 
-    const currency = (dbUser as any)?.currency || "USD";
+    const currency = user.currency || "USD";
     const facet = facetResult[0] || {};
     const stats = facet.stats?.[0] || { totalExpense: 0, highestExpense: 0, averageExpense: 0, count: 0 };
 
@@ -376,8 +394,7 @@ export async function getIncomeAnalytics(filters?: AnalyticsFilter) {
       if (endDate) queryMatch.date.$lte = endDate;
     }
 
-    const [dbUser, facetResult, highestTx] = await Promise.all([
-      User.findById(user.id).select("currency").lean(),
+    const [facetResult, highestTx] = await Promise.all([
       Transaction.aggregate([
         { $match: queryMatch },
         {
@@ -417,7 +434,7 @@ export async function getIncomeAnalytics(filters?: AnalyticsFilter) {
       Transaction.findOne(queryMatch).sort({ amount: -1 }).select("item amount").lean(),
     ]);
 
-    const currency = (dbUser as any)?.currency || "USD";
+    const currency = user.currency || "USD";
     const facet = facetResult[0] || {};
     const stats = facet.stats?.[0] || { totalIncome: 0, highestIncome: 0, averageIncome: 0, count: 0 };
 
@@ -462,8 +479,7 @@ export async function getInvestmentAnalytics(filters?: AnalyticsFilter) {
       if (endDate) queryMatch.date.$lte = endDate;
     }
 
-    const [dbUser, facetResult, highestTx, priorInvestResult] = await Promise.all([
-      User.findById(user.id).select("currency").lean(),
+    const [facetResult, highestTx, priorInvestResult] = await Promise.all([
       Transaction.aggregate([
         { $match: queryMatch },
         {
@@ -518,7 +534,7 @@ export async function getInvestmentAnalytics(filters?: AnalyticsFilter) {
         : Promise.resolve([]),
     ]);
 
-    const currency = (dbUser as any)?.currency || "USD";
+    const currency = user.currency || "USD";
     const facet = facetResult[0] || {};
     const stats = facet.stats?.[0] || { totalInvested: 0, largestInvestment: 0, averageInvestment: 0, count: 0 };
 

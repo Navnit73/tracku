@@ -2,7 +2,6 @@
 
 import { connectToDatabase } from "@/lib/db";
 import { Transaction } from "@/models/Transaction";
-import { User } from "@/models/User";
 import { requireAuthUser } from "@/lib/auth";
 import { getDateRangeBounds, formatCurrency } from "@/lib/utils";
 
@@ -174,9 +173,8 @@ export async function getComprehensiveFinancialInsights(
     const sessionUser = await requireAuthUser();
     await connectToDatabase();
 
-    // 1. Fetch user currency & settings in 1 DB query
-    const dbUser = await User.findById(sessionUser.id).select("currency").lean();
-    const currency = (dbUser as any)?.currency || "USD";
+    // 1. Fetch user currency & settings directly from authenticated session
+    const currency = sessionUser.currency || "USD";
     const fmt = (amt: number) => formatCurrency(amt, currency);
 
     const range = filters?.dateRange || "This Month";

@@ -73,6 +73,7 @@ const SubscriptionSchema = new Schema<ISubscription>(
 );
 
 // Targeted compound indexes for high-frequency user-scoped queries and background sync
+SubscriptionSchema.index({ userId: 1, status: 1, createdAt: -1 });
 SubscriptionSchema.index({ userId: 1, status: 1 });
 SubscriptionSchema.index({ status: 1, currentPeriodEnd: 1 });
 SubscriptionSchema.index({ userId: 1, createdAt: -1 });

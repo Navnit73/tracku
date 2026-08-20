@@ -9,9 +9,6 @@ export const FREE_TIER_LIMIT = 40;
 /**
  * Whitelist of email addresses that receive permanent full access (Lifetime Pro VIP)
  * without requiring payment or subscription renewals.
- * 
- * To add more emails in the future, simply add them to this list, or define
- * FULL_ACCESS_EMAILS="email1@example.com,email2@example.com" in your .env.local file.
  */
 export const FULL_ACCESS_EMAILS: string[] = [
   "navnitrai5389@gmail.com",
@@ -67,18 +64,25 @@ export interface UserSubscriptionUsage {
  * Authoritatively determines whether a user currently holds active premium privileges.
  * Checks if user is VIP whitelisted or has an ACTIVE / CANCEL_AT_PERIOD_END subscription.
  */
-export async function hasActiveSubscription(userId: string): Promise<boolean> {
+export async function hasActiveSubscription(userId: string, userEmail?: string | null): Promise<boolean> {
+  // 1. Fast path: check VIP whitelist on provided email
+  if (userEmail && isWhitelistedEmail(userEmail)) {
+    return true;
+  }
+
   await connectToDatabase();
 
-  // 1. Check if user is in VIP whitelist
-  const user = await User.findById(userId).select("email").lean<{ email?: string } | null>();
-  if (user?.email && isWhitelistedEmail(user.email)) {
-    return true;
+  // 2. Check DB email if not provided in session
+  if (!userEmail) {
+    const user = await User.findById(userId).select("email").lean<{ email?: string } | null>();
+    if (user?.email && isWhitelistedEmail(user.email)) {
+      return true;
+    }
   }
 
   const now = new Date();
 
-  // 2. Find the most recent active subscription
+  // 3. Find the most recent active subscription using compound index
   const activeSub = await Subscription.findOne({
     userId,
     status: { $in: ["ACTIVE", "CANCEL_AT_PERIOD_END"] },
@@ -94,7 +98,6 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
   if (activeSub.currentPeriodEnd) {
     const periodEnd = new Date(activeSub.currentPeriodEnd);
     if (periodEnd.getTime() < now.getTime()) {
-      // Period has naturally expired
       return false;
     }
   }
@@ -118,22 +121,30 @@ export async function getUserSubscription(userId: string): Promise<ISubscription
 
 /**
  * Returns comprehensive transaction count and billing status for a user.
+ * Accepts optional userEmail to eliminate unnecessary User model queries.
  */
-export async function getUserTransactionUsage(userId: string): Promise<UserSubscriptionUsage> {
+export async function getUserTransactionUsage(userId: string, userEmail?: string | null): Promise<UserSubscriptionUsage> {
   await connectToDatabase();
 
-  const [user, transactionCount, subRecord] = await Promise.all([
-    User.findById(userId).select("email").lean<{ email?: string } | null>(),
+  const isVip = isWhitelistedEmail(userEmail);
+
+  // If email was not passed, resolve email in parallel with count
+  const needUserFetch = !userEmail && !isVip;
+
+  const [userDoc, transactionCount, subRecord] = await Promise.all([
+    needUserFetch ? User.findById(userId).select("email").lean<{ email?: string } | null>() : Promise.resolve(null),
     Transaction.countDocuments({ userId }),
-    Subscription.findOne({
-      userId,
-      status: { $in: ["ACTIVE", "CANCEL_AT_PERIOD_END", "PENDING", "PAST_DUE", "HALTED"] },
-    })
-      .sort({ createdAt: -1 })
-      .lean<ISubscription | null>(),
+    !isVip
+      ? Subscription.findOne({
+          userId,
+          status: { $in: ["ACTIVE", "CANCEL_AT_PERIOD_END", "PENDING", "PAST_DUE", "HALTED"] },
+        })
+          .sort({ createdAt: -1 })
+          .lean<ISubscription | null>()
+      : Promise.resolve(null),
   ]);
 
-  const isVip = isWhitelistedEmail(user?.email);
+  const finalIsVip = isVip || isWhitelistedEmail(userDoc?.email);
   const now = new Date();
 
   let isSubscribed = false;
@@ -146,13 +157,12 @@ export async function getUserTransactionUsage(userId: string): Promise<UserSubsc
     }
   }
 
-  const isPremium = isVip || isSubscribed;
-
+  const isPremium = finalIsVip || isSubscribed;
   const canCreate = isPremium || transactionCount < FREE_TIER_LIMIT;
   const remainingFreeTransactions = isPremium ? 999999 : Math.max(0, FREE_TIER_LIMIT - transactionCount);
 
   let formattedSub = null;
-  if (isVip) {
+  if (finalIsVip) {
     formattedSub = {
       id: "vip_lifetime_access",
       plan: "LIFETIME_VIP",
@@ -204,8 +214,8 @@ export async function getUserTransactionUsage(userId: string): Promise<UserSubsc
  * Authoritatively asserts that a user is permitted to create a new transaction.
  * Throws a typed exception if free tier limit is reached without premium access.
  */
-export async function assertCanCreateTransaction(userId: string): Promise<void> {
-  const usage = await getUserTransactionUsage(userId);
+export async function assertCanCreateTransaction(userId: string, userEmail?: string | null): Promise<void> {
+  const usage = await getUserTransactionUsage(userId, userEmail);
 
   if (!usage.canCreate) {
     const error: any = new Error(

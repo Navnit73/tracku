@@ -9,6 +9,7 @@ import { CategoryModal } from "@/components/categories/CategoryModal";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getCategories, deleteCategory, clearAllCategories } from "@/app/actions/categories";
+import { invalidateCategoryCache } from "@/components/transactions/TransactionModal";
 import { showToast, confirmDialog } from "@/lib/toast";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { Tag, Plus, Edit2, Trash2, Trash, FolderTree } from "lucide-react";
@@ -22,6 +23,7 @@ export default function CategoriesPage() {
   const [selectedCategory, setSelectedCategory] = useState<any | null>(null);
 
   const fetchCategoryData = async () => {
+    invalidateCategoryCache();
     setLoading(true);
     const res = await getCategories(activeType);
     if (res.success && res.categories) {
