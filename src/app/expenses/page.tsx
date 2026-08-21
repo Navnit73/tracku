@@ -11,6 +11,7 @@ import { LazyCategoryPieChart } from "@/components/charts/LazyCharts";
 import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getExpenseAnalytics } from "@/app/actions/analytics";
+import { getClientCache, setClientCache } from "@/lib/clientCache";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/CurrencyProvider";
 import { TrendingDown, ShoppingBag, Plus, Sparkles, CreditCard, Receipt } from "lucide-react";
@@ -29,15 +30,30 @@ export default function ExpensesPage() {
   const activeCurrency = analytics?.currency || currency;
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
-    const analyticsRes = await getExpenseAnalytics({
-      dateRange: datePreset,
-      startDate: customStart,
-      endDate: customEnd,
-    });
+    const cacheKey = `expenses_${datePreset}_${customStart || ""}_${customEnd || ""}`;
+    const cached = getClientCache<any>(cacheKey);
 
-    if (analyticsRes.success) setAnalytics(analyticsRes);
-    setLoading(false);
+    if (cached) {
+      setAnalytics(cached);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
+    try {
+      const analyticsRes = await getExpenseAnalytics({
+        dateRange: datePreset,
+        startDate: customStart,
+        endDate: customEnd,
+      });
+
+      if (analyticsRes.success) {
+        setAnalytics(analyticsRes);
+        setClientCache(cacheKey, analyticsRes, 120000);
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [datePreset, customStart, customEnd]);
 
   useEffect(() => {

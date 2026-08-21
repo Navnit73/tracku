@@ -207,11 +207,85 @@ export async function getComprehensiveFinancialInsights(
       date: { $gte: lookbackDate },
     };
 
-    // Execute in parallel with projections & database aggregations for maximum speed
-    const [currentTxns, previousTxns, recurringTxns, allTimeSummary, allTimeInvestCats] = await Promise.all([
-      Transaction.find(currentQuery).select("type categoryName item amount date").sort({ date: 1 }).lean(),
-      Transaction.find(previousQuery).select("type categoryName item amount date").lean(),
-      Transaction.find(recurringQuery).select("type categoryName item amount date").sort({ date: 1 }).lean(),
+    // Execute optimized native MongoDB aggregations concurrently for blazing speed
+    const [currentFacetRes, previousFacetRes, recurringRaw, allTimeSummary, allTimeInvestCats] = await Promise.all([
+      Transaction.aggregate([
+        { $match: currentQuery },
+        {
+          $facet: {
+            totalsByType: [
+              {
+                $group: {
+                  _id: "$type",
+                  total: { $sum: "$amount" },
+                },
+              },
+            ],
+            expenseCategories: [
+              { $match: { type: "Expense" } },
+              {
+                $group: {
+                  _id: "$categoryName",
+                  amount: { $sum: "$amount" },
+                },
+              },
+              { $sort: { amount: -1 } },
+            ],
+            expenseItems: [
+              { $match: { type: "Expense" } },
+              {
+                $group: {
+                  _id: "$item",
+                  total: { $sum: "$amount" },
+                  count: { $sum: 1 },
+                  category: { $first: "$categoryName" },
+                },
+              },
+              { $sort: { total: -1 } },
+            ],
+          },
+        },
+      ]),
+      Transaction.aggregate([
+        { $match: previousQuery },
+        {
+          $facet: {
+            totalsByType: [
+              {
+                $group: {
+                  _id: "$type",
+                  total: { $sum: "$amount" },
+                },
+              },
+            ],
+            expenseCategories: [
+              { $match: { type: "Expense" } },
+              {
+                $group: {
+                  _id: "$categoryName",
+                  amount: { $sum: "$amount" },
+                },
+              },
+            ],
+          },
+        },
+      ]),
+      Transaction.aggregate([
+        { $match: recurringQuery },
+        {
+          $group: {
+            _id: { $toLower: { $trim: { input: "$item" } } },
+            item: { $first: "$item" },
+            category: { $first: "$categoryName" },
+            amounts: { $push: "$amount" },
+            dates: { $push: "$date" },
+            count: { $sum: 1 },
+            avgAmount: { $avg: "$amount" },
+            lastDate: { $max: "$date" },
+          },
+        },
+        { $match: { count: { $gte: 3 } } },
+      ]),
       Transaction.aggregate([
         { $match: { userId: sessionUser.id } },
         {
@@ -234,34 +308,44 @@ export async function getComprehensiveFinancialInsights(
     ]);
 
     // ────────────────────────────────────────────────────────────────────────
-    // Computation A: Current vs Previous Period Aggregation
+    // Computation A: Current vs Previous Period Extraction
     // ────────────────────────────────────────────────────────────────────────
-    let curIncome = 0, curExpenses = 0, curInvestments = 0;
-    const curCatMap: Record<string, number> = {};
-    const curItemMap: Record<string, { count: number; total: number; category: string }> = {};
+    const curFacet = currentFacetRes[0] || {};
+    const prevFacet = previousFacetRes[0] || {};
 
-    currentTxns.forEach((t: any) => {
-      const amt = Number(t.amount) || 0;
-      if (t.type === "Income") curIncome += amt;
-      else if (t.type === "Expense") {
-        curExpenses += amt;
-        curCatMap[t.categoryName] = (curCatMap[t.categoryName] || 0) + amt;
-        if (!curItemMap[t.item]) curItemMap[t.item] = { count: 0, total: 0, category: t.categoryName };
-        curItemMap[t.item].count++;
-        curItemMap[t.item].total += amt;
-      } else if (t.type === "Investment") curInvestments += amt;
+    let curIncome = 0, curExpenses = 0, curInvestments = 0;
+    (curFacet.totalsByType || []).forEach((t: any) => {
+      const amt = Number(t.total) || 0;
+      if (t._id === "Income") curIncome = amt;
+      else if (t._id === "Expense") curExpenses = amt;
+      else if (t._id === "Investment") curInvestments = amt;
+    });
+
+    const curCatMap: Record<string, number> = {};
+    (curFacet.expenseCategories || []).forEach((c: any) => {
+      curCatMap[c._id] = Number(c.amount) || 0;
+    });
+
+    const curItemMap: Record<string, { count: number; total: number; category: string }> = {};
+    (curFacet.expenseItems || []).forEach((item: any) => {
+      curItemMap[item._id] = {
+        count: item.count || 0,
+        total: Number(item.total) || 0,
+        category: item.category || "General",
+      };
     });
 
     let prevIncome = 0, prevExpenses = 0, prevInvestments = 0;
-    const prevCatMap: Record<string, number> = {};
+    (prevFacet.totalsByType || []).forEach((t: any) => {
+      const amt = Number(t.total) || 0;
+      if (t._id === "Income") prevIncome = amt;
+      else if (t._id === "Expense") prevExpenses = amt;
+      else if (t._id === "Investment") prevInvestments = amt;
+    });
 
-    previousTxns.forEach((t: any) => {
-      const amt = Number(t.amount) || 0;
-      if (t.type === "Income") prevIncome += amt;
-      else if (t.type === "Expense") {
-        prevExpenses += amt;
-        prevCatMap[t.categoryName] = (prevCatMap[t.categoryName] || 0) + amt;
-      } else if (t.type === "Investment") prevInvestments += amt;
+    const prevCatMap: Record<string, number> = {};
+    (prevFacet.expenseCategories || []).forEach((c: any) => {
+      prevCatMap[c._id] = Number(c.amount) || 0;
     });
 
     // ────────────────────────────────────────────────────────────────────────
@@ -421,39 +505,29 @@ export async function getComprehensiveFinancialInsights(
     }
 
     // ────────────────────────────────────────────────────────────────────────
-    // Computation C: Recurring Expenses Detection
+    // Computation C: Recurring Expenses Detection via DB aggregation results
     // ────────────────────────────────────────────────────────────────────────
-    const itemGroups: Record<string, { item: string; category: string; amounts: number[]; dates: Date[] }> = {};
-
-    recurringTxns.forEach((e: any) => {
-      const key = e.item.toLowerCase().trim();
-      if (!itemGroups[key]) {
-        itemGroups[key] = { item: e.item, category: e.categoryName, amounts: [], dates: [] };
-      }
-      itemGroups[key].amounts.push(Number(e.amount) || 0);
-      itemGroups[key].dates.push(new Date(e.date));
-    });
-
     const recurring: RecurringExpense[] = [];
 
-    for (const [, group] of Object.entries(itemGroups)) {
-      if (group.amounts.length < 3) continue;
+    (recurringRaw || []).forEach((group: any) => {
+      const amounts: number[] = group.amounts || [];
+      const dates: Date[] = (group.dates || [])
+        .map((d: any) => new Date(d))
+        .sort((a: Date, b: Date) => a.getTime() - b.getTime());
 
-      // Chronologically sort dates to compute accurate interval deltas
-      group.dates.sort((a, b) => a.getTime() - b.getTime());
+      if (amounts.length < 3) return;
 
-      const avg = group.amounts.reduce((s, a) => s + a, 0) / group.amounts.length;
+      const avg = group.avgAmount || (amounts.reduce((s: number, a: number) => s + a, 0) / amounts.length);
       const variance =
         Math.sqrt(
-          group.amounts.reduce((sum, a) => sum + Math.pow(a - avg, 2), 0) / group.amounts.length
+          amounts.reduce((sum: number, a: number) => sum + Math.pow(a - avg, 2), 0) / amounts.length
         ) / (avg || 1);
 
       if (variance <= 0.25) {
-        // Calculate average day interval between consecutive distinct transactions
         let totalIntervalDays = 0;
         let intervalsCount = 0;
-        for (let i = 1; i < group.dates.length; i++) {
-          const diffDays = (group.dates[i].getTime() - group.dates[i - 1].getTime()) / (1000 * 60 * 60 * 24);
+        for (let i = 1; i < dates.length; i++) {
+          const diffDays = (dates[i].getTime() - dates[i - 1].getTime()) / (1000 * 60 * 60 * 24);
           if (diffDays > 0) {
             totalIntervalDays += diffDays;
             intervalsCount++;
@@ -461,26 +535,25 @@ export async function getComprehensiveFinancialInsights(
         }
         const avgIntervalDays = intervalsCount > 0 ? totalIntervalDays / intervalsCount : 30;
 
-        // Determine monthly frequency cleanly (minimum 4 days interval to qualify as recurring regular bill)
         if (avgIntervalDays >= 4) {
           let monthlyFreq = 1;
-          if (avgIntervalDays >= 25 && avgIntervalDays <= 35) monthlyFreq = 1; // Monthly
-          else if (avgIntervalDays >= 12 && avgIntervalDays <= 16) monthlyFreq = 2; // Bi-weekly
-          else if (avgIntervalDays >= 6 && avgIntervalDays <= 8) monthlyFreq = 4.33; // Weekly
+          if (avgIntervalDays >= 25 && avgIntervalDays <= 35) monthlyFreq = 1;
+          else if (avgIntervalDays >= 12 && avgIntervalDays <= 16) monthlyFreq = 2;
+          else if (avgIntervalDays >= 6 && avgIntervalDays <= 8) monthlyFreq = 4.33;
           else monthlyFreq = Math.min(10, Math.max(0.5, 30 / avgIntervalDays));
 
           recurring.push({
             item: group.item,
-            categoryName: group.category,
-            occurrences: group.amounts.length,
+            categoryName: group.category || "General",
+            occurrences: amounts.length,
             averageAmount: Math.round(avg * 100) / 100,
             estimatedMonthly: Math.round(avg * monthlyFreq * 100) / 100,
-            lastDate: group.dates[group.dates.length - 1].toISOString(),
+            lastDate: group.lastDate ? new Date(group.lastDate).toISOString() : dates[dates.length - 1].toISOString(),
             amountVariance: Math.round(variance * 100) / 100,
           });
         }
       }
-    }
+    });
 
     recurring.sort((a, b) => b.estimatedMonthly - a.estimatedMonthly);
     const totalMonthlyRecurring = Math.round(recurring.reduce((s, r) => s + r.estimatedMonthly, 0) * 100) / 100;

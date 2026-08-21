@@ -42,7 +42,9 @@ const TransactionSchema = new Schema<ITransaction>(
 
 // Targeted compound indexes for high-frequency user-scoped queries & aggregations (Covered queries)
 TransactionSchema.index({ userId: 1, date: -1, type: 1, amount: 1 });
+TransactionSchema.index({ userId: 1, type: 1, amount: -1, date: -1 });
 TransactionSchema.index({ userId: 1, type: 1, date: -1, categoryName: 1, amount: 1 });
+TransactionSchema.index({ userId: 1, type: 1, categoryName: 1, amount: -1 });
 TransactionSchema.index({ userId: 1, type: 1, date: -1 });
 TransactionSchema.index({ userId: 1, date: -1, type: 1 });
 TransactionSchema.index({ userId: 1, categoryId: 1, date: -1 });

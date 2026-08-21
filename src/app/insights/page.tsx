@@ -13,6 +13,7 @@ import { MonthComparisonChart } from "@/components/insights/MonthComparison";
 import { SavingsGauge } from "@/components/insights/SavingsGauge";
 import { getComprehensiveFinancialInsights } from "@/app/actions/insights";
 import { clearAllUserData } from "@/app/actions/transactions";
+import { getClientCache, setClientCache, invalidateClientCache } from "@/lib/clientCache";
 import { formatCurrency } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/CurrencyProvider";
 import type {
@@ -58,30 +59,45 @@ export default function InsightsPage() {
 
   const activeCurrency = serverCurrency || currency;
 
+  const applyInsightsData = useCallback((res: any) => {
+    if (res.currency) setServerCurrency(res.currency);
+    setInsights(res.insights || []);
+    setRecurring(res.recurring || []);
+    setTotalMonthlyRecurring(res.totalMonthlyRecurring || 0);
+    setComparison(res.comparison);
+    setSavings(res.savings);
+    setNetWorth(res.netWorth);
+    setHealthScore(res.healthScore);
+  }, []);
+
   const fetchAll = useCallback(async () => {
-    setLoading(true);
+    const cacheKey = `insights_${datePreset}_${customStart || ""}_${customEnd || ""}`;
+    const cached = getClientCache<any>(cacheKey);
 
-    const res = await getComprehensiveFinancialInsights({
-      dateRange: datePreset,
-      startDate: customStart,
-      endDate: customEnd,
-    });
-
-    if (res.success) {
-      if (res.currency) setServerCurrency(res.currency);
-      setInsights(res.insights || []);
-      setRecurring(res.recurring || []);
-      setTotalMonthlyRecurring(res.totalMonthlyRecurring || 0);
-      setComparison(res.comparison);
-      setSavings(res.savings);
-      setNetWorth(res.netWorth);
-      setHealthScore(res.healthScore);
+    if (cached) {
+      applyInsightsData(cached);
+      setLoading(false);
     } else {
-      showToast.error("Insights Error", res.error);
+      setLoading(true);
     }
 
-    setLoading(false);
-  }, [datePreset, customStart, customEnd]);
+    try {
+      const res = await getComprehensiveFinancialInsights({
+        dateRange: datePreset,
+        startDate: customStart,
+        endDate: customEnd,
+      });
+
+      if (res.success) {
+        applyInsightsData(res);
+        setClientCache(cacheKey, res, 120000);
+      } else {
+        showToast.error("Insights Error", res.error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [datePreset, customStart, customEnd, applyInsightsData]);
 
   useEffect(() => {
     fetchAll();
@@ -100,6 +116,7 @@ export default function InsightsPage() {
       setClearing(false);
       if (res.success) {
         showToast.success("Data Cleared!", res.message);
+        invalidateClientCache();
         fetchAll();
       } else {
         showToast.error("Clear Failed", res.error);

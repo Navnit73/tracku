@@ -45,7 +45,7 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
     isLoading: true,
   });
 
-  const fetchBilling = useCallback(async () => {
+  const fetchBilling = useCallback(async (force = false) => {
     if (status !== "authenticated" || !session?.user) {
       if (status === "unauthenticated") {
         setBillingState((prev) => ({ ...prev, isLoading: false }));
@@ -53,11 +53,24 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Check memory / session cache if not forced
+    const now = Date.now();
+    const cachedBilling = typeof window !== "undefined" ? sessionStorage.getItem("billing_cache") : null;
+    if (!force && cachedBilling) {
+      try {
+        const parsed = JSON.parse(cachedBilling);
+        if (now - parsed.timestamp < 180000 && parsed.data) {
+          setBillingState({ ...parsed.data, isLoading: false });
+          return;
+        }
+      } catch {}
+    }
+
     try {
       const res = await fetch("/api/billing/status");
       const data = await res.json();
       if (data.success) {
-        setBillingState({
+        const newState = {
           isPremium: data.isPremium ?? false,
           canCreate: data.canCreate ?? true,
           transactionCount: data.transactionCount ?? 0,
@@ -65,7 +78,11 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
           remainingFreeTransactions: data.remainingFreeTransactions ?? 40,
           subscription: data.subscription ?? null,
           isLoading: false,
-        });
+        };
+        setBillingState(newState);
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("billing_cache", JSON.stringify({ timestamp: now, data: newState }));
+        }
       } else {
         setBillingState((prev) => ({ ...prev, isLoading: false }));
       }
@@ -75,14 +92,14 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
   }, [status, session?.user]);
 
   useEffect(() => {
-    fetchBilling();
+    fetchBilling(false);
   }, [fetchBilling]);
 
   return (
     <BillingContext.Provider
       value={{
         ...billingState,
-        refreshBilling: fetchBilling,
+        refreshBilling: () => fetchBilling(true),
       }}
     >
       {children}

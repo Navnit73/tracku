@@ -338,6 +338,7 @@ export async function getExpenseAnalytics(filters?: AnalyticsFilter) {
                 },
               },
               { $sort: { count: -1 } },
+              { $limit: 10 },
             ],
           },
         },

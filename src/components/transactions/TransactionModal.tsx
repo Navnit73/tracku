@@ -11,6 +11,8 @@ import { getCategories } from "@/app/actions/categories";
 import { showToast } from "@/lib/toast";
 import { formatCurrency } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/CurrencyProvider";
+import { useBilling } from "@/components/providers/BillingProvider";
+import { invalidateClientCache } from "@/lib/clientCache";
 import { PricingModal } from "@/components/billing/PricingModal";
 
 export interface TransactionModalProps {
@@ -62,6 +64,7 @@ export function TransactionModal({
   initialCategories,
 }: TransactionModalProps) {
   const { currency, currencySymbol } = useCurrency();
+  const { refreshBilling } = useBilling();
   const [type, setType] = useState<"Expense" | "Income" | "Investment">(defaultType);
   const [categories, setCategories] = useState<{ _id: string; name: string; type: string }[]>(
     initialCategories || categoryCache || []
@@ -199,6 +202,8 @@ export function TransactionModal({
     setIsLoading(false);
 
     if (res.success) {
+      invalidateClientCache();
+      refreshBilling();
       showToast.success(
         transactionToEdit ? "Transaction Updated" : "Transaction Created",
         `Successfully saved ${payload.item} (${formatCurrency(payload.amount, currency)})`
