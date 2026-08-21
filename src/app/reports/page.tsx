@@ -11,6 +11,7 @@ import { InsightCard } from "@/components/insights/InsightCard";
 import { getTransactions } from "@/app/actions/transactions";
 import { getComprehensiveFinancialInsights } from "@/app/actions/insights";
 import type { InsightItem, MonthComparisonCategory, HealthScore, MonthComparison } from "@/app/actions/insights";
+import { getClientCache, setClientCache } from "@/lib/clientCache";
 import { downloadTransactionsCSV } from "@/lib/csvExport";
 import { formatCurrency } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/CurrencyProvider";
@@ -44,32 +45,46 @@ export default function ReportsPage() {
 
   const activeCurrency = serverCurrency || currency;
 
+  const applyReportData = useCallback((res: any) => {
+    if (res.currency) setServerCurrency(res.currency);
+    setComparison(res.comparison);
+    setInsights((res.insights || []).slice(0, 3));
+    if (res.comparison) {
+      setCategories(res.comparison.categories || []);
+    }
+    if (res.savings) {
+      setSavingsRate(res.savings.savingsRate);
+    }
+    if (res.healthScore) {
+      setHealthScore(res.healthScore);
+    }
+  }, []);
+
   const fetchData = useCallback(async () => {
-    setLoading(true);
-    const filters = { dateRange: datePreset, startDate: customStart, endDate: customEnd };
+    const cacheKey = `reports_${datePreset}_${customStart || ""}_${customEnd || ""}`;
+    const cached = getClientCache<any>(cacheKey);
 
-    // Single unified intelligence query replaces 3 overlapping roundtrips
-    const comprehensiveInsightsRes = await getComprehensiveFinancialInsights(filters);
-
-    if (comprehensiveInsightsRes.success) {
-      if (comprehensiveInsightsRes.currency) setServerCurrency(comprehensiveInsightsRes.currency);
-      setComparison(comprehensiveInsightsRes.comparison);
-      setInsights((comprehensiveInsightsRes.insights || []).slice(0, 3));
-      if (comprehensiveInsightsRes.comparison) {
-        setCategories(comprehensiveInsightsRes.comparison.categories || []);
-      }
-      if (comprehensiveInsightsRes.savings) {
-        setSavingsRate(comprehensiveInsightsRes.savings.savingsRate);
-      }
-      if (comprehensiveInsightsRes.healthScore) {
-        setHealthScore(comprehensiveInsightsRes.healthScore);
-      }
+    if (cached) {
+      applyReportData(cached);
+      setLoading(false);
     } else {
-      showToast.error("Failed to load report", comprehensiveInsightsRes.error);
+      setLoading(true);
     }
 
-    setLoading(false);
-  }, [datePreset, customStart, customEnd]);
+    try {
+      const filters = { dateRange: datePreset, startDate: customStart, endDate: customEnd };
+      const comprehensiveInsightsRes = await getComprehensiveFinancialInsights(filters);
+
+      if (comprehensiveInsightsRes.success) {
+        applyReportData(comprehensiveInsightsRes);
+        setClientCache(cacheKey, comprehensiveInsightsRes, 120000);
+      } else {
+        showToast.error("Failed to load report", comprehensiveInsightsRes.error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [datePreset, customStart, customEnd, applyReportData]);
 
   useEffect(() => {
     fetchData();

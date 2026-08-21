@@ -11,9 +11,10 @@ import { LazyCategoryPieChart } from "@/components/charts/LazyCharts";
 import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getIncomeAnalytics } from "@/app/actions/analytics";
-import { formatCurrency } from "@/lib/utils";
+import { getClientCache, setClientCache } from "@/lib/clientCache";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/CurrencyProvider";
-import { TrendingUp, Banknote, Plus, ArrowUpRight, DollarSign, Layers } from "lucide-react";
+import { TrendingUp, DollarSign, Plus, Sparkles, Building2, Wallet, Banknote, Layers } from "lucide-react";
 
 export default function IncomePage() {
   const { currency } = useCurrency();
@@ -29,14 +30,29 @@ export default function IncomePage() {
   const activeCurrency = analytics?.currency || currency;
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
-    const res = await getIncomeAnalytics({
-      dateRange: datePreset,
-      startDate: customStart,
-      endDate: customEnd,
-    });
-    if (res.success) setAnalytics(res);
-    setLoading(false);
+    const cacheKey = `income_${datePreset}_${customStart || ""}_${customEnd || ""}`;
+    const cached = getClientCache<any>(cacheKey);
+
+    if (cached) {
+      setAnalytics(cached);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
+    try {
+      const res = await getIncomeAnalytics({
+        dateRange: datePreset,
+        startDate: customStart,
+        endDate: customEnd,
+      });
+      if (res.success) {
+        setAnalytics(res);
+        setClientCache(cacheKey, res, 120000);
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [datePreset, customStart, customEnd]);
 
   useEffect(() => {

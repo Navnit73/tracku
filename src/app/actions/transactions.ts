@@ -84,18 +84,39 @@ export async function getTransactions(filters: TransactionFilterInput) {
 
     const skip = (page - 1) * limit;
 
-    const txPromise = Transaction.find(query)
-      .select("_id userId type categoryId categoryName item amount date paymentMethod notes tags createdAt updatedAt")
-      .sort(sortOption)
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    const [transactions, totalCount] = await Promise.all([
-      txPromise,
-      Transaction.countDocuments(query),
+    const [facetResult] = await Transaction.aggregate([
+      { $match: query },
+      {
+        $facet: {
+          data: [
+            { $sort: sortOption },
+            { $skip: skip },
+            { $limit: limit },
+            {
+              $project: {
+                _id: 1,
+                userId: 1,
+                type: 1,
+                categoryId: 1,
+                categoryName: 1,
+                item: 1,
+                amount: 1,
+                date: 1,
+                paymentMethod: 1,
+                notes: 1,
+                tags: 1,
+                createdAt: 1,
+                updatedAt: 1,
+              },
+            },
+          ],
+          totalCount: [{ $count: "count" }],
+        },
+      },
     ]);
 
+    const transactions = facetResult?.data || [];
+    const totalCount = facetResult?.totalCount?.[0]?.count || 0;
     const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 
     return {

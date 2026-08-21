@@ -18,6 +18,7 @@ import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getDashboardAnalytics } from "@/app/actions/analytics";
 import { seedSampleTransactions } from "@/app/actions/transactions";
+import { getClientCache, setClientCache, invalidateClientCache } from "@/lib/clientCache";
 import type { InsightItem } from "@/app/actions/insights";
 import { InsightCard } from "@/components/insights/InsightCard";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -99,16 +100,16 @@ function deriveQuickInsights(analytics: any, curr: string): InsightItem[] {
   } else if (analytics.frequentlySpentItems?.length > 0) {
     const freq = analytics.frequentlySpentItems[0];
     items.push({
-      id: "quick-freq",
-      type: "neutral",
-      icon: "Sparkles",
+      id: "quick-frequent",
+      type: "info",
+      icon: "TrendingDown",
       headline: `Frequent: ${freq.item}`,
       description: `Purchased ${freq.count} times for a total of ${formatCurrency(freq.totalAmount, curr)}.`,
-      metric: `${freq.count}x`,
+      metric: `${freq.count} purchases`,
     });
   }
 
-  return items.slice(0, 3);
+  return items;
 }
 
 export default function DashboardPage() {
@@ -118,29 +119,42 @@ export default function DashboardPage() {
   const [customEnd, setCustomEnd] = useState<string | undefined>();
 
   const [analytics, setAnalytics] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [quickInsights, setQuickInsights] = useState<InsightItem[]>([]);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const activeCurrency = analytics?.currency || currency;
 
   const fetchAnalytics = useCallback(async () => {
-    setLoading(true);
-    const res = await getDashboardAnalytics({
-      dateRange: datePreset,
-      startDate: customStart,
-      endDate: customEnd,
-    });
+    const cacheKey = `dashboard_${datePreset}_${customStart || ""}_${customEnd || ""}`;
+    const cached = getClientCache<any>(cacheKey);
 
-    if (res.success) {
-      setAnalytics(res);
-      setQuickInsights(deriveQuickInsights(res, res.currency || currency));
+    if (cached) {
+      setAnalytics(cached);
+      setQuickInsights(deriveQuickInsights(cached, cached.currency || currency));
+      setLoading(false);
     } else {
-      showToast.error("Failed to load dashboard data", res.error);
+      setLoading(true);
     }
-    setLoading(false);
+
+    try {
+      const res = await getDashboardAnalytics({
+        dateRange: datePreset,
+        startDate: customStart,
+        endDate: customEnd,
+      });
+
+      if (res.success) {
+        setAnalytics(res);
+        setQuickInsights(deriveQuickInsights(res, res.currency || currency));
+        setClientCache(cacheKey, res, 120000);
+      } else {
+        showToast.error("Failed to load dashboard data", res.error);
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [datePreset, customStart, customEnd, currency]);
 
   useEffect(() => {

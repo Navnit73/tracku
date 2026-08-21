@@ -16,6 +16,7 @@ import { TableSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getTransactions, deleteTransaction } from "@/app/actions/transactions";
 import { getCategories } from "@/app/actions/categories";
+import { getClientCache, setClientCache, invalidateClientCache } from "@/lib/clientCache";
 import { downloadTransactionsCSV } from "@/lib/csvExport";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/CurrencyProvider";
@@ -70,36 +71,56 @@ export default function TransactionsPage() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const fetchCategories = async () => {
+    const cachedCats = getClientCache<any[]>("user_categories_cache", 300000);
+    if (cachedCats) {
+      setCategories(cachedCats);
+      return;
+    }
     const res = await getCategories("All");
     if (res.success && res.categories) {
       setCategories(res.categories);
+      setClientCache("user_categories_cache", res.categories, 300000);
     }
   };
 
   const fetchLedger = useCallback(async () => {
-    setLoading(true);
-    const res = await getTransactions({
-      search: debouncedSearch,
-      type: type as any,
-      categoryId,
-      dateRange,
-      startDate: customStart,
-      endDate: customEnd,
-      minAmount: debouncedMinAmount ? parseFloat(debouncedMinAmount) : undefined,
-      maxAmount: debouncedMaxAmount ? parseFloat(debouncedMaxAmount) : undefined,
-      sortBy,
-      sortOrder,
-      page,
-      limit: pageSize,
-    });
+    const cacheKey = `ledger_${debouncedSearch}_${type}_${categoryId}_${dateRange}_${customStart || ""}_${customEnd || ""}_${debouncedMinAmount || ""}_${debouncedMaxAmount || ""}_${sortBy}_${sortOrder}_${page}_${pageSize}`;
+    const cached = getClientCache<any>(cacheKey);
 
-    if (res.success) {
-      setTransactions(res.transactions);
-      if (res.pagination) setPagination(res.pagination);
+    if (cached) {
+      setTransactions(cached.transactions);
+      if (cached.pagination) setPagination(cached.pagination);
+      setLoading(false);
     } else {
-      showToast.error("Failed to load transactions", res.error);
+      setLoading(true);
     }
-    setLoading(false);
+
+    try {
+      const res = await getTransactions({
+        search: debouncedSearch,
+        type: type as any,
+        categoryId,
+        dateRange,
+        startDate: customStart,
+        endDate: customEnd,
+        minAmount: debouncedMinAmount ? parseFloat(debouncedMinAmount) : undefined,
+        maxAmount: debouncedMaxAmount ? parseFloat(debouncedMaxAmount) : undefined,
+        sortBy,
+        sortOrder,
+        page,
+        limit: pageSize,
+      });
+
+      if (res.success) {
+        setTransactions(res.transactions);
+        if (res.pagination) setPagination(res.pagination);
+        setClientCache(cacheKey, { transactions: res.transactions, pagination: res.pagination }, 120000);
+      } else {
+        showToast.error("Failed to load transactions", res.error);
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [
     debouncedSearch,
     type,
@@ -138,6 +159,7 @@ export default function TransactionsPage() {
     if (confirmed) {
       const res = await deleteTransaction(id);
       if (res.success) {
+        invalidateClientCache();
         showToast.success("Transaction Deleted", `Removed "${item}" from records.`);
         fetchLedger();
       } else {

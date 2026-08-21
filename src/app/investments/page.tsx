@@ -14,9 +14,10 @@ import { TransactionModal } from "@/components/transactions/TransactionModal";
 import { CardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getInvestmentAnalytics } from "@/app/actions/analytics";
-import { formatCurrency } from "@/lib/utils";
+import { getClientCache, setClientCache } from "@/lib/clientCache";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { useCurrency } from "@/components/providers/CurrencyProvider";
-import { LineChart, Plus, ShieldCheck, Coins, TrendingUp } from "lucide-react";
+import { TrendingUp, LineChart, Plus, Sparkles, PieChart, Landmark, ArrowUpRight, Coins, ShieldCheck } from "lucide-react";
 
 export default function InvestmentsPage() {
   const { currency } = useCurrency();
@@ -33,18 +34,32 @@ export default function InvestmentsPage() {
   const activeCurrency = analytics?.currency || currency;
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
-    const invRes = await getInvestmentAnalytics({
-      dateRange: datePreset,
-      startDate: customStart,
-      endDate: customEnd,
-    });
+    const cacheKey = `investments_${datePreset}_${customStart || ""}_${customEnd || ""}`;
+    const cached = getClientCache<any>(cacheKey);
 
-    if (invRes.success) {
-      setAnalytics(invRes);
-      setGrowthData(invRes.investmentGrowth || []);
+    if (cached) {
+      setAnalytics(cached);
+      setGrowthData(cached.investmentGrowth || []);
+      setLoading(false);
+    } else {
+      setLoading(true);
     }
-    setLoading(false);
+
+    try {
+      const invRes = await getInvestmentAnalytics({
+        dateRange: datePreset,
+        startDate: customStart,
+        endDate: customEnd,
+      });
+
+      if (invRes.success) {
+        setAnalytics(invRes);
+        setGrowthData(invRes.investmentGrowth || []);
+        setClientCache(cacheKey, invRes, 120000);
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [datePreset, customStart, customEnd]);
 
   useEffect(() => {
