@@ -21,13 +21,13 @@ export const PLAN_CONFIGS: Record<SubscriptionPlan, PlanDetails> = {
   MONTHLY: {
     id: "MONTHLY",
     name: "Monthly Pro",
-    price: 10,
-    amountInSubunit: 1000, // $10.00 USD in cents
+    price: 15,
+    amountInSubunit: 1500, // $15.00 USD in cents
     currency: "USD",
     period: "monthly",
     interval: 1,
     billingText: "Billed every month",
-    effectiveMonthly: "$10.00/mo",
+    effectiveMonthly: "$15.00/mo",
     description: "Ideal for short term tracking and complete ledger freedom.",
     features: [
       "Unlimited income, expense & investment entries",
@@ -36,27 +36,6 @@ export const PLAN_CONFIGS: Record<SubscriptionPlan, PlanDetails> = {
       "Multi-currency support & historical trends",
       "CSV & Spreadsheet statement exports",
       "Standard email support",
-    ],
-  },
-  SIX_MONTH: {
-    id: "SIX_MONTH",
-    name: "6-Month Pro",
-    price: 59,
-    amountInSubunit: 5900, // $59.00 USD in cents
-    currency: "USD",
-    period: "monthly",
-    interval: 6,
-    billingText: "Billed every 6 months ($59)",
-    effectiveMonthly: "$9.83/mo",
-    savingsBadge: "Save 2%",
-    description: "Great balance for mid-term financial tracking and planning.",
-    features: [
-      "Unlimited income, expense & investment entries",
-      "Real-time cash flow & category breakdown",
-      "Advanced AI financial insights & forecasts",
-      "Multi-currency support & historical trends",
-      "CSV & Spreadsheet statement exports",
-      "Priority customer assistance",
     ],
   },
   YEARLY: {
@@ -69,7 +48,7 @@ export const PLAN_CONFIGS: Record<SubscriptionPlan, PlanDetails> = {
     interval: 1,
     billingText: "Billed annually ($99)",
     effectiveMonthly: "$8.25/mo",
-    savingsBadge: "Best Value • Save 18%",
+    savingsBadge: "Best Value • Save 45%",
     description: "Maximum value for long-term personal wealth management.",
     features: [
       "Unlimited income, expense & investment entries",
@@ -112,7 +91,6 @@ export function getRazorpayClient(): Razorpay {
 export async function resolveRazorpayPlanId(planType: SubscriptionPlan): Promise<string> {
   const envMap: Record<SubscriptionPlan, string | undefined> = {
     MONTHLY: process.env.RAZORPAY_PLAN_MONTHLY,
-    SIX_MONTH: process.env.RAZORPAY_PLAN_SIX_MONTH,
     YEARLY: process.env.RAZORPAY_PLAN_YEARLY,
   };
 

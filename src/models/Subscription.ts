@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-export type SubscriptionPlan = "MONTHLY" | "SIX_MONTH" | "YEARLY";
+export type SubscriptionPlan = "MONTHLY" | "YEARLY";
 
 export type SubscriptionStatus =
   | "ACTIVE"
@@ -40,7 +40,7 @@ const SubscriptionSchema = new Schema<ISubscription>(
     razorpayCustomerId: { type: String },
     plan: {
       type: String,
-      enum: ["MONTHLY", "SIX_MONTH", "YEARLY"],
+      enum: ["MONTHLY", "YEARLY"],
       required: true,
     },
     status: {

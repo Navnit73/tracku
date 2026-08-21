@@ -26,7 +26,7 @@ export default function PricingPage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
-  const handleSubscribe = async (planType: "MONTHLY" | "SIX_MONTH" | "YEARLY") => {
+  const handleSubscribe = async (planType: "MONTHLY" | "YEARLY") => {
     setLoadingPlan(planType);
 
     try {
@@ -129,7 +129,7 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto w-full items-stretch">
           <PricingCard
             plan={PLAN_CONFIGS.MONTHLY}
             isCurrentPlan={currentPlan === "MONTHLY"}
@@ -141,12 +141,6 @@ export default function PricingPage() {
             isPopular={true}
             isCurrentPlan={currentPlan === "YEARLY"}
             isLoading={loadingPlan === "YEARLY"}
-            onSubscribe={handleSubscribe}
-          />
-          <PricingCard
-            plan={PLAN_CONFIGS.SIX_MONTH}
-            isCurrentPlan={currentPlan === "SIX_MONTH"}
-            isLoading={loadingPlan === "SIX_MONTH"}
             onSubscribe={handleSubscribe}
           />
         </div>

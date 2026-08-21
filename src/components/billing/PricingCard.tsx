@@ -12,7 +12,7 @@ export interface PricingCardProps {
   isPopular?: boolean;
   isCurrentPlan?: boolean;
   isLoading?: boolean;
-  onSubscribe: (planId: "MONTHLY" | "SIX_MONTH" | "YEARLY") => void;
+  onSubscribe: (planId: "MONTHLY" | "YEARLY") => void;
 }
 
 export function PricingCard({
@@ -63,7 +63,7 @@ export function PricingCard({
               ${plan.price}
             </span>
             <span className="text-xs font-semibold text-ink-muted">
-              {plan.id === "MONTHLY" ? "/ month" : plan.id === "SIX_MONTH" ? "/ 6 months" : "/ year"}
+              {plan.id === "MONTHLY" ? "/ month" : "/ year"}
             </span>
           </div>
 

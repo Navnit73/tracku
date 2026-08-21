@@ -14,11 +14,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const planType = body?.plan as SubscriptionPlan;
 
-    if (!planType || !["MONTHLY", "SIX_MONTH", "YEARLY"].includes(planType)) {
+    if (!planType || !["MONTHLY", "YEARLY"].includes(planType)) {
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid plan selected. Must be MONTHLY, SIX_MONTH, or YEARLY.",
+          error: "Invalid plan selected. Must be MONTHLY or YEARLY.",
         },
         { status: 400 }
       );

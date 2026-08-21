@@ -29,7 +29,7 @@ export function PricingModal({
   const { data: session } = useSession();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
-  const handleSubscribe = async (planType: "MONTHLY" | "SIX_MONTH" | "YEARLY") => {
+  const handleSubscribe = async (planType: "MONTHLY" | "YEARLY") => {
     setLoadingPlan(planType);
 
     try {
@@ -105,7 +105,7 @@ export function PricingModal({
       onClose={onClose}
       title={title}
       description={description}
-      maxWidth="4xl"
+      maxWidth="3xl"
     >
       <div className="flex flex-col gap-6 py-2">
         {/* Limit reached banner alert */}
@@ -120,7 +120,7 @@ export function PricingModal({
         )}
 
         {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch">
           <PricingCard
             plan={PLAN_CONFIGS.MONTHLY}
             isLoading={loadingPlan === "MONTHLY"}
@@ -130,11 +130,6 @@ export function PricingModal({
             plan={PLAN_CONFIGS.YEARLY}
             isPopular={true}
             isLoading={loadingPlan === "YEARLY"}
-            onSubscribe={handleSubscribe}
-          />
-          <PricingCard
-            plan={PLAN_CONFIGS.SIX_MONTH}
-            isLoading={loadingPlan === "SIX_MONTH"}
             onSubscribe={handleSubscribe}
           />
         </div>
