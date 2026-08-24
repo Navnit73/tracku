@@ -59,7 +59,7 @@ export function BottomNav({
             aria-hidden="true"
           />
 
-          <div className="relative bg-surface border-t border-hairline rounded-t-3xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] shadow-2xl z-10 space-y-4 animate-in slide-in-from-bottom duration-250">
+          <div className="relative bg-surface border-t border-hairline rounded-t-3xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))]  z-10 space-y-4 animate-in slide-in-from-bottom duration-250">
             {/* Sheet Handle */}
             <div className="w-12 h-1 bg-ink-muted/30 rounded-full mx-auto -mt-1 mb-1" />
 
@@ -131,7 +131,7 @@ export function BottomNav({
         <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] right-4 z-30 lg:hidden">
           <button
             onClick={onOpenNewTransaction}
-            className="flex items-center gap-2 px-4 py-3 rounded-full bg-primary hover:bg-primary-active text-white font-bold shadow-lg shadow-primary/30 active:scale-95 transition-all cursor-pointer min-h-[44px]"
+            className="flex items-center gap-2 px-4 py-3 rounded-full bg-primary hover:bg-primary-active text-white font-bold  shadow-primary/30 active:scale-95 transition-all cursor-pointer min-h-[44px]"
             aria-label="New Transaction"
           >
             <Plus className="w-5 h-5" />
@@ -141,7 +141,7 @@ export function BottomNav({
       )}
 
       {/* Fixed Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-surface/90 backdrop-blur-md border-t border-hairline h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)] px-2 flex items-center justify-around shadow-lg">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-surface/90 backdrop-blur-md border-t border-hairline h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)] px-2 flex items-center justify-around ">
         {PRIMARY_NAV.map((item) => {
           const isActive =
             pathname === item.href ||

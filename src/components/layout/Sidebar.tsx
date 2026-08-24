@@ -63,7 +63,7 @@ export function Sidebar({
       {/* Sidebar Container: Fixed Sleek Dark Executive Styling */}
       <aside
         className={cn(
-          "fixed top-0 bottom-0 left-0 z-50 bg-[#0d1714] border-r border-[#1a2d26] text-white flex flex-col transition-[width,transform,translate] duration-300 ease-in-out shadow-2xl lg:shadow-none select-none overflow-hidden will-change-[width,transform,translate]",
+          "fixed top-0 bottom-0 left-0 z-50 bg-[#0d1714] border-r border-[#1a2d26] text-white flex flex-col transition-[width,transform,translate] duration-300 ease-in-out  lg:shadow-none select-none overflow-hidden will-change-[width,transform,translate]",
           mobileOpen ? "translate-x-0 w-64" : "-translate-x-full lg:translate-x-0",
           isCollapsed ? "lg:w-20" : "lg:w-64"
         )}
@@ -167,7 +167,7 @@ export function Sidebar({
 
                 {/* Floating Tooltip in Collapsed Mode */}
                 {isCollapsed && (
-                  <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-[#14231e] text-white text-xs font-semibold rounded-lg shadow-2xl border border-[#233d32] whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
+                  <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-[#14231e] text-white text-xs font-semibold rounded-lg  border border-[#233d32] whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
                     {item.name}
                     <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-[#14231e]" />
                   </div>
@@ -207,7 +207,7 @@ export function Sidebar({
 
               {/* Tooltip for Collapse Toggle */}
               {isCollapsed && (
-                <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-[#14231e] text-white text-xs font-semibold rounded-lg shadow-2xl border border-[#233d32] whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
+                <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-[#14231e] text-white text-xs font-semibold rounded-lg  border border-[#233d32] whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
                   Expand Sidebar
                   <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-[#14231e]" />
                 </div>
@@ -235,7 +235,7 @@ export function Sidebar({
 
             {/* Tooltip for System Status in Collapsed Mode */}
             {isCollapsed && (
-              <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-[#14231e] text-white text-xs font-semibold rounded-lg shadow-2xl border border-[#233d32] whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
+              <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-[#14231e] text-white text-xs font-semibold rounded-lg  border border-[#233d32] whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
                 System Online
                 <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-[#14231e]" />
               </div>

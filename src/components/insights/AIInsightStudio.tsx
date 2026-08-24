@@ -69,12 +69,12 @@ export function AIInsightStudio({
   const quotaPercent = Math.min(100, Math.round((used / dailyLimit) * 100));
 
   return (
-    <div className="relative rounded-2xl overflow-hidden border border-hairline bg-surface shadow-sm transition-all duration-300">
+    <div className="relative rounded-2xl overflow-hidden border border-hairline bg-surface  transition-all duration-300">
       {/* Top Header Bar */}
       <div className="relative z-10 px-5 py-4 border-b border-hairline bg-surface flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white ">
               <Bot className="w-5 h-5" />
             </div>
             <span className="absolute -top-1 -right-1 flex h-3 w-3">
@@ -153,7 +153,7 @@ export function AIInsightStudio({
         {!insights && !loading && !error && (
           <div className="py-10 px-4 flex flex-col items-center justify-center text-center max-w-xl mx-auto">
             <div className="relative mb-5">
-              <div className="w-16 h-16 rounded-2xl bg-investment-bg border border-investment-border flex items-center justify-center text-investment shadow-sm">
+              <div className="w-16 h-16 rounded-2xl bg-investment-bg border border-investment-border flex items-center justify-center text-investment ">
                 <Sparkles className="w-8 h-8" />
               </div>
               <div className="absolute -bottom-1.5 -right-1.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-ink text-canvas border border-hairline">
@@ -194,7 +194,7 @@ export function AIInsightStudio({
             <button
               onClick={onGenerate}
               disabled={loading}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-primary hover:bg-primary-active text-white text-sm font-semibold shadow-sm transition-all active:scale-[0.98] cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-primary hover:bg-primary-active text-white text-sm font-semibold  transition-all active:scale-[0.98] cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
               <span>Run AI Financial Diagnosis</span>

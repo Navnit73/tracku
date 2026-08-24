@@ -255,7 +255,7 @@ export default function DashboardPage() {
               variant={(analytics?.summary?.balance ?? 0) < 0 ? "default" : "hero"}
               className={`relative overflow-hidden p-4 sm:p-5 flex flex-col justify-between min-h-[145px] ${
                 (analytics?.summary?.balance ?? 0) < 0
-                  ? "bg-gradient-to-br from-red-600 to-red-800 dark:from-red-700 dark:to-red-900 text-white border-red-500/30 shadow-lg"
+                  ? "bg-gradient-to-br from-red-600 to-red-800 dark:from-red-700 dark:to-red-900 text-white border-red-500/30 "
                   : ""
               }`}
             >
@@ -266,15 +266,15 @@ export default function DashboardPage() {
                   }`}>
                     Liquid Cash Balance
                   </span>
-                  <div className="p-2 rounded-xl bg-white/15 text-white backdrop-blur-xs ">
+                  <div className="p-2 rounded-xl bg-white/15 text-white backdrop-blur-xs shrink-0">
                     <Wallet className="w-4 h-4" />
                   </div>
                 </div>
-                <div className="text-2xl sm:text-3xl xl:text-2xl 2xl:text-3xl font-black tracking-tight text-white truncate">
+                <div className="text-xl sm:text-2xl 2xl:text-3xl font-black tracking-tight text-white truncate">
                   {formatCurrency(analytics?.summary?.balance || 0, activeCurrency)}
                 </div>
               </div>
-              <div className={`mt-3 text-xs flex items-center justify-between border-t border-white/15 pt-2 ${
+              <div className={`mt-3 text-xs flex items-center justify-between border-t border-white/15 pt-2 gap-1 ${
                 (analytics?.summary?.balance ?? 0) < 0 ? "text-red-100" : "text-emerald-100"
               }`}>
                 <span className="text-[11px] opacity-90 truncate">
@@ -295,7 +295,7 @@ export default function DashboardPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Total Net Savings
                   </span>
-                  <div className={`p-2 rounded-xl ${
+                  <div className={`p-2 rounded-xl shrink-0 ${
                     (analytics?.summary?.netSavings ?? 0) < 0
                       ? "bg-expense-bg text-expense"
                       : "bg-income-bg text-income"
@@ -303,7 +303,7 @@ export default function DashboardPage() {
                     <PiggyBank className="w-4 h-4" />
                   </div>
                 </div>
-                <div className={`text-2xl sm:text-3xl xl:text-2xl 2xl:text-3xl font-black tracking-tight truncate ${
+                <div className={`text-xl sm:text-2xl 2xl:text-3xl font-black tracking-tight truncate ${
                   (analytics?.summary?.netSavings ?? 0) < 0 ? "text-expense" : "text-income"
                 }`}>
                   {formatCurrency(analytics?.summary?.netSavings ?? 0, activeCurrency)}
@@ -311,7 +311,7 @@ export default function DashboardPage() {
               </div>
               <div className="mt-3 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2 gap-1">
                 <span className="text-[11px] truncate">Savings Rate:</span>
-                <Badge variant={(analytics?.summary?.savingsRate ?? 0) >= 20 ? "income" : (analytics?.summary?.savingsRate ?? 0) >= 0 ? "sky" : "expense"} size="sm">
+                <Badge variant={(analytics?.summary?.savingsRate ?? 0) >= 20 ? "income" : (analytics?.summary?.savingsRate ?? 0) >= 0 ? "sky" : "expense"} size="sm" className="shrink-0">
                   {analytics?.summary?.savingsRate ?? 0}%
                 </Badge>
               </div>
@@ -324,30 +324,36 @@ export default function DashboardPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Income vs Expenses
                   </span>
-                  <div className="p-2 rounded-xl bg-sky-brand-bg text-sky-brand ">
+                  <div className="p-2 rounded-xl bg-sky-brand-bg text-sky-brand shrink-0">
                     <TrendingUp className="w-4 h-4" />
                   </div>
                 </div>
-                <div className="flex items-baseline justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="text-[11px] text-ink-muted font-medium">Inflow</div>
-                    <div className="text-base sm:text-lg font-extrabold text-income truncate">
+                <div className="space-y-1.5 mt-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-ink-muted font-medium flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-income shrink-0" />
+                      Inflow:
+                    </span>
+                    <span className="text-sm sm:text-base font-black text-income whitespace-nowrap">
                       +{formatCurrency(analytics?.summary?.totalIncome || 0, activeCurrency)}
-                    </div>
+                    </span>
                   </div>
-                  <div className="text-right min-w-0">
-                    <div className="text-[11px] text-ink-muted font-medium">Outflow</div>
-                    <div className="text-base sm:text-lg font-extrabold text-expense truncate">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-ink-muted font-medium flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-expense shrink-0" />
+                      Outflow:
+                    </span>
+                    <span className="text-sm sm:text-base font-black text-expense whitespace-nowrap">
                       -{formatCurrency(analytics?.summary?.totalExpenses || 0, activeCurrency)}
-                    </div>
+                    </span>
                   </div>
                 </div>
               </div>
-              <div className="mt-3 text-xs text-ink-muted border-t border-hairline pt-2 flex items-center justify-between">
-                <span className="text-[11px] truncate">This Mo. Spend:</span>
-                <strong className="text-expense text-[11px]">
+              <div className="mt-2.5 text-xs text-ink-muted border-t border-hairline pt-2 flex items-center justify-between gap-1">
+                <span className="text-[11px] text-ink-muted whitespace-nowrap">This Mo. Spend:</span>
+                <span className="text-expense text-[11px] font-bold whitespace-nowrap">
                   {formatCurrency(analytics?.summary?.monthlyExpenses || 0, activeCurrency)}
-                </strong>
+                </span>
               </div>
             </Card>
 
@@ -358,19 +364,19 @@ export default function DashboardPage() {
                   <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
                     Total Investments
                   </span>
-                  <div className="p-2 rounded-xl bg-investment-bg text-investment ">
+                  <div className="p-2 rounded-xl bg-investment-bg text-investment shrink-0">
                     <LineChart className="w-4 h-4" />
                   </div>
                 </div>
-                <div className="text-2xl sm:text-3xl xl:text-2xl 2xl:text-3xl font-black text-investment tracking-tight truncate">
+                <div className="text-xl sm:text-2xl 2xl:text-3xl font-black text-investment tracking-tight truncate">
                   {formatCurrency(analytics?.summary?.totalInvestments || 0, activeCurrency)}
                 </div>
               </div>
               <div className="mt-3 text-xs text-ink-muted flex items-center justify-between border-t border-hairline pt-2 gap-1">
                 <span className="text-[11px] truncate">This Mo. Invested:</span>
-                <strong className="text-investment text-[11px]">
+                <span className="text-investment text-[11px] font-bold shrink-0">
                   +{formatCurrency(analytics?.summary?.monthlyInvestments || 0, activeCurrency)}
-                </strong>
+                </span>
               </div>
             </Card>
           </div>

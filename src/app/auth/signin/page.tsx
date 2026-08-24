@@ -262,7 +262,7 @@ export default function SignInPage() {
       {/* Top Header / Brand Logo */}
       {/* <header className="w-full flex items-center justify-between max-w-7xl mx-auto">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-[#00A860] flex items-center justify-center shadow-sm">
+          <div className="w-9 h-9 rounded-xl bg-[#00A860] flex items-center justify-center ">
             <Wallet className="w-5 h-5 text-white" />
           </div>
           <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
@@ -398,7 +398,7 @@ export default function SignInPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all shadow-sm active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 min-h-[44px]"
+                      className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all  active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 min-h-[44px]"
                     >
                       {loading ? (
                         <RotateCw className="w-4 h-4 animate-spin" />
@@ -420,7 +420,7 @@ export default function SignInPage() {
                   <button
                     type="button"
                     onClick={handleGoogleSignIn}
-                    className="w-full py-3 px-4 bg-[#3B82F6] hover:bg-[#2563EB] active:bg-[#1D4ED8] text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-3 transition-all shadow-sm active:scale-[0.99] cursor-pointer min-h-[44px]"
+                    className="w-full py-3 px-4 bg-[#3B82F6] hover:bg-[#2563EB] active:bg-[#1D4ED8] text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-3 transition-all  active:scale-[0.99] cursor-pointer min-h-[44px]"
                   >
                     <div className="w-5 h-5 bg-white rounded flex items-center justify-center shrink-0">
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
@@ -541,7 +541,7 @@ export default function SignInPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all shadow-sm active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 mt-1 min-h-[44px]"
+                      className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all  active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 mt-1 min-h-[44px]"
                     >
                       {loading ? (
                         <RotateCw className="w-4 h-4 animate-spin" />
@@ -563,7 +563,7 @@ export default function SignInPage() {
                   <button
                     type="button"
                     onClick={handleGoogleSignIn}
-                    className="w-full py-2.5 px-4 bg-[#3B82F6] hover:bg-[#2563EB] active:bg-[#1D4ED8] text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-3 transition-all shadow-sm active:scale-[0.99] cursor-pointer min-h-[44px]"
+                    className="w-full py-2.5 px-4 bg-[#3B82F6] hover:bg-[#2563EB] active:bg-[#1D4ED8] text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-3 transition-all  active:scale-[0.99] cursor-pointer min-h-[44px]"
                   >
                     <div className="w-5 h-5 bg-white rounded flex items-center justify-center shrink-0">
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
@@ -627,7 +627,7 @@ export default function SignInPage() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all shadow-sm active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 min-h-[44px]"
+                        className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all  active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 min-h-[44px]"
                       >
                         {loading ? (
                           <RotateCw className="w-4 h-4 animate-spin" />
@@ -731,7 +731,7 @@ export default function SignInPage() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all shadow-sm active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 mt-2 min-h-[44px]"
+                        className="w-full py-3 px-4 bg-[#00a859] hover:bg-[#00924d] active:bg-[#008144] disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-all  active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 mt-2 min-h-[44px]"
                       >
                         {loading ? (
                           <RotateCw className="w-4 h-4 animate-spin" />

@@ -82,7 +82,7 @@ export function DatePicker({
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute right-0 sm:right-0 mt-2 w-[calc(100vw-2rem)] max-w-xs sm:w-80 rounded-2xl bg-surface border border-hairline shadow-2xl z-40 p-3.5 flex flex-col gap-2.5 animate-in fade-in zoom-in-95 duration-150">
+          <div className="absolute right-0 sm:right-0 mt-2 w-[calc(100vw-2rem)] max-w-xs sm:w-80 rounded-2xl bg-surface border border-hairline  z-40 p-3.5 flex flex-col gap-2.5 animate-in fade-in zoom-in-95 duration-150">
             <div className="text-xs font-bold uppercase tracking-wider text-ink-muted px-1.5">
               Select Time Horizon
             </div>

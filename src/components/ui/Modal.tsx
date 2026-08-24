@@ -64,7 +64,7 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         className={cn(
-          "relative w-full rounded-t-3xl sm:rounded-2xl bg-surface border-t sm:border border-hairline shadow-2xl transition-all animate-in slide-in-from-bottom-8 sm:zoom-in-95 duration-200 z-10 flex flex-col max-h-[85vh] sm:max-h-[90vh]",
+          "relative w-full rounded-t-3xl sm:rounded-2xl bg-surface border-t sm:border border-hairline  transition-all animate-in slide-in-from-bottom-8 sm:zoom-in-95 duration-200 z-10 flex flex-col max-h-[85vh] sm:max-h-[90vh]",
           maxWidths[maxWidth]
         )}
       >

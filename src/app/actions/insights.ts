@@ -397,20 +397,22 @@ export async function getComprehensiveFinancialInsights(
     const dailyBurn = curExpenses / daysElapsed;
     const projectedTotal = dailyBurn * daysInMonth;
 
-    insights.push({
-      id: `insight-${insightIdx++}`,
-      type: projectedTotal > curIncome * 0.9 && curIncome > 0 ? "warning" : "info",
-      icon: "Zap",
-      headline: `Spending ${fmt(dailyBurn)}/day`,
-      description: `At your current pace, you'll spend ~${fmt(projectedTotal)} this month. ${
-        curIncome > 0 && projectedTotal > curIncome
-          ? "That exceeds your income — consider slowing down."
-          : curIncome > 0
-          ? `That's ${Math.round((projectedTotal / curIncome) * 100)}% of your income.`
-          : "Keep track of your daily expenses."
-      }`,
-      metric: `${fmt(dailyBurn)}/day`,
-    });
+    if (curExpenses > 0) {
+      insights.push({
+        id: `insight-${insightIdx++}`,
+        type: projectedTotal > curIncome * 0.9 && curIncome > 0 ? "warning" : "info",
+        icon: "Zap",
+        headline: `Spending ${fmt(dailyBurn)}/day`,
+        description: `At your current pace, you'll spend ~${fmt(projectedTotal)} this month. ${
+          curIncome > 0 && projectedTotal > curIncome
+            ? "That exceeds your income — consider slowing down."
+            : curIncome > 0
+            ? `That's ${Math.round((projectedTotal / curIncome) * 100)}% of your income.`
+            : "Keep track of your daily expenses."
+        }`,
+        metric: `${fmt(dailyBurn)}/day`,
+      });
+    }
 
     // B3: Income vs expense trend
     const expenseDelta = pctChange(curExpenses, prevExpenses);
@@ -468,22 +470,24 @@ export async function getComprehensiveFinancialInsights(
     }
 
     // B5: Savings rate narrative
-    const savingsRate = curIncome > 0 ? Math.round(((curIncome - curExpenses) / curIncome) * 100) : 0;
-    insights.push({
-      id: `insight-${insightIdx++}`,
-      type: savingsRate >= 20 ? "positive" : savingsRate >= 0 ? "neutral" : "warning",
-      icon: "PiggyBank",
-      headline: `Savings rate: ${savingsRate}%`,
-      description:
-        savingsRate >= 30
-          ? `Excellent! You're saving ${savingsRate}% of your income. Financial experts recommend 20%+.`
-          : savingsRate >= 10
-          ? `You're saving ${savingsRate}% of income. Try pushing towards 20% for stronger financial health.`
-          : savingsRate >= 0
-          ? `Only ${savingsRate}% of income is being saved. Look for areas to cut back.`
-          : `You're spending more than you earn. Immediate attention needed.`,
-      metric: `${savingsRate}%`,
-    });
+    if (curIncome > 0) {
+      const savingsRate = Math.round(((curIncome - curExpenses) / curIncome) * 100);
+      insights.push({
+        id: `insight-${insightIdx++}`,
+        type: savingsRate >= 20 ? "positive" : savingsRate >= 0 ? "neutral" : "warning",
+        icon: "PiggyBank",
+        headline: `Savings rate: ${savingsRate}%`,
+        description:
+          savingsRate >= 30
+            ? `Excellent! You're saving ${savingsRate}% of your income. Financial experts recommend 20%+.`
+            : savingsRate >= 10
+            ? `You're saving ${savingsRate}% of income. Try pushing towards 20% for stronger financial health.`
+            : savingsRate >= 0
+            ? `Only ${savingsRate}% of income is being saved. Look for areas to cut back.`
+            : `You're spending more than you earn. Immediate attention needed.`,
+        metric: `${savingsRate}%`,
+      });
+    }
 
     // B6: Investment allocation narrative
     if (curInvestments > 0) {
@@ -751,16 +755,19 @@ export async function getComprehensiveFinancialInsights(
       },
     };
 
+    const hasCurrentPeriodData = (curIncome > 0 || curExpenses > 0 || curInvestments > 0 || prevIncome > 0 || prevExpenses > 0 || prevInvestments > 0);
+    const hasAllTimeData = (totalAllIncome > 0 || totalAllExpenses > 0 || totalAllInvestments > 0 || allTimeSummary.length > 0);
+
     return {
       success: true,
       currency,
       insights,
       recurring,
       totalMonthlyRecurring,
-      comparison,
-      savings,
-      netWorth,
-      healthScore,
+      comparison: hasCurrentPeriodData ? comparison : null,
+      savings: (curIncome > 0 || curExpenses > 0) ? savings : null,
+      netWorth: hasAllTimeData ? netWorth : null,
+      healthScore: hasCurrentPeriodData ? healthScore : null,
     };
   } catch (error: any) {
     console.error("[Comprehensive Insights Error]", error instanceof Error ? error.message : "Failed");

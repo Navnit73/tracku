@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 // Configure SweetAlert2 for Notion design system aesthetic
 const CustomSwal = Swal.mixin({
   customClass: {
-    popup: "font-sans border border-hairline rounded-xl shadow-lg bg-surface text-ink",
+    popup: "font-sans border border-hairline rounded-xl  bg-surface text-ink",
     title: "text-lg font-bold text-ink",
     htmlContainer: "text-sm text-ink-muted",
     confirmButton: "bg-primary hover:bg-primary-active text-white text-sm font-medium px-4 py-2 rounded-lg transition-all",
@@ -90,7 +90,7 @@ export const confirmDialog = async (options: {
       htmlContainer: "text-sm text-ink-muted leading-relaxed",
       input: "!mt-4 !mx-auto !w-[88%] !px-3.5 !py-2.5 !text-sm !font-mono !bg-canvas !text-ink !border !border-hairline !rounded-xl focus:!outline-none focus:!border-primary",
       validationMessage: "!bg-expense-bg !text-expense !text-xs !border !border-expense-border !rounded-lg !py-1.5 !px-3 !mx-auto !mt-2",
-      confirmButton: "bg-expense hover:opacity-90 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all shadow-sm cursor-pointer",
+      confirmButton: "bg-expense hover:opacity-90 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all  cursor-pointer",
       cancelButton: "bg-canvas hover:bg-hairline text-ink text-sm font-semibold px-4 py-2 rounded-xl border border-hairline transition-all ml-2 cursor-pointer",
     },
   };

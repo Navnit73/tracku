@@ -10,8 +10,8 @@ export function Card({ className, variant = "default", children, ...props }: Car
   const variants = {
     default: "bg-surface border border-hairline ",
     flat: "bg-canvas border border-hairline",
-    elevated: "bg-surface-raised border border-hairline shadow-md",
-    hero: "bg-gradient-to-br from-[#00874C] to-[#005c33] dark:from-[#00A860] dark:to-[#005c33] text-white rounded-2xl shadow-lg border border-primary/30",
+    elevated: "bg-surface-raised border border-hairline ",
+    hero: "bg-gradient-to-br from-[#00874C] to-[#005c33] dark:from-[#00A860] dark:to-[#005c33] text-white rounded-2xl  border border-primary/30",
   };
 
   return (

@@ -196,7 +196,7 @@ export default function InsightsPage() {
     <AppShell title="Financial Insights">
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface p-5 sm:p-6 rounded-2xl border border-hairline shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface p-5 sm:p-6 rounded-2xl border border-hairline ">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-income-bg text-income border border-income-border inline-flex items-center gap-1">
@@ -472,7 +472,7 @@ export default function InsightsPage() {
               ) : netWorth ? (
                 <div className="space-y-4">
                   {/* Top-level net worth */}
-                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-primary to-primary-active text-white shadow-sm">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-primary to-primary-active text-white ">
                     <div className="text-[10px] uppercase font-bold text-emerald-100 tracking-wider">
                       Estimated Net Worth (Retained Wealth)
                     </div>

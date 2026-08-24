@@ -28,13 +28,13 @@ export function PricingCard({
         "relative rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-200 backdrop-blur-md",
         isPopular
           ? "bg-surface border-2 border-primary ring-4 ring-primary/10 shadow-[0_12px_30px_rgba(0,210,123,0.15)] z-10"
-          : "bg-surface/80 border border-hairline hover:border-hairline-strong shadow-sm hover:shadow-md"
+          : "bg-surface/80 border border-hairline hover:border-hairline-strong  hover:"
       )}
     >
       {/* Badges */}
       {isPopular && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-primary text-slate-950 shadow-md">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-primary text-slate-950 ">
             <Sparkles className="w-3.5 h-3.5 fill-current" />
             Most Popular • Best Value
           </span>
