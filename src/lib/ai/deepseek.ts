@@ -36,8 +36,32 @@ function getApiKey(): string {
   return key;
 }
 
+const VALID_MODELS = [
+  "deepseek-v4-flash",
+  "deepseek-v4-pro",
+  "deepseek-v4-flash-vision-exp",
+];
+
 function getModel(): string {
-  return process.env.DEEPSEEK_MODEL || "deepseek-v4-flash";
+  const raw = (process.env.DEEPSEEK_MODEL || "deepseek-v4-flash").trim().toLowerCase();
+
+  // Exact match
+  if (VALID_MODELS.includes(raw)) {
+    return raw;
+  }
+
+  // Alias & format normalizations (e.g. DeepSeek-V4-Flash, deepseek-v4-flash-0731)
+  if (raw.includes("vision")) {
+    return "deepseek-v4-flash-vision-exp";
+  }
+  if (raw.includes("pro")) {
+    return "deepseek-v4-pro";
+  }
+  if (raw.includes("flash") || raw.includes("v4") || raw.includes("deepseek")) {
+    return "deepseek-v4-flash";
+  }
+
+  return "deepseek-v4-flash";
 }
 
 function getTimeoutMs(): number {
