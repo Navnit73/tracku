@@ -73,12 +73,12 @@ export function Sidebar({
           <Link
             href="/"
             className="flex items-center group min-w-0 flex-1 overflow-hidden"
-            title="FinanceTrack"
+            title="Expenseliy"
           >
             <div className="w-10 h-10 flex items-center justify-center p-1.5 group-hover:scale-105 transition-transform shrink-0">
               <Image
                 src="/asset-management.png"
-                alt="FinanceTrack Logo"
+                alt="Expenseliy Logo"
                 width={28}
                 height={28}
                 className="w-7 h-7 object-contain drop-shadow"
@@ -94,7 +94,7 @@ export function Sidebar({
               )}
             >
               <span className="font-extrabold text-[15px] tracking-tight text-white leading-tight truncate">
-                FinanceTrack
+                Expenseliy
               </span>
               <span className="text-[10px] text-[#00D27B] font-semibold flex items-center gap-1 mt-0.5">
                 Personal Ledger <Sparkles className="w-2.5 h-2.5 text-[#00D27B] shrink-0" />

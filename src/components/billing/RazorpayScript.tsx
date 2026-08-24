@@ -76,8 +76,8 @@ export async function openRazorpayCheckout(options: RazorpayCheckoutOptions) {
   const razorpayConfig = {
     key: options.keyId,
     subscription_id: options.subscriptionId,
-    name: "FinanceTrack",
-    description: options.description || "FinanceTrack Pro Subscription",
+    name: "Expenseliy",
+    description: options.description || "Expenseliy Pro Subscription",
     image: "/asset-management.png",
     prefill: {
       name: options.user?.name || "",

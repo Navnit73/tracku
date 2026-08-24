@@ -214,7 +214,7 @@ export default function SettingsPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-base font-extrabold text-ink truncate">
                     {isPremium
-                      ? sub?.planName || "FinanceTrack Pro"
+                      ? sub?.planName || "Expenseliy Pro"
                       : "Free Tier Plan"}
                   </span>
                   <Badge

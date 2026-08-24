@@ -36,7 +36,7 @@ export function AppShell({
         <div className="p-3 animate-pulse">
           <Image
             src="/asset-management.png"
-            alt="FinanceTrack"
+            alt="Expenseliy"
             width={40}
             height={40}
             className="w-10 h-10 object-contain drop-shadow"

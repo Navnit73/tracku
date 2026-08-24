@@ -22,7 +22,7 @@ export function PricingModal({
   isOpen,
   onClose,
   onSuccess,
-  title = "Upgrade to FinanceTrack Pro",
+  title = "Upgrade to Expenseliy Pro",
   description = "Unlock unlimited transaction records, deep AI analytics, and multi-currency tracking.",
   reason,
 }: PricingModalProps) {
@@ -73,7 +73,7 @@ export function PricingModal({
 
           if (verifyData.success) {
             showToast.success(
-              "Welcome to FinanceTrack Pro!",
+              "Welcome to Expenseliy Pro!",
               "Your subscription is active. Unlimited transaction recording is now unlocked."
             );
             if (onSuccess) onSuccess();

@@ -763,7 +763,7 @@ export default function SignInPage() {
             <div className="relative w-[260px] xl:w-[310px] aspect-[4/5]">
               <Image
                 src="/auth-character-Photoroom.png"
-                alt="Finance User Illustration"
+                alt="Expenseliy Illustration"
                 fill
                 priority
                 className="object-contain transition-all duration-300 dark:brightness-105"
@@ -777,7 +777,7 @@ export default function SignInPage() {
 
       {/* Page Footer */}
       <footer className="w-full text-center py-2 text-xs text-slate-400 dark:text-zinc-500 font-medium">
-        © 2026 Finance Tracker. All rights reserved.
+        © 2026 Expenseliy. All rights reserved.
       </footer>
     </div>
   );

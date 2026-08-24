@@ -67,7 +67,7 @@ export default function PricingPage() {
 
           if (verifyData.success) {
             showToast.success(
-              "Welcome to FinanceTrack Pro!",
+              "Welcome to Expenseliy Pro!",
               "Your subscription is active. Unlimited transaction recording is now unlocked."
             );
             refreshBilling();

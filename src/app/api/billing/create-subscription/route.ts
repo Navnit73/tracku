@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       planType,
       userId: user.id,
       userEmail: user.email || "",
-      userName: user.name || "FinanceTrack User",
+      userName: user.name || "Expenseliy User",
     });
 
     // Save pending subscription in MongoDB
