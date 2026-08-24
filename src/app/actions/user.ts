@@ -66,6 +66,14 @@ export async function deleteUserAccountAndData() {
       $or: [{ _id: userId }, { email: user.email }],
     });
 
+    // 4. Purge AI usage logs and cache
+    try {
+      const { AIUsage } = await import("@/models/AIUsage");
+      const { invalidateUserAICache } = await import("@/lib/ai/cache");
+      await AIUsage.deleteMany({ userId });
+      invalidateUserAICache(userId);
+    } catch {}
+
     revalidatePath("/");
     revalidatePath("/transactions");
     revalidatePath("/expenses");

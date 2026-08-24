@@ -12,6 +12,7 @@ import {
   PiggyBank,
   LineChart,
   Info,
+  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { InsightItem } from "@/app/actions/insights";
@@ -27,36 +28,44 @@ const ICON_MAP: Record<string, React.ElementType> = {
   PiggyBank,
   LineChart,
   Info,
+  Bot,
 };
 
 const TYPE_STYLES: Record<string, { bg: string; border: string; icon: string; badge: string; badgeText: string }> = {
   warning: {
-    bg: "bg-warning-brand-bg",
-    border: "border-warning-brand/30",
+    bg: "bg-warning-brand-bg/60",
+    border: "border-warning-brand-border",
     icon: "text-warning-brand",
-    badge: "bg-warning-brand-bg",
+    badge: "bg-warning-brand-bg text-warning-brand border border-warning-brand-border",
     badgeText: "text-warning-brand",
   },
   positive: {
-    bg: "bg-income-bg",
-    border: "border-income/30",
+    bg: "bg-income-bg/60",
+    border: "border-income-border",
     icon: "text-income",
-    badge: "bg-income-bg",
+    badge: "bg-income-bg text-income border border-income-border",
     badgeText: "text-income",
   },
   neutral: {
     bg: "bg-canvas",
     border: "border-hairline",
     icon: "text-ink-muted",
-    badge: "bg-hairline/60",
+    badge: "bg-surface text-ink-muted border border-hairline",
     badgeText: "text-ink-muted",
   },
   info: {
-    bg: "bg-sky-brand-bg",
-    border: "border-sky-brand/30",
+    bg: "bg-sky-brand-bg/60",
+    border: "border-sky-brand-border",
     icon: "text-sky-brand",
-    badge: "bg-sky-brand-bg",
+    badge: "bg-sky-brand-bg text-sky-brand border border-sky-brand-border",
     badgeText: "text-sky-brand",
+  },
+  ai: {
+    bg: "bg-investment-bg/60",
+    border: "border-investment-border",
+    icon: "text-investment",
+    badge: "bg-investment-bg text-investment border border-investment-border",
+    badgeText: "text-investment",
   },
 };
 

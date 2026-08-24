@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { DatePicker, DateRangePreset } from "@/components/ui/DatePicker";
@@ -12,6 +12,8 @@ import { HealthScoreRing } from "@/components/insights/HealthScore";
 import { MonthComparisonChart } from "@/components/insights/MonthComparison";
 import { SavingsGauge } from "@/components/insights/SavingsGauge";
 import { getComprehensiveFinancialInsights } from "@/app/actions/insights";
+import { generateAIInsights, getAIUsageStats } from "@/app/actions/ai";
+import { AIInsightStudio } from "@/components/insights/AIInsightStudio";
 import { clearAllUserData } from "@/app/actions/transactions";
 import { getClientCache, setClientCache, invalidateClientCache } from "@/lib/clientCache";
 import { formatCurrency } from "@/lib/utils";
@@ -24,6 +26,7 @@ import type {
   NetWorthSnapshot,
   HealthScore,
 } from "@/app/actions/insights";
+import type { AIInsightsResponse, AIInsightResponse } from "@/lib/ai/types";
 import { showToast, confirmDialog } from "@/lib/toast";
 import {
   Brain,
@@ -34,7 +37,6 @@ import {
   PiggyBank,
   Landmark,
   ShieldCheck,
-  Calendar,
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -56,6 +58,15 @@ export default function InsightsPage() {
 
   const [loading, setLoading] = useState(true);
   const [clearing, setClearing] = useState(false);
+
+  // ── AI Insights State ──
+  const [aiInsights, setAiInsights] = useState<AIInsightResponse | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<{ message: string; retryable: boolean } | null>(null);
+  const [aiUsage, setAiUsage] = useState<{ requestsToday: number; dailyLimit: number; remainingToday: number } | null>(null);
+  const [aiCached, setAiCached] = useState(false);
+  const [aiGeneratedAt, setAiGeneratedAt] = useState<string | null>(null);
+  const aiRequestRef = useRef(false); // Prevents duplicate simultaneous requests
 
   const activeCurrency = serverCurrency || currency;
 
@@ -103,11 +114,26 @@ export default function InsightsPage() {
     fetchAll();
   }, [fetchAll]);
 
+  // Load initial daily AI quota on mount
+  useEffect(() => {
+    getAIUsageStats().then((res) => {
+      if (res.success && res.stats) {
+        setAiUsage({
+          requestsToday: res.stats.requestsToday,
+          dailyLimit: res.stats.dailyLimit,
+          remainingToday: res.stats.remainingToday,
+        });
+      }
+    });
+  }, []);
+
   const handleClearData = async () => {
     const confirmed = await confirmDialog({
       title: "CLEAR ALL TRANSACTIONS?",
-      text: "This will remove all income, expense, and investment entries so you can test cleanly with new data.",
+      text: 'This will remove all income, expense, and investment entries so you can test cleanly with new data. Type "delete" below to confirm.',
       confirmText: "Yes, Clear All Transactions",
+      confirmPhrase: "delete",
+      inputPlaceholder: 'Type "delete" to confirm',
     });
 
     if (confirmed) {
@@ -116,6 +142,9 @@ export default function InsightsPage() {
       setClearing(false);
       if (res.success) {
         showToast.success("Data Cleared!", res.message);
+        setAiInsights(null);
+        setAiGeneratedAt(null);
+        setAiCached(false);
         invalidateClientCache();
         fetchAll();
       } else {
@@ -124,22 +153,65 @@ export default function InsightsPage() {
     }
   };
 
+  // ── AI Insights Handler ──
+  const handleGenerateAI = useCallback(async () => {
+    // Prevent duplicate requests (double-click, re-renders)
+    if (aiRequestRef.current) return;
+    aiRequestRef.current = true;
+    setAiLoading(true);
+    setAiError(null);
+
+    try {
+      const res: AIInsightsResponse = await generateAIInsights({
+        dateRange: datePreset,
+        startDate: customStart,
+        endDate: customEnd,
+      });
+
+      if (res.success) {
+        setAiInsights(res.insights);
+        setAiUsage(res.usage);
+        setAiCached(res.cached);
+        setAiGeneratedAt(res.generatedAt);
+        if (res.cached) {
+          showToast.info("Cached Result", "Showing previously generated AI analysis.");
+        } else {
+          showToast.success("AI Analysis Complete", "Your financial insights are ready.");
+        }
+      } else {
+        setAiError({ message: res.message, retryable: res.retryable });
+        if (res.usage) setAiUsage(res.usage);
+        showToast.error("AI Analysis", res.message);
+      }
+    } catch {
+      setAiError({ message: "Something went wrong. Please try again.", retryable: true });
+      showToast.error("AI Error", "Failed to generate AI insights.");
+    } finally {
+      setAiLoading(false);
+      aiRequestRef.current = false;
+    }
+  }, [datePreset, customStart, customEnd]);
+
   return (
     <AppShell title="Financial Insights">
       <div className="flex flex-col gap-4 sm:gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-surface p-4 sm:p-5 rounded-2xl border border-hairline ">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface p-5 sm:p-6 rounded-2xl border border-hairline shadow-sm">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold text-ink tracking-tight flex items-center gap-2">
-              <Brain className="w-5 h-5 text-primary" />
-              Financial Intelligence & Analytics
+            <div className="flex items-center gap-2 mb-1">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-income-bg text-income border border-income-border inline-flex items-center gap-1">
+                <Brain className="w-3 h-3" /> Financial Intelligence
+              </span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-ink tracking-tight">
+              Diagnostics & Advanced Analytics
             </h2>
             <p className="text-xs text-ink-muted mt-0.5">
-              Smart analysis of your spending patterns, savings, and financial health
+              Comprehensive analysis of cashflow patterns, savings velocity, and financial health
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap w-full md:w-auto">
             <DatePicker
               selectedPreset={datePreset}
               startDate={customStart}
@@ -155,8 +227,8 @@ export default function InsightsPage() {
               variant="outline"
               size="sm"
               onClick={fetchAll}
-              leftIcon={<RefreshCw className="w-4 h-4" />}
-              className="flex-1 sm:flex-none"
+              leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+              className="flex-1 sm:flex-none text-xs"
             >
               Refresh
             </Button>
@@ -165,13 +237,26 @@ export default function InsightsPage() {
               size="sm"
               onClick={handleClearData}
               isLoading={clearing}
-              leftIcon={<Trash2 className="w-4 h-4" />}
-              className="flex-1 sm:flex-none shrink-0"
+              leftIcon={<Trash2 className="w-3.5 h-3.5" />}
+              className="flex-1 sm:flex-none shrink-0 text-xs"
             >
               Clear Ledger
             </Button>
           </div>
         </div>
+
+        {/* Row 0: AI-Powered Financial Analysis Studio */}
+        <AIInsightStudio
+          insights={aiInsights}
+          loading={aiLoading}
+          error={aiError}
+          usage={aiUsage}
+          cached={aiCached}
+          generatedAt={aiGeneratedAt}
+          currency={activeCurrency}
+          datePreset={datePreset}
+          onGenerate={handleGenerateAI}
+        />
 
         {/* Row 1: Health Score + Smart Insights Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -240,9 +325,9 @@ export default function InsightsPage() {
         </div>
 
         {/* Row 2: MoM Comparison + Savings Gauge */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
           {/* Month-over-Month */}
-          <Card className="lg:col-span-2 p-4 sm:p-5">
+          <Card className="lg:col-span-2 p-5 sm:p-6 flex flex-col justify-between">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -257,7 +342,7 @@ export default function InsightsPage() {
                 Comparison
               </Badge>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1 flex flex-col justify-between">
               {loading ? (
                 <ChartSkeleton />
               ) : comparison && comparison.categories.length > 0 ? (
@@ -272,17 +357,17 @@ export default function InsightsPage() {
           </Card>
 
           {/* Savings Gauge */}
-          <Card className="p-4 sm:p-5 flex flex-col justify-between">
+          <Card className="p-5 sm:p-6 flex flex-col justify-between">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <PiggyBank className="w-4 h-4 text-income" />
-                Savings Rate
+                Savings Velocity
               </CardTitle>
               <CardDescription>
                 Ratio of net savings relative to total income
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1 flex flex-col justify-between">
               {loading ? (
                 <ChartSkeleton />
               ) : savings ? (
@@ -328,10 +413,10 @@ export default function InsightsPage() {
                   {recurring.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between p-3.5 rounded-2xl bg-canvas border border-hairline"
+                      className="flex items-center justify-between p-3.5 rounded-xl bg-canvas border border-hairline hover:border-hairline/80 transition-all"
                     >
                       <div className="flex items-center gap-3 min-w-0 pr-2">
-                        <div className="p-2 rounded-xl bg-warning-brand-bg text-warning-brand shrink-0">
+                        <div className="p-2 rounded-lg bg-warning-brand-bg text-warning-brand border border-warning-brand-border shrink-0">
                           <Repeat className="w-4 h-4" />
                         </div>
                         <div className="min-w-0">
@@ -387,14 +472,14 @@ export default function InsightsPage() {
               ) : netWorth ? (
                 <div className="space-y-4">
                   {/* Top-level net worth */}
-                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#7c3aed] to-[#4c1d95] text-white shadow-md">
-                    <div className="text-[10px] uppercase font-bold text-purple-200 tracking-wider">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-primary to-primary-active text-white shadow-sm">
+                    <div className="text-[10px] uppercase font-bold text-emerald-100 tracking-wider">
                       Estimated Net Worth (Retained Wealth)
                     </div>
                     <div className="text-2xl sm:text-3xl font-black tracking-tight mt-0.5">
                       {formatCurrency(netWorth.netBalance, activeCurrency)}
                     </div>
-                    <div className="text-[11px] text-purple-200 mt-1">
+                    <div className="text-[11px] text-emerald-100 mt-1">
                       Liquid Cash ({formatCurrency(Math.max(0, netWorth.netBalance - netWorth.totalInvestments), activeCurrency)}) + Investments ({formatCurrency(netWorth.totalInvestments, activeCurrency)})
                     </div>
                   </div>
@@ -437,15 +522,21 @@ export default function InsightsPage() {
                         const pct = netWorth.totalInvestments > 0
                           ? Math.round((cat.amount / netWorth.totalInvestments) * 100)
                           : 0;
+                        const dotColors = [
+                          "var(--investment)",
+                          "var(--sky-brand)",
+                          "var(--income)",
+                          "var(--warning)",
+                          "var(--expense)",
+                          "var(--secondary)",
+                        ];
                         return (
                           <div key={idx} className="flex items-center justify-between text-xs p-2 rounded-xl bg-canvas border border-hairline">
                             <div className="flex items-center gap-2 min-w-0">
                               <div
                                 className="w-2.5 h-2.5 rounded-full shrink-0"
                                 style={{
-                                  backgroundColor: [
-                                    "#7c3aed", "#0075de", "#059669", "#d97706", "#e11d48", "#2a9d99",
-                                  ][idx % 6],
+                                  backgroundColor: dotColors[idx % dotColors.length],
                                 }}
                               />
                               <span className="font-semibold text-ink truncate">

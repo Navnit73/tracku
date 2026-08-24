@@ -4,7 +4,7 @@ import React from "react";
 import type { HealthScore as HealthScoreType } from "@/app/actions/insights";
 
 export function HealthScoreRing({ healthScore }: { healthScore: HealthScoreType }) {
-  const { score, grade, color, breakdown } = healthScore;
+  const { score, grade, breakdown } = healthScore;
 
   // SVG ring configuration
   const size = 180;
@@ -23,10 +23,19 @@ export function HealthScoreRing({ healthScore }: { healthScore: HealthScoreType 
       ? "var(--warning)"
       : "var(--expense)";
 
+  const gradeBadgeClass =
+    score >= 80
+      ? "bg-income-bg text-income border-income-border"
+      : score >= 60
+      ? "bg-sky-brand-bg text-sky-brand border-sky-brand-border"
+      : score >= 40
+      ? "bg-warning-brand-bg text-warning-brand border-warning-brand-border"
+      : "bg-expense-bg text-expense border-expense-border";
+
   return (
     <div className="flex flex-col items-center gap-5">
       {/* Score Ring */}
-      <div className="relative">
+      <div className="relative my-2">
         <svg width={size} height={size} className="transform -rotate-90">
           {/* Background circle */}
           <circle
@@ -61,30 +70,30 @@ export function HealthScoreRing({ healthScore }: { healthScore: HealthScoreType 
           >
             {score}
           </span>
-          <span className="text-xs font-semibold text-ink-muted uppercase tracking-wider">
+          <span className={`mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${gradeBadgeClass}`}>
             {grade}
           </span>
         </div>
       </div>
 
       {/* Breakdown bars */}
-      <div className="w-full space-y-2.5">
+      <div className="w-full space-y-3">
         {Object.entries(breakdown).map(([key, item]) => (
           <div key={key} className="space-y-1">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-ink-muted capitalize">
+              <span className="text-ink-muted font-medium capitalize">
                 {key.replace(/([A-Z])/g, " $1").trim()}
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <span className="text-[10px] text-ink-faint">
-                  {item.weight}%
+                  ({item.weight}%)
                 </span>
                 <span className="font-bold text-ink">
                   {item.score}
                 </span>
               </div>
             </div>
-            <div className="w-full h-1.5 bg-hairline rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-canvas border border-hairline rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-700 ease-out"
                 style={{
@@ -93,7 +102,7 @@ export function HealthScoreRing({ healthScore }: { healthScore: HealthScoreType 
                 }}
               />
             </div>
-            <p className="text-[10px] text-ink-faint">{item.detail}</p>
+            <p className="text-[10px] text-ink-faint leading-tight">{item.detail}</p>
           </div>
         ))}
       </div>

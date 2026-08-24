@@ -122,8 +122,10 @@ export default function SettingsPage() {
   const handleDeleteAccount = async () => {
     const confirmed = await confirmDialog({
       title: "PERMANENTLY DELETE ACCOUNT & ALL DATA?",
-      text: "This action CANNOT be undone. All your personal records, income, expenses, investments, and custom categories will be permanently purged from the database.",
+      text: 'This action CANNOT be undone. All your personal records, income, expenses, investments, and custom categories will be permanently purged from the database. Type "delete" below to confirm.',
       confirmText: "Yes, Delete Everything",
+      confirmPhrase: "delete",
+      inputPlaceholder: 'Type "delete" to confirm',
     });
 
     if (confirmed) {

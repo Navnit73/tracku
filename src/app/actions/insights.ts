@@ -11,7 +11,7 @@ import { getDateRangeBounds, formatCurrency } from "@/lib/utils";
 
 export interface InsightItem {
   id: string;
-  type: "warning" | "positive" | "neutral" | "info";
+  type: "warning" | "positive" | "neutral" | "info" | "ai";
   icon: string;
   headline: string;
   description: string;

@@ -72,8 +72,10 @@ export const confirmDialog = async (options: {
   text: string;
   confirmText?: string;
   cancelText?: string;
+  confirmPhrase?: string;
+  inputPlaceholder?: string;
 }): Promise<boolean> => {
-  const result = await CustomSwal.fire({
+  const swalConfig: any = {
     title: options.title,
     text: options.text,
     icon: "warning",
@@ -82,7 +84,35 @@ export const confirmDialog = async (options: {
     cancelButtonText: options.cancelText || "Cancel",
     reverseButtons: true,
     iconColor: "var(--expense)",
-  });
+    customClass: {
+      popup: "font-sans border border-hairline rounded-2xl shadow-xl bg-surface text-ink p-6",
+      title: "text-lg font-bold text-ink tracking-tight",
+      htmlContainer: "text-sm text-ink-muted leading-relaxed",
+      input: "!mt-4 !mx-auto !w-[88%] !px-3.5 !py-2.5 !text-sm !font-mono !bg-canvas !text-ink !border !border-hairline !rounded-xl focus:!outline-none focus:!border-primary",
+      validationMessage: "!bg-expense-bg !text-expense !text-xs !border !border-expense-border !rounded-lg !py-1.5 !px-3 !mx-auto !mt-2",
+      confirmButton: "bg-expense hover:opacity-90 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all shadow-sm cursor-pointer",
+      cancelButton: "bg-canvas hover:bg-hairline text-ink text-sm font-semibold px-4 py-2 rounded-xl border border-hairline transition-all ml-2 cursor-pointer",
+    },
+  };
+
+  if (options.confirmPhrase) {
+    swalConfig.input = "text";
+    swalConfig.inputPlaceholder = options.inputPlaceholder || `Type "${options.confirmPhrase}" to confirm`;
+    swalConfig.inputAttributes = {
+      autocapitalize: "off",
+      autocorrect: "off",
+      spellcheck: "false",
+      autocomplete: "off",
+    };
+    swalConfig.inputValidator = (value: string) => {
+      if (!value || value.trim().toLowerCase() !== options.confirmPhrase?.toLowerCase()) {
+        return `Please type "${options.confirmPhrase}" to confirm.`;
+      }
+      return null;
+    };
+  }
+
+  const result = await CustomSwal.fire(swalConfig);
   return result.isConfirmed;
 };
 
