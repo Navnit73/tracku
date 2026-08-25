@@ -82,8 +82,8 @@ export function DatePicker({
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute right-0 sm:right-0 mt-2 w-[calc(100vw-2rem)] max-w-xs sm:w-80 rounded-2xl bg-surface border border-hairline  z-40 p-3.5 flex flex-col gap-2.5 animate-in fade-in zoom-in-95 duration-150">
-            <div className="text-xs font-bold uppercase tracking-wider text-ink-muted px-1.5">
+          <div className="absolute right-0 sm:right-0 mt-2 w-[calc(100vw-2.5rem)] max-w-xs sm:w-80 rounded-2xl bg-surface border border-hairline shadow-2xl z-40 p-3.5 flex flex-col gap-2.5 animate-in fade-in zoom-in-95 duration-150 max-h-[75vh] overflow-y-auto touch-scroll">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-ink-muted px-1">
               Select Time Horizon
             </div>
             <div className="grid grid-cols-2 gap-1.5">
@@ -93,10 +93,10 @@ export function DatePicker({
                   type="button"
                   onClick={() => handleSelectPreset(preset)}
                   className={cn(
-                    "text-left px-3 py-2 text-xs font-semibold rounded-xl transition-all select-none cursor-pointer active:scale-98 min-h-[36px]",
+                    "text-left px-3 py-2 text-xs font-semibold rounded-xl transition-all select-none cursor-pointer active:scale-98 min-h-[38px] flex items-center",
                     selectedPreset === preset
-                      ? "bg-primary text-white "
-                      : "text-ink bg-canvas/60 hover:bg-canvas hover:text-primary"
+                      ? "bg-primary text-white shadow-xs"
+                      : "text-ink bg-canvas/70 hover:bg-canvas hover:text-primary border border-hairline/50"
                   )}
                 >
                   {preset}
@@ -120,7 +120,7 @@ export function DatePicker({
                   onChange={(e) => setCustomEnd(e.target.value)}
                   className="py-1.5 text-xs min-h-[38px]"
                 />
-                <Button size="sm" onClick={handleApplyCustom} className="mt-1 w-full">
+                <Button size="sm" onClick={handleApplyCustom} className="mt-1 w-full font-bold">
                   Apply Custom Range
                 </Button>
               </div>

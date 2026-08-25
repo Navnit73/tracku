@@ -16,7 +16,42 @@ export async function POST(req: NextRequest) {
       razorpay_payment_id,
       razorpay_subscription_id,
       razorpay_signature,
+      isSandbox,
+      plan,
     } = body;
+
+    await connectToDatabase();
+
+    // 1. Check if Sandbox / Demo Mode upgrade
+    if (isSandbox || (razorpay_subscription_id && razorpay_subscription_id.startsWith("sub_sandbox_"))) {
+      const days = plan === "YEARLY" ? 365 : 30;
+      const currentPeriodStart = new Date();
+      const currentPeriodEnd = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+
+      const updated = await Subscription.findOneAndUpdate(
+        {
+          userId: user.id,
+          razorpaySubscriptionId: razorpay_subscription_id || { $regex: /^sub_sandbox_/ },
+        },
+        {
+          $set: {
+            status: "ACTIVE",
+            plan: plan === "YEARLY" ? "YEARLY" : "MONTHLY",
+            currentPeriodStart,
+            currentPeriodEnd,
+          },
+        },
+        { new: true, upsert: true }
+      );
+
+      return NextResponse.json({
+        success: true,
+        status: "ACTIVE",
+        currentPeriodStart: updated.currentPeriodStart,
+        currentPeriodEnd: updated.currentPeriodEnd,
+        message: "Expenseliy Pro successfully activated!",
+      });
+    }
 
     if (
       !razorpay_payment_id ||
@@ -32,7 +67,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Verify cryptographic HMAC SHA256 signature
+    // 2. Verify cryptographic HMAC SHA256 signature for live mode
     const isValid = verifySubscriptionSignature({
       razorpayPaymentId: razorpay_payment_id,
       razorpaySubscriptionId: razorpay_subscription_id,
@@ -49,9 +84,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await connectToDatabase();
-
-    // 2. Fetch authoritative state from Razorpay
+    // 3. Fetch authoritative state from Razorpay
     let rzpSub: any = null;
     try {
       rzpSub = await fetchRazorpaySubscription(razorpay_subscription_id);
@@ -67,7 +100,7 @@ export async function POST(req: NextRequest) {
       ? new Date(rzpSub.current_end * 1000)
       : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-    // 3. Update subscription record in MongoDB
+    // 4. Update subscription record in MongoDB
     const updated = await Subscription.findOneAndUpdate(
       {
         userId: user.id,

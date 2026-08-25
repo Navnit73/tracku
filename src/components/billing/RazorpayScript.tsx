@@ -87,7 +87,7 @@ export async function openRazorpayCheckout(options: RazorpayCheckoutOptions) {
       source: "web_checkout",
     },
     theme: {
-      color: options.themeColor || "#00D27B",
+      color: options.themeColor || "#10B981",
     },
     modal: {
       backdropclose: false,

@@ -106,6 +106,18 @@ export function HealthScoreRing({ healthScore }: { healthScore: HealthScoreType 
           </div>
         ))}
       </div>
+
+      {/* Score Improvement Guidance */}
+      <div className="w-full p-3 rounded-2xl bg-canvas border border-hairline text-xs text-ink-muted flex items-start gap-2">
+        <span className="font-bold text-ink">💡 Goal:</span>
+        <span className="text-[11px] leading-relaxed">
+          {score >= 80
+            ? "Excellent! You are maintaining strong savings and healthy investment ratios."
+            : score >= 60
+            ? "Good footing. Increase your savings rate to 20%+ and trim recurring costs to reach Grade A."
+            : "Focus on curbing discretionary expenses and building at least 1-month of savings buffer."}
+        </span>
+      </div>
     </div>
   );
 }

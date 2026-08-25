@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Track expenses, monitor income, analyze budgets, and grow your wealth.",
     start_url: "/",
     display: "standalone",
-    background_color: "#0d1714",
-    theme_color: "#00D27B",
+    background_color: "#090d14",
+    theme_color: "#10B981",
     icons: [
       {
         src: "/asset-management.png",

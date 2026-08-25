@@ -1,13 +1,13 @@
 import Swal from "sweetalert2";
 
-// Configure SweetAlert2 for Notion design system aesthetic
+// Configure SweetAlert2 for Expenseliy design system aesthetic
 const CustomSwal = Swal.mixin({
   customClass: {
-    popup: "font-sans border border-hairline rounded-xl  bg-surface text-ink",
-    title: "text-lg font-bold text-ink",
-    htmlContainer: "text-sm text-ink-muted",
-    confirmButton: "bg-primary hover:bg-primary-active text-white text-sm font-medium px-4 py-2 rounded-lg transition-all",
-    cancelButton: "bg-canvas hover:bg-hairline text-ink text-sm font-medium px-4 py-2 rounded-lg border border-hairline transition-all ml-2",
+    popup: "font-sans border border-hairline rounded-2xl bg-surface text-ink shadow-2xl",
+    title: "text-base font-bold text-ink tracking-tight",
+    htmlContainer: "text-xs sm:text-sm text-ink-muted leading-relaxed",
+    confirmButton: "bg-primary hover:bg-primary-active text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl transition-all active:scale-95 cursor-pointer",
+    cancelButton: "bg-canvas hover:bg-hairline text-ink text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl border border-hairline transition-all ml-2 active:scale-95 cursor-pointer",
   },
   buttonsStyling: false,
 });
@@ -67,31 +67,38 @@ export const showToast = {
   },
 };
 
-export const confirmDialog = async (options: {
+export interface ConfirmDialogOptions {
   title: string;
   text: string;
   confirmText?: string;
   cancelText?: string;
   confirmPhrase?: string;
   inputPlaceholder?: string;
-}): Promise<boolean> => {
+  isDanger?: boolean;
+  icon?: "warning" | "info" | "question" | "error" | "success";
+}
+
+export const confirmDialog = async (options: ConfirmDialogOptions): Promise<boolean> => {
+  const isDanger = options.isDanger ?? true;
   const swalConfig: any = {
     title: options.title,
     text: options.text,
-    icon: "warning",
+    icon: options.icon || (isDanger ? "warning" : "question"),
     showCancelButton: true,
-    confirmButtonText: options.confirmText || "Yes, delete",
+    confirmButtonText: options.confirmText || (isDanger ? "Yes, proceed" : "Confirm"),
     cancelButtonText: options.cancelText || "Cancel",
     reverseButtons: true,
-    iconColor: "var(--expense)",
+    iconColor: isDanger ? "var(--expense)" : "var(--primary)",
     customClass: {
-      popup: "font-sans border border-hairline rounded-2xl shadow-xl bg-surface text-ink p-6",
-      title: "text-lg font-bold text-ink tracking-tight",
-      htmlContainer: "text-sm text-ink-muted leading-relaxed",
-      input: "!mt-4 !mx-auto !w-[88%] !px-3.5 !py-2.5 !text-sm !font-mono !bg-canvas !text-ink !border !border-hairline !rounded-xl focus:!outline-none focus:!border-primary",
+      popup: "font-sans border border-hairline rounded-3xl shadow-2xl bg-surface text-ink p-5 sm:p-6",
+      title: "text-base sm:text-lg font-bold text-ink tracking-tight",
+      htmlContainer: "text-xs sm:text-sm text-ink-muted leading-relaxed mt-1",
+      input: "!mt-4 !mx-auto !w-[90%] !px-3.5 !py-2.5 !text-sm !font-mono !bg-canvas !text-ink !border !border-hairline !rounded-xl focus:!outline-none focus:!border-primary",
       validationMessage: "!bg-expense-bg !text-expense !text-xs !border !border-expense-border !rounded-lg !py-1.5 !px-3 !mx-auto !mt-2",
-      confirmButton: "bg-expense hover:opacity-90 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all  cursor-pointer",
-      cancelButton: "bg-canvas hover:bg-hairline text-ink text-sm font-semibold px-4 py-2 rounded-xl border border-hairline transition-all ml-2 cursor-pointer",
+      confirmButton: isDanger
+        ? "bg-expense hover:opacity-90 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl transition-all active:scale-95 cursor-pointer"
+        : "bg-primary hover:bg-primary-active text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl transition-all active:scale-95 cursor-pointer",
+      cancelButton: "bg-canvas hover:bg-hairline text-ink text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl border border-hairline transition-all ml-2 active:scale-95 cursor-pointer",
     },
   };
 
@@ -117,3 +124,4 @@ export const confirmDialog = async (options: {
 };
 
 export default CustomSwal;
+

@@ -48,7 +48,37 @@ export function PricingModal({
         return;
       }
 
-      // 2. Open Razorpay Checkout modal
+      // 2. Handle Sandbox / Instant Demo Mode Activation
+      if (data.isSandbox) {
+        showToast.info("Activating Pro Membership", "Upgrading your account to Expenseliy Pro...");
+
+        const verifyRes = await fetch("/api/billing/verify-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            isSandbox: true,
+            plan: planType,
+            razorpay_subscription_id: data.subscriptionId,
+          }),
+        });
+
+        const verifyData = await verifyRes.json();
+        setLoadingPlan(null);
+
+        if (verifyData.success) {
+          showToast.success(
+            "Welcome to Expenseliy Pro!",
+            "Unlimited transaction recording and deep AI intelligence are now unlocked."
+          );
+          if (onSuccess) onSuccess();
+          onClose();
+        } else {
+          showToast.error("Activation Failed", verifyData.error || "Please try again.");
+        }
+        return;
+      }
+
+      // 3. Open Live Razorpay Checkout modal
       await openRazorpayCheckout({
         subscriptionId: data.subscriptionId,
         keyId: data.keyId,
@@ -59,7 +89,6 @@ export function PricingModal({
           image: session?.user?.image,
         },
         onSuccess: async (response) => {
-          // 3. Verify cryptographic signature on backend
           showToast.info("Verifying Payment", "Confirming your subscription status...");
 
           const verifyRes = await fetch("/api/billing/verify-payment", {

@@ -253,7 +253,7 @@ export default function TransactionsPage() {
           <div className="flex items-center gap-2 sm:hidden mb-3">
             <div className="flex-1">
               <Input
-                placeholder="Search items..."
+                placeholder="Search items or notes..."
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
@@ -273,10 +273,37 @@ export default function TransactionsPage() {
             </Button>
           </div>
 
+          {/* Quick Mobile Type Chips with Smooth Horizontal Momentum Scroll */}
+          <div className="flex items-center gap-1.5 overflow-x-auto touch-scroll no-scrollbar pb-2.5 sm:hidden -mx-1 px-1">
+            {[
+              { label: "All", val: "All" },
+              { label: "Expenses", val: "Expense" },
+              { label: "Income", val: "Income" },
+              { label: "Investments", val: "Investment" },
+            ].map((chip) => (
+              <button
+                key={chip.val}
+                type="button"
+                onClick={() => {
+                  setType(chip.val);
+                  setPage(1);
+                }}
+                className={cn(
+                  "px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all select-none cursor-pointer shrink-0 min-h-[34px]",
+                  type === chip.val
+                    ? "bg-primary text-white shadow-xs"
+                    : "bg-canvas text-ink-muted border border-hairline hover:text-ink hover:bg-surface"
+                )}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+
           {/* Desktop & Collapsed Mobile Filter Controls */}
           <div
             className={cn(
-              "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3",
+              "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 animate-in fade-in duration-150",
               !showMobileFilters && "hidden sm:grid"
             )}
           >
@@ -292,18 +319,20 @@ export default function TransactionsPage() {
               />
             </div>
 
-            <Select
-              value={type}
-              onChange={(e) => {
-                setType(e.target.value);
-                setPage(1);
-              }}
-            >
-              <option value="All">All Transaction Types</option>
-              <option value="Expense">Expenses Only</option>
-              <option value="Income">Income Only</option>
-              <option value="Investment">Investments Only</option>
-            </Select>
+            <div className="hidden sm:block">
+              <Select
+                value={type}
+                onChange={(e) => {
+                  setType(e.target.value);
+                  setPage(1);
+                }}
+              >
+                <option value="All">All Transaction Types</option>
+                <option value="Expense">Expenses Only</option>
+                <option value="Income">Income Only</option>
+                <option value="Investment">Investments Only</option>
+              </Select>
+            </div>
 
             <Select
               value={categoryId}
@@ -341,7 +370,7 @@ export default function TransactionsPage() {
               !showMobileFilters && "hidden sm:flex"
             )}
           >
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap touch-scroll">
               <span className="font-semibold text-ink flex items-center gap-1.5">
                 <Filter className="w-3.5 h-3.5 text-primary" /> Amount Range:
               </span>

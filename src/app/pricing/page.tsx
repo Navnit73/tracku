@@ -44,6 +44,34 @@ export default function PricingPage() {
         return;
       }
 
+      // Handle Sandbox / Demo mode upgrade
+      if (data.isSandbox) {
+        showToast.info("Activating Pro Plan", "Upgrading your account to Expenseliy Pro...");
+        const verifyRes = await fetch("/api/billing/verify-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            isSandbox: true,
+            plan: planType,
+            razorpay_subscription_id: data.subscriptionId,
+          }),
+        });
+
+        const verifyData = await verifyRes.json();
+        setLoadingPlan(null);
+
+        if (verifyData.success) {
+          showToast.success(
+            "Welcome to Expenseliy Pro!",
+            "Unlimited transaction recording is now unlocked."
+          );
+          refreshBilling();
+        } else {
+          showToast.error("Activation Failed", verifyData.error || "Please try again.");
+        }
+        return;
+      }
+
       await openRazorpayCheckout({
         subscriptionId: data.subscriptionId,
         keyId: data.keyId,

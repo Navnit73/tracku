@@ -38,8 +38,16 @@ import {
   Landmark,
   ShieldCheck,
   Trash2,
+  Lightbulb,
+  Target,
+  CheckCircle2,
+  Zap,
+  ArrowRight,
+  TrendingUp,
+  HelpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import Link from "next/link";
 
 export default function InsightsPage() {
   const { currency } = useCurrency();
@@ -155,7 +163,6 @@ export default function InsightsPage() {
 
   // ── AI Insights Handler ──
   const handleGenerateAI = useCallback(async () => {
-    // Prevent duplicate requests (double-click, re-renders)
     if (aiRequestRef.current) return;
     aiRequestRef.current = true;
     setAiLoading(true);
@@ -200,14 +207,14 @@ export default function InsightsPage() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-income-bg text-income border border-income-border inline-flex items-center gap-1">
-                <Brain className="w-3 h-3" /> Financial Intelligence
+                <Brain className="w-3 h-3" /> Personal CFO Intelligence
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-ink tracking-tight">
-              Diagnostics & Advanced Analytics
+              Financial Diagnostics & Actionable Insights
             </h2>
             <p className="text-xs text-ink-muted mt-0.5">
-              Comprehensive analysis of cashflow patterns, savings velocity, and financial health
+              Automated diagnostic intelligence identifying spending leaks, financial health score, and wealth runway
             </p>
           </div>
 
@@ -242,6 +249,86 @@ export default function InsightsPage() {
             >
               Clear Ledger
             </Button>
+          </div>
+        </div>
+
+        {/* Executive Value Proposition Banner: What is this page for? */}
+        <div className="rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-surface via-surface to-canvas border border-hairline shadow-xs flex flex-col gap-4">
+          <div className="flex items-start sm:items-center justify-between gap-3 border-b border-hairline pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-primary/10 text-primary shrink-0">
+                <Lightbulb className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-ink tracking-tight">
+                  Why use Financial Insights?
+                </h3>
+                <p className="text-xs text-ink-muted">
+                  Your numbers transformed into clear, actionable wealth-building advice
+                </p>
+              </div>
+            </div>
+            <span className="hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+              4 Answers For You
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="p-3 rounded-2xl bg-canvas border border-hairline flex flex-col gap-1">
+              <span className="text-[11px] font-bold text-income flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5" /> 1. Am I living within my means?
+              </span>
+              <p className="text-[11px] text-ink-muted leading-tight">
+                Instantly tracks your net burn rate and whether expenses are eating your income.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-canvas border border-hairline flex flex-col gap-1">
+              <span className="text-[11px] font-bold text-warning-brand flex items-center gap-1.5">
+                <Repeat className="w-3.5 h-3.5" /> 2. Where is money leaking?
+              </span>
+              <p className="text-[11px] text-ink-muted leading-tight">
+                Auto-detects recurring subscription charges and highest outlay categories.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-canvas border border-hairline flex flex-col gap-1">
+              <span className="text-[11px] font-bold text-sky-brand flex items-center gap-1.5">
+                <PiggyBank className="w-3.5 h-3.5" /> 3. How fast am I saving?
+              </span>
+              <p className="text-[11px] text-ink-muted leading-tight">
+                Measures your savings velocity and gives your projected months of runway.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-canvas border border-hairline flex flex-col gap-1">
+              <span className="text-[11px] font-bold text-investment flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5" /> 4. What is my Health Score?
+              </span>
+              <p className="text-[11px] text-ink-muted leading-tight">
+                A holistic 100-point rating of your financial discipline, investments & buffer.
+              </p>
+            </div>
+          </div>
+
+          {/* 3 Quick Action Steps Card */}
+          <div className="pt-2 border-t border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 text-ink-muted">
+              <Zap className="w-4 h-4 text-primary shrink-0" />
+              <span><strong>Ready to take action?</strong> Use the shortcuts below to optimize your finances today:</span>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Link href="/categories">
+                <Button variant="secondary" size="sm" className="text-xs h-8">
+                  Set Budgets
+                </Button>
+              </Link>
+              <Link href="/transactions">
+                <Button variant="primary" size="sm" className="text-xs h-8 font-bold">
+                  View Ledger
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
 

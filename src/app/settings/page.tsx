@@ -35,6 +35,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { FirstTimeUserGuide } from "@/components/ui/FirstTimeUserGuide";
+
 export default function SettingsPage() {
   const { data: session } = useSession();
   const { currency, setCurrency: setGlobalCurrency, isSaving: isSavingCurrency } = useCurrency();
@@ -43,6 +45,7 @@ export default function SettingsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClearingTx, setIsClearingTx] = useState(false);
   const [activeTheme, setActiveTheme] = useState<"light" | "dark">("light");
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   // Subscription state
   const [isCancellingSub, setIsCancellingSub] = useState(false);
@@ -68,6 +71,21 @@ export default function SettingsPage() {
       localStorage.setItem("theme", "light");
     }
     showToast.success("Theme Updated", `Switched to ${newTheme} mode.`);
+  };
+
+  const handleSignOut = async () => {
+    const confirmed = await confirmDialog({
+      title: "Sign Out?",
+      text: "Are you sure you want to sign out of your account?",
+      confirmText: "Yes, Sign Out",
+      cancelText: "Stay Logged In",
+      isDanger: false,
+      icon: "question",
+    });
+
+    if (confirmed) {
+      signOut({ callbackUrl: "/auth/signin" });
+    }
   };
 
   const handleCurrencyChange = useCallback(async (newCurrency: string) => {
@@ -375,9 +393,9 @@ export default function SettingsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => signOut()}
+                onClick={handleSignOut}
                 leftIcon={<LogOut className="w-4 h-4 shrink-0" />}
-                className="w-full sm:w-auto shrink-0 justify-center"
+                className="w-full sm:w-auto shrink-0 justify-center hover:text-expense hover:border-expense/40"
               >
                 Sign Out
               </Button>
@@ -402,7 +420,7 @@ export default function SettingsPage() {
                 onClick={() => handleThemeChange("light")}
                 className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between active:scale-98 ${
                   activeTheme === "light"
-                    ? "bg-surface border-primary ring-2 ring-primary/20"
+                    ? "bg-surface border-primary ring-2 ring-primary/20 shadow-xs"
                     : "bg-canvas border-hairline hover:border-hairline-strong text-ink-muted"
                 }`}
               >
@@ -428,7 +446,7 @@ export default function SettingsPage() {
                 onClick={() => handleThemeChange("dark")}
                 className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between active:scale-98 ${
                   activeTheme === "dark"
-                    ? "bg-surface border-primary ring-2 ring-primary/20"
+                    ? "bg-surface border-primary ring-2 ring-primary/20 shadow-xs"
                     : "bg-canvas border-hairline hover:border-hairline-strong text-ink-muted"
                 }`}
               >
@@ -438,7 +456,7 @@ export default function SettingsPage() {
                   </div>
                   <div className="min-w-0">
                     <div className="text-sm font-bold text-ink truncate">Dark Mode</div>
-                    <div className="text-xs text-ink-muted mt-0.5 truncate">Sleek slate green theme</div>
+                    <div className="text-xs text-ink-muted mt-0.5 truncate">Sleek obsidian emerald theme</div>
                   </div>
                 </div>
                 {activeTheme === "dark" && (
@@ -447,6 +465,27 @@ export default function SettingsPage() {
                   </div>
                 )}
               </button>
+            </div>
+
+            {/* Quick Start Guide Relauncher */}
+            <div className="p-4 rounded-2xl bg-canvas border border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
+              <div className="min-w-0">
+                <div className="text-sm font-bold text-ink flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span>Interactive App Tour & Feature Guide</span>
+                </div>
+                <p className="text-xs text-ink-muted mt-0.5 leading-relaxed">
+                  Walk through how transaction recording, smart categories, health score, and AI insights work.
+                </p>
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsGuideOpen(true)}
+                className="w-full sm:w-auto shrink-0 font-bold justify-center"
+              >
+                Relaunch Guide
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -597,6 +636,11 @@ export default function SettingsPage() {
         isOpen={isPricingModalOpen}
         onClose={() => setIsPricingModalOpen(false)}
         onSuccess={refreshBilling}
+      />
+
+      <FirstTimeUserGuide
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
       />
     </AppShell>
   );

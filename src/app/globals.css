@@ -5,9 +5,9 @@
 :root {
   /* Brand Palette Tokens */
   --brand-whitesmoke: #f6f5f4;
-  --brand-mediumseagreen: #00A860;
-  --brand-mediumspringgreen: #00D27B;
-  --brand-seagreen: #00874C;
+  --brand-mediumseagreen: #059669;
+  --brand-mediumspringgreen: #10B981;
+  --brand-seagreen: #047857;
 
   /* Homepage Palette Tokens */
   --homepage-mintcream: #EBF5F0;
@@ -58,40 +58,40 @@
 }
 
 .dark {
-  /* Application UI Mappings (Dark Mode - Professional Slate Green) */
-  --canvas: #0e1714;
-  --surface: #15221e;
-  --surface-raised: #1c2d28;
-  --ink: #f4f9f6;
-  --ink-secondary: #d1e4dc;
-  --ink-muted: #8caea0;
-  --ink-faint: #4e6f62;
-  --hairline: #223730;
-  --hairline-strong: #2f4b42;
+  /* Application UI Mappings (Dark Mode - Sleek Obsidian Slate with Luminous Mint Emerald) */
+  --canvas: #090d14;
+  --surface: #0f1622;
+  --surface-raised: #16202f;
+  --ink: #f8fafc;
+  --ink-secondary: #cbd5e1;
+  --ink-muted: #94a3b8;
+  --ink-faint: #64748b;
+  --hairline: #1e293b;
+  --hairline-strong: #334155;
 
-  --primary: #00D27B;
-  --primary-active: #00A860;
-  --secondary: #00A860;
+  --primary: #10B981;
+  --primary-active: #059669;
+  --secondary: #059669;
 
-  --income: #00E687;
-  --income-bg: #0d271c;
-  --income-border: #184834;
+  --income: #10B981;
+  --income-bg: rgba(16, 185, 129, 0.12);
+  --income-border: rgba(16, 185, 129, 0.25);
 
-  --expense: #fb7185;
-  --expense-bg: #35131b;
-  --expense-border: #5c1e2b;
+  --expense: #f43f5e;
+  --expense-bg: rgba(244, 63, 94, 0.12);
+  --expense-border: rgba(244, 63, 94, 0.25);
 
-  --investment: #a78bfa;
-  --investment-bg: #27173e;
-  --investment-border: #4c2d7b;
+  --investment: #8b5cf6;
+  --investment-bg: rgba(139, 92, 246, 0.12);
+  --investment-border: rgba(139, 92, 246, 0.25);
 
-  --sky: #38bdf8;
-  --sky-bg: #0c2a3a;
-  --sky-border: #134e6f;
+  --sky: #0ea5e9;
+  --sky-bg: rgba(14, 165, 233, 0.12);
+  --sky-border: rgba(14, 165, 233, 0.25);
 
-  --warning: #fbbf24;
-  --warning-bg: #332403;
-  --warning-border: #5e4308;
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --warning-border: rgba(245, 158, 11, 0.25);
 }
 
 @theme {
@@ -157,6 +157,62 @@ body {
   overflow-x: hidden;
 }
 
+/* Dropdown & Form select options styling */
+select {
+  font-family: inherit;
+}
+
+select option,
+select optgroup {
+  background-color: var(--surface) !important;
+  color: var(--ink) !important;
+  font-family: inherit;
+}
+
+/* SweetAlert2 Theme Overrides */
+.swal2-container {
+  z-index: 100 !important;
+}
+
+.swal2-popup {
+  background-color: var(--surface) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--hairline) !important;
+  border-radius: 1.25rem !important;
+  font-family: inherit !important;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.35) !important;
+}
+
+.swal2-popup.swal2-toast {
+  background-color: var(--surface) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--hairline) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3) !important;
+  padding: 0.85rem 1.15rem !important;
+}
+
+.swal2-title {
+  color: var(--ink) !important;
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.015em !important;
+}
+
+.swal2-html-container {
+  color: var(--ink-muted) !important;
+  font-size: 0.875rem !important;
+}
+
+.swal2-timer-progress-bar {
+  background: var(--primary) !important;
+}
+
+.swal2-input {
+  background-color: var(--canvas) !important;
+  color: var(--ink) !important;
+  border-color: var(--hairline) !important;
+}
+
 /* Utilities for hiding scrollbars without breaking scrolling */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -164,6 +220,13 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Touch and Momentum Scrolling */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-behavior: smooth;
 }
 
 /* Print Stylesheet */
