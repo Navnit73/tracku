@@ -80,12 +80,12 @@ export function Navbar({
       text: "Are you sure you want to log out of your Expenseliy account?",
       confirmText: "Yes, Sign Out",
       cancelText: "Stay Logged In",
-      isDanger: false,
+      isDanger: true,
       icon: "question",
     });
 
     if (confirmed) {
-      signOut({ callbackUrl: "/auth/signin" });
+      await signOut({ callbackUrl: "/auth/signin" });
     }
   };
 

@@ -60,16 +60,16 @@ export function Sidebar({
         aria-hidden="true"
       />
 
-      {/* Sidebar Container: Theme-Adaptive Executive Styling */}
+      {/* Sidebar Container: Deep Executive Midnight Styling (Not white in light theme) */}
       <aside
         className={cn(
-          "fixed top-0 bottom-0 left-0 z-50 bg-surface border-r border-hairline text-ink flex flex-col transition-[width,transform,translate] duration-300 ease-in-out lg:shadow-none select-none overflow-hidden will-change-[width,transform,translate]",
+          "fixed top-0 bottom-0 left-0 z-50 bg-sidebar-canvas border-r border-sidebar-hairline text-sidebar-ink flex flex-col transition-[width,transform,translate] duration-300 ease-in-out lg:shadow-none select-none overflow-hidden will-change-[width,transform,translate]",
           mobileOpen ? "translate-x-0 w-64 shadow-2xl" : "-translate-x-full lg:translate-x-0",
           isCollapsed ? "lg:w-20" : "lg:w-64"
         )}
       >
         {/* Brand Header */}
-        <div className="h-16 flex items-center justify-between border-b border-hairline shrink-0 px-3.5 bg-surface">
+        <div className="h-16 flex items-center justify-between border-b border-sidebar-hairline shrink-0 px-3.5 bg-sidebar-canvas">
           <Link
             href="/"
             className="flex items-center group min-w-0 flex-1 overflow-hidden"
@@ -93,7 +93,7 @@ export function Sidebar({
                   : "opacity-100 max-w-[170px] ml-2.5"
               )}
             >
-              <span className="font-extrabold text-[15px] tracking-tight text-ink leading-tight truncate">
+              <span className="font-extrabold text-[15px] tracking-tight text-sidebar-ink leading-tight truncate">
                 Expenseliy
               </span>
               <span className="text-[10px] text-primary font-semibold flex items-center gap-1 mt-0.5">
@@ -105,7 +105,7 @@ export function Sidebar({
           {/* Mobile close button */}
           <button
             onClick={() => setMobileOpen(false)}
-            className="p-2 rounded-xl text-ink-muted hover:text-ink hover:bg-canvas lg:hidden cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center transition-colors shrink-0"
+            className="p-2 rounded-xl text-sidebar-ink-muted hover:text-sidebar-ink hover:bg-sidebar-surface-hover lg:hidden cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center transition-colors shrink-0"
             aria-label="Close sidebar"
           >
             <X className="w-5 h-5" />
@@ -113,10 +113,10 @@ export function Sidebar({
         </div>
 
         {/* Navigation Section */}
-        <div className="flex-1 px-3 py-4 overflow-y-auto space-y-1.5 no-scrollbar bg-surface">
+        <div className="flex-1 px-3 py-4 overflow-y-auto space-y-1.5 no-scrollbar bg-sidebar-canvas">
           <div
             className={cn(
-              "px-3 text-[10px] font-bold uppercase tracking-wider text-ink-faint select-none transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap",
+              "px-3 text-[10px] font-bold uppercase tracking-wider text-sidebar-ink-faint select-none transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap",
               isCollapsed
                 ? "opacity-0 max-h-0 mb-0 pointer-events-none"
                 : "opacity-100 max-h-6 mb-2"
@@ -139,8 +139,8 @@ export function Sidebar({
                 className={cn(
                   "relative flex items-center w-full h-11 px-3.5 rounded-xl transition-colors duration-200 group overflow-hidden",
                   isActive
-                    ? "bg-primary/15 text-primary font-bold border border-primary/30 shadow-xs"
-                    : "text-ink-muted hover:bg-canvas hover:text-ink border border-transparent"
+                    ? "bg-sidebar-active-bg text-sidebar-active-text font-bold border border-sidebar-active-border shadow-xs"
+                    : "text-sidebar-ink-muted hover:bg-sidebar-surface-hover hover:text-sidebar-ink border border-transparent"
                 )}
               >
                 <div className="w-5 h-5 flex items-center justify-center shrink-0">
@@ -148,8 +148,8 @@ export function Sidebar({
                     className={cn(
                       "w-5 h-5 transition-transform duration-200 shrink-0",
                       isActive
-                        ? "text-primary scale-105"
-                        : "text-ink-muted group-hover:text-ink group-hover:scale-105"
+                        ? "text-sidebar-active-text scale-105"
+                        : "text-sidebar-ink-muted group-hover:text-sidebar-ink group-hover:scale-105"
                     )}
                   />
                 </div>
@@ -167,9 +167,9 @@ export function Sidebar({
 
                 {/* Floating Tooltip in Collapsed Mode */}
                 {isCollapsed && (
-                  <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-surface text-ink text-xs font-semibold rounded-lg shadow-lg border border-hairline whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
+                  <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-sidebar-surface text-sidebar-ink text-xs font-semibold rounded-lg shadow-lg border border-sidebar-hairline whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
                     {item.name}
-                    <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-surface" />
+                    <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-sidebar-surface" />
                   </div>
                 )}
               </Link>
@@ -178,19 +178,19 @@ export function Sidebar({
         </div>
 
         {/* Footer with Toggle & System Status */}
-        <div className="p-3 border-t border-hairline text-xs text-ink-muted bg-canvas shrink-0 flex flex-col gap-2">
+        <div className="p-3 border-t border-sidebar-hairline text-xs text-sidebar-ink-muted bg-sidebar-surface/60 shrink-0 flex flex-col gap-2">
           {/* Desktop Collapse / Expand Toggle Button */}
           {onToggleCollapse && (
             <button
               onClick={onToggleCollapse}
-              className="hidden lg:flex items-center w-full h-11 px-3.5 rounded-xl border border-hairline bg-surface/60 hover:bg-surface text-ink-muted hover:text-ink transition-all cursor-pointer active:scale-95 group relative overflow-hidden"
+              className="hidden lg:flex items-center w-full h-11 px-3.5 rounded-xl border border-sidebar-hairline bg-sidebar-surface hover:bg-sidebar-surface-hover text-sidebar-ink-muted hover:text-sidebar-ink transition-all cursor-pointer active:scale-95 group relative overflow-hidden"
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <div className="w-5 h-5 flex items-center justify-center shrink-0">
                 {isCollapsed ? (
                   <PanelLeftOpen className="w-4 h-4 text-primary" />
                 ) : (
-                  <PanelLeftClose className="w-4 h-4 text-ink-muted group-hover:text-ink transition-colors" />
+                  <PanelLeftClose className="w-4 h-4 text-sidebar-ink-muted group-hover:text-sidebar-ink transition-colors" />
                 )}
               </div>
 
@@ -202,21 +202,21 @@ export function Sidebar({
                     : "opacity-100 max-w-[170px] ml-3"
                 )}
               >
-                <span className="text-xs font-semibold text-ink truncate">Collapse Menu</span>
+                <span className="text-xs font-semibold text-sidebar-ink truncate">Collapse Menu</span>
               </div>
 
               {/* Tooltip for Collapse Toggle */}
               {isCollapsed && (
-                <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-surface text-ink text-xs font-semibold rounded-lg shadow-lg border border-hairline whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
+                <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-sidebar-surface text-sidebar-ink text-xs font-semibold rounded-lg shadow-lg border border-sidebar-hairline whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
                   Expand Sidebar
-                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-surface" />
+                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-sidebar-surface" />
                 </div>
               )}
             </button>
           )}
 
           {/* System status */}
-          <div className="flex items-center w-full h-7 px-3.5 text-[11px] font-medium text-ink-muted relative group">
+          <div className="flex items-center w-full h-7 px-3.5 text-[11px] font-medium text-sidebar-ink-muted relative group">
             <div className="w-5 h-5 flex items-center justify-center shrink-0">
               <span className="w-2 h-2 rounded-full bg-income inline-block animate-pulse" />
             </div>
@@ -235,9 +235,9 @@ export function Sidebar({
 
             {/* Tooltip for System Status in Collapsed Mode */}
             {isCollapsed && (
-              <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-surface text-ink text-xs font-semibold rounded-lg shadow-lg border border-hairline whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
+              <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-sidebar-surface text-sidebar-ink text-xs font-semibold rounded-lg shadow-lg border border-sidebar-hairline whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
                 System Online
-                <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-surface" />
+                <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-sidebar-surface" />
               </div>
             )}
           </div>

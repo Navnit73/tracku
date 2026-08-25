@@ -52,6 +52,18 @@
   --warning-bg: #fffbeb;
   --warning-border: #fde68a;
 
+  /* Sidebar Tokens (Light Mode - Deep Executive Midnight Slate, NOT white) */
+  --sidebar-canvas: #0c131d;
+  --sidebar-surface: #111a27;
+  --sidebar-surface-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-hairline: #1e293b;
+  --sidebar-ink: #f8fafc;
+  --sidebar-ink-muted: #94a3b8;
+  --sidebar-ink-faint: #64748b;
+  --sidebar-active-bg: rgba(16, 185, 129, 0.16);
+  --sidebar-active-border: rgba(16, 185, 129, 0.35);
+  --sidebar-active-text: #10B981;
+
   /* Safe areas */
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
@@ -92,6 +104,18 @@
   --warning: #f59e0b;
   --warning-bg: rgba(245, 158, 11, 0.12);
   --warning-border: rgba(245, 158, 11, 0.25);
+
+  /* Sidebar Tokens (Dark Mode) */
+  --sidebar-canvas: #090d14;
+  --sidebar-surface: #0f1622;
+  --sidebar-surface-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-hairline: #1e293b;
+  --sidebar-ink: #f8fafc;
+  --sidebar-ink-muted: #94a3b8;
+  --sidebar-ink-faint: #64748b;
+  --sidebar-active-bg: rgba(16, 185, 129, 0.16);
+  --sidebar-active-border: rgba(16, 185, 129, 0.35);
+  --sidebar-active-text: #10B981;
 }
 
 @theme {
@@ -127,6 +151,18 @@
   --color-warning-brand: var(--warning);
   --color-warning-brand-bg: var(--warning-bg);
   --color-warning-brand-border: var(--warning-border);
+
+  /* Sidebar Theme Utility Colors */
+  --color-sidebar-canvas: var(--sidebar-canvas);
+  --color-sidebar-surface: var(--sidebar-surface);
+  --color-sidebar-surface-hover: var(--sidebar-surface-hover);
+  --color-sidebar-hairline: var(--sidebar-hairline);
+  --color-sidebar-ink: var(--sidebar-ink);
+  --color-sidebar-ink-muted: var(--sidebar-ink-muted);
+  --color-sidebar-ink-faint: var(--sidebar-ink-faint);
+  --color-sidebar-active-bg: var(--sidebar-active-bg);
+  --color-sidebar-active-border: var(--sidebar-active-border);
+  --color-sidebar-active-text: var(--sidebar-active-text);
 
   /* Direct Brand Utility Classes */
   --color-brand-whitesmoke: var(--brand-whitesmoke);
@@ -171,16 +207,19 @@ select optgroup {
 
 /* SweetAlert2 Theme Overrides */
 .swal2-container {
-  z-index: 100 !important;
+  z-index: 99999 !important;
 }
 
 .swal2-popup {
   background-color: var(--surface) !important;
   color: var(--ink) !important;
   border: 1px solid var(--hairline) !important;
-  border-radius: 1.25rem !important;
+  border-radius: 1.5rem !important;
   font-family: inherit !important;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45) !important;
+  max-width: 90vw !important;
+  width: 26rem !important;
+  padding: 1.5rem !important;
 }
 
 .swal2-popup.swal2-toast {
@@ -189,18 +228,48 @@ select optgroup {
   border: 1px solid var(--hairline) !important;
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3) !important;
   padding: 0.85rem 1.15rem !important;
+  width: auto !important;
+  max-width: 90vw !important;
 }
 
 .swal2-title {
   color: var(--ink) !important;
-  font-size: 1.05rem !important;
+  font-size: 1.125rem !important;
   font-weight: 700 !important;
   letter-spacing: -0.015em !important;
+  padding: 0 !important;
+  margin-bottom: 0.5rem !important;
 }
 
 .swal2-html-container {
   color: var(--ink-muted) !important;
   font-size: 0.875rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.swal2-actions {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.75rem !important;
+  margin-top: 1.25rem !important;
+  padding: 0 !important;
+}
+
+@media (max-width: 640px) {
+  .swal2-actions {
+    flex-direction: column-reverse !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+  .swal2-actions button {
+    width: 100% !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+  }
 }
 
 .swal2-timer-progress-bar {

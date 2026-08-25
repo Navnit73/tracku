@@ -79,12 +79,12 @@ export default function SettingsPage() {
       text: "Are you sure you want to sign out of your account?",
       confirmText: "Yes, Sign Out",
       cancelText: "Stay Logged In",
-      isDanger: false,
+      isDanger: true,
       icon: "question",
     });
 
     if (confirmed) {
-      signOut({ callbackUrl: "/auth/signin" });
+      await signOut({ callbackUrl: "/auth/signin" });
     }
   };
 
