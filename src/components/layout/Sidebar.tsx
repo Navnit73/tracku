@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   LayoutDashboard,
   Receipt,
@@ -19,6 +20,7 @@ import {
   CreditCard,
   PanelLeftClose,
   PanelLeftOpen,
+  ShieldAlert,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -47,6 +49,14 @@ export function Sidebar({
   onToggleCollapse?: () => void;
 }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  const isSuperAdmin =
+    session?.user?.isSuperAdmin ||
+    session?.user?.role === "superadmin" ||
+    session?.user?.role === "admin" ||
+    session?.user?.email?.toLowerCase() === "navnitrai5389@gmail.com";
+
 
   return (
     <>
@@ -175,7 +185,56 @@ export function Sidebar({
               </Link>
             );
           })}
+
+          {/* Super Admin Command Center Link */}
+          {isSuperAdmin && (
+            <div className="pt-2 mt-2 border-t border-sidebar-hairline/60">
+              <div
+                className={cn(
+                  "px-3 text-[10px] font-bold uppercase tracking-wider text-primary select-none transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap",
+                  isCollapsed
+                    ? "opacity-0 max-h-0 mb-0 pointer-events-none"
+                    : "opacity-100 max-h-6 mb-1.5"
+                )}
+              >
+                Root Administration
+              </div>
+              <Link
+                href="/admin"
+                onClick={() => setMobileOpen(false)}
+                className={cn(
+                  "relative flex items-center w-full h-11 px-3.5 rounded-xl transition-colors duration-200 group overflow-hidden",
+                  pathname.startsWith("/admin")
+                    ? "bg-primary/20 text-primary font-bold border border-primary/40 shadow-xs"
+                    : "text-primary/80 hover:bg-primary/10 hover:text-primary border border-transparent"
+                )}
+              >
+                <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                  <ShieldAlert className="w-5 h-5 transition-transform duration-200 shrink-0 text-primary group-hover:scale-110" />
+                </div>
+
+                <span
+                  className={cn(
+                    "truncate text-sm font-bold tracking-tight text-primary transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap",
+                    isCollapsed
+                      ? "opacity-0 max-w-0 ml-0 pointer-events-none"
+                      : "opacity-100 max-w-[170px] ml-3"
+                  )}
+                >
+                  Super Admin
+                </span>
+
+                {isCollapsed && (
+                  <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-sidebar-surface text-primary text-xs font-bold rounded-lg shadow-lg border border-sidebar-hairline whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-150 z-50">
+                    Super Admin Center
+                    <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-sidebar-surface" />
+                  </div>
+                )}
+              </Link>
+            </div>
+          )}
         </div>
+
 
         {/* Footer with Toggle & System Status */}
         <div className="p-3 border-t border-sidebar-hairline text-xs text-sidebar-ink-muted bg-sidebar-surface/60 shrink-0 flex flex-col gap-2">

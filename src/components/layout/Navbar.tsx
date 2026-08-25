@@ -16,6 +16,7 @@ import {
   Zap,
   ArrowLeft,
   HelpCircle,
+  ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -152,6 +153,24 @@ export function Navbar({
             <HelpCircle className="w-4 h-4" />
           </button>
 
+          {/* Super Admin Quick Link */}
+          {session?.user &&
+            (session.user.isSuperAdmin ||
+              session.user.role === "superadmin" ||
+              session.user.role === "admin" ||
+              session.user.email?.toLowerCase() === "navnitrai5389@gmail.com") && (
+              <Link href="/admin">
+                <Badge
+                  variant="primary"
+                  size="sm"
+                  className="hidden sm:inline-flex items-center gap-1 font-extrabold text-[10px] tracking-wide hover:scale-105 transition-transform cursor-pointer shadow-xs"
+                  title="Open Super Admin Portal"
+                >
+                  <ShieldAlert className="w-3 h-3" /> ADMIN
+                </Badge>
+              </Link>
+            )}
+
           {/* Plan status / Upgrade link */}
           {session?.user && (
             <>
@@ -172,6 +191,7 @@ export function Navbar({
               ) : null}
             </>
           )}
+
 
           {/* Dark / Light Mode Toggle */}
           <button

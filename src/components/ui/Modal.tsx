@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title?: string;
+  title?: ReactNode;
   description?: string;
   children: ReactNode;
   footer?: ReactNode;
@@ -25,39 +25,20 @@ export function Modal({
   maxWidth = "md",
 }: ModalProps) {
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+      }
     };
 
-    let pushedState = false;
-
-    const handlePopState = () => {
-      // If mobile user hits back button, close modal
-      onClose();
-    };
-
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
-      window.addEventListener("popstate", handlePopState);
-
-      // Push history state so back button closes modal rather than leaving the page
-      try {
-        window.history.pushState({ modalOpen: true }, "");
-        pushedState = true;
-      } catch {}
-    }
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.body.style.overflow = "unset";
       window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("popstate", handlePopState);
-
-      if (pushedState && window.history.state?.modalOpen) {
-        try {
-          window.history.back();
-        } catch {}
-      }
     };
   }, [isOpen, onClose]);
 

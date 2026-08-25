@@ -72,12 +72,19 @@ export async function hasActiveSubscription(userId: string, userEmail?: string |
 
   await connectToDatabase();
 
-  // 2. Check DB email if not provided in session
-  if (!userEmail) {
-    const user = await User.findById(userId).select("email").lean<{ email?: string } | null>();
-    if (user?.email && isWhitelistedEmail(user.email)) {
-      return true;
-    }
+  // 2. Check DB email or vip override if not provided in session
+  const user = await User.findById(userId)
+    .select("email isVipOverride role")
+    .lean<{ email?: string; isVipOverride?: boolean; role?: string } | null>();
+
+  if (
+    user &&
+    (user.isVipOverride === true ||
+      user.role === "superadmin" ||
+      user.role === "admin" ||
+      isWhitelistedEmail(user.email))
+  ) {
+    return true;
   }
 
   const now = new Date();
@@ -126,15 +133,13 @@ export async function getUserSubscription(userId: string): Promise<ISubscription
 export async function getUserTransactionUsage(userId: string, userEmail?: string | null): Promise<UserSubscriptionUsage> {
   await connectToDatabase();
 
-  const isVip = isWhitelistedEmail(userEmail);
+  const isEmailVip = isWhitelistedEmail(userEmail);
 
-  // If email was not passed, resolve email in parallel with count
-  const needUserFetch = !userEmail && !isVip;
-
+  // Fetch user document to check DB VIP flags and role
   const [userDoc, transactionCount, subRecord] = await Promise.all([
-    needUserFetch ? User.findById(userId).select("email").lean<{ email?: string } | null>() : Promise.resolve(null),
+    User.findById(userId).select("email isVipOverride role").lean<{ email?: string; isVipOverride?: boolean; role?: string } | null>(),
     Transaction.countDocuments({ userId }),
-    !isVip
+    !isEmailVip
       ? Subscription.findOne({
           userId,
           status: { $in: ["ACTIVE", "CANCEL_AT_PERIOD_END", "PENDING", "PAST_DUE", "HALTED"] },
@@ -144,7 +149,13 @@ export async function getUserTransactionUsage(userId: string, userEmail?: string
       : Promise.resolve(null),
   ]);
 
-  const finalIsVip = isVip || isWhitelistedEmail(userDoc?.email);
+  const finalIsVip =
+    isEmailVip ||
+    userDoc?.isVipOverride === true ||
+    userDoc?.role === "superadmin" ||
+    userDoc?.role === "admin" ||
+    isWhitelistedEmail(userDoc?.email);
+
   const now = new Date();
 
   let isSubscribed = false;
