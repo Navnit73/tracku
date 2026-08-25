@@ -327,6 +327,36 @@ export async function getExpenseAnalytics(filters?: AnalyticsFilter) {
               },
               { $sort: { amount: -1 } },
             ],
+            dailyTrends: [
+              {
+                $group: {
+                  _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+                  amount: { $sum: "$amount" },
+                  count: { $sum: 1 },
+                },
+              },
+              { $sort: { _id: 1 } },
+            ],
+            byPaymentMethod: [
+              {
+                $group: {
+                  _id: { $ifNull: ["$paymentMethod", "Other"] },
+                  amount: { $sum: "$amount" },
+                  count: { $sum: 1 },
+                },
+              },
+              { $sort: { amount: -1 } },
+            ],
+            byDayOfWeek: [
+              {
+                $group: {
+                  _id: { $dayOfWeek: "$date" },
+                  amount: { $sum: "$amount" },
+                  count: { $sum: 1 },
+                },
+              },
+              { $sort: { _id: 1 } },
+            ],
             byItem: [
               {
                 $group: {
@@ -351,8 +381,29 @@ export async function getExpenseAnalytics(filters?: AnalyticsFilter) {
     const stats = facet.stats?.[0] || { totalExpense: 0, highestExpense: 0, averageExpense: 0, count: 0 };
 
     const categorySpending = (facet.byCategory || []).map((c: any) => ({
-      name: c._id,
+      name: c._id || "Uncategorized",
       amount: c.amount,
+    }));
+
+    const dailyTrends = (facet.dailyTrends || []).map((d: any) => ({
+      date: d._id,
+      amount: d.amount,
+      count: d.count,
+    }));
+
+    const paymentMethods = (facet.byPaymentMethod || []).map((p: any) => ({
+      method: p._id || "Other",
+      amount: p.amount,
+      count: p.count,
+      percentage: stats.totalExpense > 0 ? Math.round((p.amount / stats.totalExpense) * 100) : 0,
+    }));
+
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const dayOfWeekDistribution = (facet.byDayOfWeek || []).map((d: any) => ({
+      dayIndex: d._id,
+      day: dayNames[(d._id - 1) % 7] || "Day",
+      amount: d.amount,
+      count: d.count,
     }));
 
     const frequentlyPurchased = (facet.byItem || []).map((item: any) => ({
@@ -364,6 +415,14 @@ export async function getExpenseAnalytics(filters?: AnalyticsFilter) {
       categoryName: item.categoryName,
     }));
 
+    const topSpendingItems = [...(facet.byItem || [])]
+      .sort((a: any, b: any) => b.totalAmount - a.totalAmount)
+      .slice(0, 6)
+      .map((item: any) => ({
+        item: item._id,
+        totalAmount: item.totalAmount,
+      }));
+
     return {
       success: true,
       currency,
@@ -373,6 +432,10 @@ export async function getExpenseAnalytics(filters?: AnalyticsFilter) {
       averageExpense: stats.averageExpense || 0,
       transactionCount: stats.count || 0,
       categorySpending,
+      dailyTrends,
+      paymentMethods,
+      dayOfWeekDistribution,
+      topSpendingItems,
       frequentlyPurchased,
     };
   } catch (error: any) {

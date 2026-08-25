@@ -13,49 +13,54 @@ import {
 } from "recharts";
 import { formatCurrency, formatCompactCurrency } from "@/lib/utils";
 
-export interface TopItemData {
-  item: string;
-  totalAmount: number;
+export interface DayOfWeekData {
+  dayIndex: number;
+  day: string;
+  amount: number;
+  count: number;
 }
 
-export const TopItemsChart = React.memo(function TopItemsChart({
+export const DayOfWeekChart = React.memo(function DayOfWeekChart({
   data,
   currency = "USD",
 }: {
-  data: TopItemData[];
+  data: DayOfWeekData[];
   currency?: string;
 }) {
   if (!data || data.length === 0) {
     return (
       <div className="h-60 sm:h-72 flex items-center justify-center text-xs font-semibold text-ink-muted">
-        No item spend data available.
+        No weekly distribution records available.
       </div>
     );
   }
+
+  // Sort Monday through Sunday
+  const dayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const sortedData = [...data].sort((a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day));
+
+  const maxAmount = Math.max(...sortedData.map((d) => d.amount), 1);
 
   return (
     <div className="w-full h-60 sm:h-72">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          layout="vertical"
-          data={data}
-          margin={{ top: 10, right: 15, left: -10, bottom: 0 }}
+          data={sortedData}
+          margin={{ top: 10, right: 10, left: -6, bottom: 0 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="var(--hairline)" opacity={0.6} />
           <XAxis
-            type="number"
+            dataKey="day"
+            tick={{ fontSize: 10, fill: "var(--ink-muted)" }}
+            tickLine={false}
+            axisLine={{ stroke: "var(--hairline)" }}
+          />
+          <YAxis
+            width={48}
             tick={{ fontSize: 10, fill: "var(--ink-muted)" }}
             tickLine={false}
             axisLine={{ stroke: "var(--hairline)" }}
             tickFormatter={(v) => formatCompactCurrency(v, currency)}
-          />
-          <YAxis
-            type="category"
-            dataKey="item"
-            tick={{ fontSize: 10, fill: "var(--ink)" }}
-            tickLine={false}
-            axisLine={{ stroke: "var(--hairline)" }}
-            width={78}
           />
           <Tooltip
             wrapperStyle={{ zIndex: 50 }}
@@ -68,18 +73,19 @@ export const TopItemsChart = React.memo(function TopItemsChart({
               boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
               padding: "8px 12px",
             }}
-            formatter={(value: any) => [formatCurrency(Number(value) || 0, currency), "Total Spend"]}
+            formatter={(value: any, name: any, item: any) => [
+              `${formatCurrency(Number(value) || 0, currency)} (${item.payload?.count || 0} transactions)`,
+              "Spending",
+            ]}
           />
-          <Bar dataKey="totalAmount" radius={[0, 6, 6, 0]}>
-            {data.map((_, index) => {
-              // Descending opacity of expense color so rank #1 is brightest red and #2-#5 are subtle expense tones
-              const opacities = [1, 0.85, 0.7, 0.55, 0.4];
-              const opacity = opacities[index] || 0.4;
+          <Bar dataKey="amount" maxBarSize={38} radius={[6, 6, 0, 0]}>
+            {sortedData.map((entry, index) => {
+              const isPeak = entry.amount === maxAmount;
               return (
                 <Cell
-                  key={`bar-${index}`}
-                  fill="var(--expense)"
-                  fillOpacity={opacity}
+                  key={`day-cell-${index}`}
+                  fill={isPeak ? "var(--expense)" : "var(--primary)"}
+                  fillOpacity={isPeak ? 0.95 : 0.65}
                 />
               );
             })}
@@ -89,4 +95,3 @@ export const TopItemsChart = React.memo(function TopItemsChart({
     </div>
   );
 });
-

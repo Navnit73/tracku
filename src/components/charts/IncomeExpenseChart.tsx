@@ -11,7 +11,7 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatCompactCurrency } from "@/lib/utils";
 
 export interface IncomeExpenseData {
   date: string;
@@ -52,9 +52,9 @@ export const IncomeExpenseChart = React.memo(function IncomeExpenseChart({
   const investmentGradId = `investmentGrad-${uniqueId}`;
 
   return (
-    <div className="w-full h-64 sm:h-72 lg:h-80">
+    <div className="w-full h-60 sm:h-72 lg:h-80">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={formattedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+        <AreaChart data={formattedData} margin={{ top: 10, right: 10, left: -6, bottom: 0 }}>
           <defs>
             <linearGradient id={incomeGradId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="var(--income)" stopOpacity={0.35} />
@@ -72,17 +72,20 @@ export const IncomeExpenseChart = React.memo(function IncomeExpenseChart({
           <CartesianGrid strokeDasharray="3 3" stroke="var(--hairline)" opacity={0.6} />
           <XAxis
             dataKey="displayDate"
-            tick={{ fontSize: 11, fill: "var(--ink-muted)" }}
+            minTickGap={22}
+            tick={{ fontSize: 10, fill: "var(--ink-muted)" }}
             axisLine={{ stroke: "var(--hairline)" }}
             tickLine={false}
           />
           <YAxis
-            tick={{ fontSize: 11, fill: "var(--ink-muted)" }}
+            width={48}
+            tick={{ fontSize: 10, fill: "var(--ink-muted)" }}
             axisLine={{ stroke: "var(--hairline)" }}
             tickLine={false}
-            tickFormatter={(val) => formatCurrency(val, currency)}
+            tickFormatter={(val) => formatCompactCurrency(val, currency)}
           />
           <Tooltip
+            wrapperStyle={{ zIndex: 50 }}
             contentStyle={{
               backgroundColor: "var(--surface)",
               borderColor: "var(--hairline)",
@@ -90,11 +93,14 @@ export const IncomeExpenseChart = React.memo(function IncomeExpenseChart({
               fontSize: "12px",
               color: "var(--ink)",
               boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
-              padding: "10px 14px",
+              padding: "8px 12px",
             }}
             formatter={(value: any) => [formatCurrency(Number(value) || 0, currency), ""]}
           />
-          <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "12px" }} />
+          <Legend
+            wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }}
+            iconSize={8}
+          />
           <Area
             type="monotone"
             dataKey="income"

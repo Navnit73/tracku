@@ -58,6 +58,23 @@ export function formatCurrency(amount: number, currency: string = "USD"): string
   return formatter.format(Number(amount) || 0);
 }
 
+export function formatCompactCurrency(amount: number, currency: string = "USD"): string {
+  const sym = getCurrencySymbol(currency);
+  const val = Number(amount) || 0;
+  const absVal = Math.abs(val);
+
+  if (absVal >= 1_000_000_000) {
+    return `${sym}${(val / 1_000_000_000).toFixed(1)}B`;
+  }
+  if (absVal >= 1_000_000) {
+    return `${sym}${(val / 1_000_000).toFixed(1)}M`;
+  }
+  if (absVal >= 1_000) {
+    return `${sym}${(val / 1_000).toFixed(absVal >= 10_000 ? 0 : 1)}k`;
+  }
+  return `${sym}${Math.round(val)}`;
+}
+
 const defaultDateFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
   month: "short",

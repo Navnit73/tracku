@@ -46,3 +46,36 @@ export const LazyTopItemsChart = dynamic(
     loading: () => <ChartSkeleton />,
   }
 );
+
+export const LazyExpenseTrendChart = dynamic(
+  () =>
+    import("@/components/charts/ExpenseTrendChart").then(
+      (mod) => mod.ExpenseTrendChart
+    ),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton />,
+  }
+);
+
+export const LazyPaymentMethodChart = dynamic(
+  () =>
+    import("@/components/charts/PaymentMethodChart").then(
+      (mod) => mod.PaymentMethodChart
+    ),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton />,
+  }
+);
+
+export const LazyDayOfWeekChart = dynamic(
+  () =>
+    import("@/components/charts/DayOfWeekChart").then(
+      (mod) => mod.DayOfWeekChart
+    ),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton />,
+  }
+);

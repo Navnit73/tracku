@@ -13,22 +13,34 @@ import {
 } from "recharts";
 import { formatCurrency, formatCompactCurrency } from "@/lib/utils";
 
-export interface TopItemData {
-  item: string;
-  totalAmount: number;
+export interface PaymentMethodData {
+  method: string;
+  amount: number;
+  count: number;
+  percentage?: number;
 }
 
-export const TopItemsChart = React.memo(function TopItemsChart({
+const METHOD_COLORS = [
+  "var(--primary)",
+  "var(--expense)",
+  "var(--warning)",
+  "var(--investment)",
+  "#06B6D4", // Cyan
+  "#EC4899", // Pink
+  "#8B5CF6", // Purple
+];
+
+export const PaymentMethodChart = React.memo(function PaymentMethodChart({
   data,
   currency = "USD",
 }: {
-  data: TopItemData[];
+  data: PaymentMethodData[];
   currency?: string;
 }) {
   if (!data || data.length === 0) {
     return (
       <div className="h-60 sm:h-72 flex items-center justify-center text-xs font-semibold text-ink-muted">
-        No item spend data available.
+        No payment method records available.
       </div>
     );
   }
@@ -51,7 +63,7 @@ export const TopItemsChart = React.memo(function TopItemsChart({
           />
           <YAxis
             type="category"
-            dataKey="item"
+            dataKey="method"
             tick={{ fontSize: 10, fill: "var(--ink)" }}
             tickLine={false}
             axisLine={{ stroke: "var(--hairline)" }}
@@ -68,25 +80,22 @@ export const TopItemsChart = React.memo(function TopItemsChart({
               boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
               padding: "8px 12px",
             }}
-            formatter={(value: any) => [formatCurrency(Number(value) || 0, currency), "Total Spend"]}
+            formatter={(value: any, name: any, item: any) => [
+              `${formatCurrency(Number(value) || 0, currency)} (${item.payload?.percentage || 0}%)`,
+              "Volume",
+            ]}
           />
-          <Bar dataKey="totalAmount" radius={[0, 6, 6, 0]}>
-            {data.map((_, index) => {
-              // Descending opacity of expense color so rank #1 is brightest red and #2-#5 are subtle expense tones
-              const opacities = [1, 0.85, 0.7, 0.55, 0.4];
-              const opacity = opacities[index] || 0.4;
-              return (
-                <Cell
-                  key={`bar-${index}`}
-                  fill="var(--expense)"
-                  fillOpacity={opacity}
-                />
-              );
-            })}
+          <Bar dataKey="amount" radius={[0, 6, 6, 0]}>
+            {data.map((_, index) => (
+              <Cell
+                key={`pm-cell-${index}`}
+                fill={METHOD_COLORS[index % METHOD_COLORS.length]}
+                fillOpacity={0.85}
+              />
+            ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 });
-
